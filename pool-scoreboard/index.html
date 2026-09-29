@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="dark mode-cash">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0d0e0f">
   <title>Championship Pool Scoreboard · 21N2</title>
 
-  <!-- Typography: Newsreader (Editorial Serif), Inter (Clean UI), JetBrains Mono (Telemetry) -->
+  <!-- Typography: Newsreader, Inter, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
@@ -22,12 +22,18 @@
     <header class="masthead">
       <div class="masthead-left">
         <span class="table-badge">TABLE <strong id="tableIdText">#01</strong></span>
-        <nav class="nav-links">
-          <button class="nav-tab active" id="tabScoreboard" type="button">SCOREBOARD</button>
-          <button class="nav-tab" id="tabInningsLog" type="button">INNINGS LOG</button>
-          <button class="nav-tab" id="tabArchive" type="button">ARCHIVE</button>
-          <button class="nav-tab" id="tabRules" type="button">RULES</button>
-        </nav>
+        
+        <!-- DUAL-MODE TOGGLE SWITCH -->
+        <div class="mode-toggle-group">
+          <button class="mode-switch-btn active" id="btnModeCash" type="button" title="Switch to Cash Ring Game (Zero-Sum Betting)">
+            <span class="material-symbols-outlined">payments</span>
+            <span>CASH RING</span>
+          </button>
+          <button class="mode-switch-btn" id="btnModeTournament" type="button" title="Switch to WPA Tournament Frame (Race-to-X & Shot Clock)">
+            <span class="material-symbols-outlined">emoji_events</span>
+            <span>TOURNAMENT</span>
+          </button>
+        </div>
       </div>
 
       <div class="masthead-right">
@@ -56,18 +62,33 @@
       </div>
     </header>
 
+    <!-- ── 2. TOURNAMENT-ONLY: Inverted Black HUD Strip ── -->
+    <aside class="hud-ticker-band tournament-only" id="hudTickerBand">
+      <div class="hud-ticker-inner">
+        <div class="hud-ticker-left">
+          <span class="hud-pill"><span class="hud-dot"></span> HUD ACTIVE</span>
+          <span class="hud-title" id="hudMatchTitle">TABLE #01 · 9-BALL CHAMPIONSHIP FRAME</span>
+        </div>
+        <div class="hud-ticker-right">
+          <span class="hud-stat" id="hudLeadStat">LEAD: <strong>EVEN</strong></span>
+          <span class="hud-divider">|</span>
+          <span class="hud-stat" id="hudDeltaStat">DELTA: <strong>$0.00 NET (BALANCED)</strong></span>
+        </div>
+      </div>
+    </aside>
+
     <!-- ── Main Viewport Content ── -->
     <main class="main-content">
 
-      <!-- ── 2. Telemetry Dual Widgets ── -->
-      <section class="telemetry-grid">
+      <!-- ── 3A. TOURNAMENT-ONLY: Dual Precision Telemetry Widgets ── -->
+      <section class="telemetry-grid tournament-only">
 
         <!-- Widget A: Shot Clock Precision Readout -->
         <article class="telemetry-card clock-readout-card">
           <div class="card-head">
             <div class="card-title">
               <span class="material-symbols-outlined icon-accent">timer</span>
-              <span class="card-title-text">SHOT CLOCK</span>
+              <span class="card-title-text">SHOT CLOCK PRECISION READOUT</span>
             </div>
             <div class="mode-chips">
               <button class="clock-mode-btn" data-sec="30" type="button">30S</button>
@@ -106,12 +127,12 @@
           </div>
         </article>
 
-        <!-- Widget B: Stakes Ledger & Match Race -->
+        <!-- Widget B: Tournament Stakes & Match Race -->
         <article class="telemetry-card stakes-protocol-card">
           <div class="card-head">
             <div class="card-title">
               <span class="material-symbols-outlined icon-accent">payments</span>
-              <span class="card-title-text">STAKES &amp; MATCH RACE</span>
+              <span class="card-title-text">STAKES LEDGER &amp; PROTOCOL</span>
             </div>
             <span class="header-badge" id="racePillTag">RACE 15</span>
           </div>
@@ -138,17 +159,42 @@
               <code>Q/W: P1 ±</code>
               <code>O/P: P2 ±</code>
             </div>
-            <span class="shortcut-hint">Tap any box to configure</span>
+            <span class="shortcut-hint">Tap box to edit</span>
           </div>
         </article>
 
       </section>
 
-      <!-- ── 3. Zero-Sum Balance Status Bar ── -->
-      <section class="match-balance-bar" id="balanceStatusBar">
+      <!-- ── 3B. CASH-ONLY: Compact Money & Compact Clock Bar ── -->
+      <section class="cash-telemetry-bar cash-only">
+        <div class="cash-telemetry-left">
+          <button class="cash-rate-chip" id="btnCashRateChip" type="button" title="Configure stake rate">
+            <span class="material-symbols-outlined" style="font-size: 15px;">payments</span>
+            <span>STAKE: <strong id="cashStakeLabel">$1.00 / PT</strong></span>
+          </button>
+          <button class="cash-payout-btn" id="btnOpenSettlements" type="button" title="Open Cash Settlement Transfers">
+            <span class="material-symbols-outlined" style="font-size: 15px;">receipt_long</span>
+            <span>WHO PAYS WHOM</span>
+          </button>
+        </div>
+
+        <!-- Optional Compact Shot Clock in Cash Mode -->
+        <div class="cash-compact-clock">
+          <span class="material-symbols-outlined" style="font-size: 16px;">timer</span>
+          <span class="compact-clock-digits" id="compactClockDigits">45s</span>
+          <button class="compact-clock-btn" id="btnCompactClockToggle" type="button">START</button>
+          <button class="compact-clock-btn" id="btnCompactClockExt" type="button">+30s</button>
+          <button class="compact-clock-btn icon-only" id="btnCompactClockReset" type="button" title="Reset Clock">
+            <span class="material-symbols-outlined" style="font-size: 14px;">refresh</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ── 4. CASH-ONLY: Mathematically Bulletproof Zero-Sum Balance Bar ── -->
+      <section class="match-balance-bar cash-only" id="balanceStatusBar">
         <div class="balance-left">
           <span class="balance-dot" id="balanceDot"></span>
-          <span class="balance-title" id="balanceStatusText">MATCH ZERO-SUM BALANCED</span>
+          <span class="balance-title" id="balanceStatusText">ZERO-SUM BALANCED (0)</span>
         </div>
         <div class="balance-right">
           <span class="balance-tag">DISCREPANCY:</span>
@@ -156,12 +202,21 @@
         </div>
       </section>
 
-      <!-- ── 4. Dynamic Player Roster Array (2 to 4 Players) ── -->
-      <section class="players-array-grid" id="playersArrayContainer">
-        <!-- Rendered dynamically by script.js with .hotcell slight highlighted effect -->
+      <!-- ── 5. TOURNAMENT-ONLY: Race Header ── -->
+      <section class="tournament-race-header tournament-only">
+        <div class="race-header-title">
+          <span class="material-symbols-outlined">sports_score</span>
+          <span>CHAMPIONSHIP SCORE ARRAY</span>
+        </div>
+        <span class="race-target-label" id="tourneyRaceBadge">TARGET: RACE TO 15</span>
       </section>
 
-      <!-- ── 5. Tactical Control Actions Row ── -->
+      <!-- ── 6. Dynamic Player Roster Array (2 to 4 Players) ── -->
+      <section class="players-array-grid" id="playersArrayContainer">
+        <!-- Rendered dynamically by script.js with mode-specific card layout -->
+      </section>
+
+      <!-- ── 7. Tactical Control Actions Row ── -->
       <section class="tactical-actions-strip">
         <div class="tactical-left">
           <button class="tactical-btn" id="btnAddPlayer" type="button">
@@ -187,15 +242,15 @@
             <div class="hold-progress-bar" id="holdResetProgressBar"></div>
           </div>
 
-          <button class="tactical-btn inverted" id="btnToggleRackLog" type="button">
+          <button class="tactical-btn inverted tournament-only" id="btnToggleRackLog" type="button">
             <span class="material-symbols-outlined">menu_book</span>
             <span>RACK LOG</span>
           </button>
         </div>
       </section>
 
-      <!-- ── 6. Rack History Ledger (180s Focus / Blur) ── -->
-      <section class="rack-log-drawer" id="rackLogDrawer">
+      <!-- ── 8. TOURNAMENT-ONLY: Chronological Rack History Drawer ── -->
+      <section class="rack-log-drawer tournament-only" id="rackLogDrawer">
         <div class="drawer-header">
           <div class="drawer-title">
             <span class="material-symbols-outlined">history_edu</span>
@@ -220,13 +275,13 @@
 
   </div>
 
-  <!-- ══════════ STAKES & TARGET MODAL ══════════ -->
+  <!-- ══════════ CASH SETTLEMENTS & CONFIG MODAL ══════════ -->
   <div class="modal-backdrop" id="stakesModal">
     <div class="modal-window">
       <div class="modal-head">
         <div class="modal-title-row">
           <span class="material-symbols-outlined">payments</span>
-          <h2>STAKES, POT &amp; TARGET CONFIGURATION</h2>
+          <h2 id="modalTitleText">STAKES &amp; CASH SETTLEMENTS</h2>
         </div>
         <button class="btn-modal-close" id="btnCloseStakesModal" type="button">
           <span class="material-symbols-outlined">close</span>
@@ -254,7 +309,7 @@
           </div>
         </div>
 
-        <div class="config-section">
+        <div class="config-section tournament-only">
           <label class="config-label" for="raceInputTarget">TARGET MATCH RACE (FIRST TO X)</label>
           <div class="stepper-row">
             <button class="btn-step" id="btnRaceMinus" type="button">−1</button>
@@ -274,7 +329,7 @@
         </div>
 
         <div class="settlement-breakdown-box">
-          <div class="breakdown-header">PAIRWISE FINANCIAL SETTLEMENT</div>
+          <div class="breakdown-header">WHO PAYS WHOM (DIRECT CASH TRANSFERS)</div>
           <div class="settlement-roster-list" id="modalSettlementRoster"></div>
           <div class="transfers-ledger-list" id="modalTransfersLedger"></div>
         </div>
@@ -345,12 +400,11 @@
         </div>
 
         <div class="system-specs-summary">
-          <span class="meta-tag">CORE PROTOCOL HIGHLIGHTS</span>
+          <span class="meta-tag">DUAL-MODE ARCHITECTURE</span>
           <ul>
-            <li><strong>Zero-Sum Point Engine:</strong> True zero-sum scoring where scores balance to 0, with subtle hotcell highlight on imbalance.</li>
+            <li><strong>💰 Cash Ring Game Mode:</strong> Zero-sum betting logic where scores balance to 0, negative points permitted, live discrepancy tracker, subtle hotcell highlight.</li>
+            <li><strong>🏆 Tournament Mode:</strong> WPA official race-to-X frames (0 to Target Race), 30s/45s/60s shot clock, inning stats, and chronological audit log.</li>
             <li><strong>Keep Screen Awake:</strong> Automatically active via Screen Wake Lock API.</li>
-            <li><strong>Audio &amp; Haptics:</strong> Web Audio API physical billiard ball strike synthesis + native mobile haptic pulses.</li>
-            <li><strong>Offline Progressive:</strong> Zero servers, zero bundler dependencies, pure web standards.</li>
           </ul>
         </div>
       </div>

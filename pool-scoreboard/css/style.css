@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   CHAMPIONSHIP POOL SCOREBOARD · EDITORIAL MONOCHROME PROTOCOL
-   Responsive Flex Layout · 0px Radius · Subtle Hotcell Contrast
+   CHAMPIONSHIP POOL SCOREBOARD · DUAL-MODE PROTOCOL
+   Mode 1: Cash Ring Game (Zero-Sum Betting & Pairwise Settlements)
+   Mode 2: Tournament Frame (WPA Broadcast Race-to-X & Shot Clock)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
@@ -8,14 +9,18 @@
   --bg-surface: #ffffff;
   --bg-inset: #f3f3f5;
   --bg-elevated: #eeeeee;
+  --bg-dark-strip: #0d0e0f;
 
   --text-primary: #111111;
   --text-secondary: #666668;
   --text-muted: #8e8e93;
+  --text-inverted: #ffffff;
+  --text-inverted-muted: #8a8d91;
 
   --border-hairline: #e2e2e5;
   --border-medium: #c4c7c7;
   --border-bold: #111111;
+  --border-dark: #282a2e;
 
   --accent-red: #ba1a1a;
   --accent-green: #16a34a;
@@ -31,14 +36,18 @@ html.dark {
   --bg-surface: #111214;
   --bg-inset: #18191c;
   --bg-elevated: #212226;
+  --bg-dark-strip: #000000;
 
   --text-primary: #f2f2f5;
   --text-secondary: #9aa0a6;
   --text-muted: #6e7378;
+  --text-inverted: #0d0e0f;
+  --text-inverted-muted: #494c50;
 
   --border-hairline: #24262a;
   --border-medium: #383b40;
   --border-bold: #f2f2f5;
+  --border-dark: #1b1d20;
 
   --accent-red: #ff5252;
   --accent-green: #22c55e;
@@ -88,6 +97,15 @@ a {
   vertical-align: middle;
 }
 
+/* ── Mode Visibility Rules ── */
+html.mode-cash .tournament-only {
+  display: none !important;
+}
+
+html.mode-tournament .cash-only {
+  display: none !important;
+}
+
 /* ══════════ MASTER APP SHELL ══════════ */
 .master-shell {
   width: 100%;
@@ -111,7 +129,7 @@ a {
 .masthead-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -134,42 +152,39 @@ a {
   font-weight: 700;
 }
 
-.nav-links {
+/* Mode Switcher Group */
+.mode-toggle-group {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  border: 1px solid var(--border-medium);
+  background: var(--bg-inset);
 }
 
-.nav-tab {
+.mode-switch-btn {
+  height: 30px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   letter-spacing: 0.06em;
   color: var(--text-secondary);
   cursor: pointer;
-  padding: 6px 0;
-  white-space: nowrap;
-  position: relative;
-  transition: color 120ms;
+  transition: all 100ms;
 }
 
-.nav-tab:hover {
+.mode-switch-btn .material-symbols-outlined {
+  font-size: 14px;
+}
+
+.mode-switch-btn:hover {
   color: var(--text-primary);
 }
 
-.nav-tab.active {
-  color: var(--text-primary);
-  font-weight: 700;
-}
-
-.nav-tab.active::after {
-  content: "";
-  position: absolute;
-  bottom: -16px;
-  left: 0;
-  right: 0;
-  height: 2px;
+.mode-switch-btn.active {
   background: var(--text-primary);
+  color: var(--bg-surface);
 }
 
 .masthead-right {
@@ -234,19 +249,94 @@ a {
   margin-left: 6px;
 }
 
+/* ── 2. Tournament Inverted Black HUD Strip ── */
+.hud-ticker-band {
+  background: var(--bg-dark-strip);
+  color: var(--text-inverted);
+  border-bottom: 1px solid var(--border-dark);
+  padding: 8px 16px;
+}
+
+.hud-ticker-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hud-ticker-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hud-pill {
+  background: #ffffff;
+  color: #000000;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hud-dot {
+  width: 6px;
+  height: 6px;
+  background: #ff3333;
+  display: inline-block;
+  animation: pulseDot 1.4s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.hud-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-inverted-muted);
+}
+
+.hud-ticker-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--text-inverted-muted);
+}
+
+.hud-stat strong {
+  color: var(--text-inverted);
+}
+
+.hud-divider {
+  opacity: 0.4;
+}
+
 /* ── Main Viewport Content ── */
 .main-content {
   flex: 1;
   max-width: 1280px;
   width: 100%;
   margin: 0 auto;
-  padding: 16px 16px 32px 16px;
+  padding: 14px 16px 28px 16px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
-/* ── 2. Telemetry Dual Widgets ── */
+/* ── 3A. TOURNAMENT: Dual Precision Telemetry Widgets ── */
 .telemetry-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -567,7 +657,106 @@ a {
   letter-spacing: 0.04em;
 }
 
-/* ── 3. Zero-Sum Balance Status Bar ── */
+/* ── 3B. CASH MODE: Compact Telemetry Bar ── */
+.cash-telemetry-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+}
+
+.cash-telemetry-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cash-rate-chip {
+  height: 32px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 100ms;
+}
+
+.cash-rate-chip:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-medium);
+}
+
+.cash-payout-btn {
+  height: 32px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--text-primary);
+  color: var(--bg-surface);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.cash-payout-btn:hover {
+  opacity: 0.9;
+}
+
+.cash-compact-clock {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.compact-clock-digits {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  min-width: 32px;
+}
+
+.compact-clock-btn {
+  height: 24px;
+  padding: 0 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.compact-clock-btn:hover {
+  background: var(--bg-elevated);
+}
+
+.compact-clock-btn.icon-only {
+  width: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── 4. CASH MODE: Bulletproof Zero-Sum Balance Bar ── */
 .match-balance-bar {
   display: flex;
   align-items: center;
@@ -605,11 +794,6 @@ a {
   animation: pulseDot 1.4s infinite;
 }
 
-@keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
-}
-
 .balance-title {
   font-weight: 700;
   color: var(--text-primary);
@@ -632,11 +816,37 @@ a {
   color: var(--text-primary);
 }
 
-/* ── 4. Dynamic Player Roster Array ── */
+/* ── 5. Tournament Race Header ── */
+.tournament-race-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.race-header-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.race-target-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── 6. Dynamic Player Roster Array ── */
 .players-array-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 14px;
+  gap: 12px;
 }
 
 @media(min-width: 640px) {
@@ -671,7 +881,7 @@ a {
   border-color: var(--border-bold);
 }
 
-/* ── HOTCELL SLIGHT HIGHLIGHTED CONTRAST ── */
+/* ── HOTCELL SLIGHT HIGHLIGHTED CONTRAST (Cash Mode Imbalance) ── */
 .player-championship-card.hotcell {
   border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
   background-color: #1a1b1f !important;
@@ -735,6 +945,13 @@ html:not(.dark) .player-championship-card.hotcell {
 
 .player-name-field:focus {
   border-bottom-color: var(--text-primary);
+}
+
+.player-sub-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
 }
 
 /* Score Row: Flex with safe min-width and auto-clamping digits */
@@ -842,7 +1059,14 @@ html:not(.dark) .player-championship-card.hotcell {
 .stat-val-bold.win { color: var(--text-primary); }
 .stat-val-bold.loss { color: var(--text-secondary); }
 
-/* ── 5. Tactical Control Actions Row ── */
+.stat-val-pct {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── 7. Tactical Control Actions Row ── */
 .tactical-actions-strip {
   display: flex;
   align-items: center;
@@ -923,7 +1147,7 @@ html:not(.dark) .player-championship-card.hotcell {
   transition: width 40ms linear;
 }
 
-/* ── 6. Rack History Drawer ── */
+/* ── 8. Tournament Rack History Drawer ── */
 .rack-log-drawer {
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);

@@ -88,7 +88,8 @@ You can access developer and system information directly inside the web app by t
 
 ## 📚 Technical Documentation & Engineering Lifecycle
 
-- 📖 **[Building, Testing & Improving Process Document](BUILDING_TESTING_IMPROVING.md):** Comprehensive engineering lifecycle breakdown covering architecture, testing verification, and iterative problem solving.
+- 💼 **[Portfolio Case Study: Problem · Solution · Outcome (PORTFOLIO_CASE_STUDY.md)](PORTFOLIO_CASE_STUDY.md):** Engineering case studies formatted for your portfolio, resume bullet points, and interview STAR cheat sheet.
+- 📖 **[Building, Testing & Improving Process Document](BUILDING_TESTING_IMPROVING.md):** Detailed problem-solution-outcome breakdown and technical post-mortem.
 - 📐 **[Functionality Specification (SPEC.md)](pool-scoreboard/SPEC.md):** Complete source-of-truth functional contract for the Championship Edition.
 - 🎨 **[Monochrome Editorial Design System (DESIGN.md)](pool-scoreboard/reference/DESIGN.md):** Structural design specifications, typography, color tokens, and layout guidelines.
 

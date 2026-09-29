@@ -1,155 +1,97 @@
 # Pool Scoreboard — Functionality Specification
 
-> **Source of Truth (v2.5.0 WPA Championship Edition)**
-> This document defines every feature, behavior, and constraint of the Pool Scoreboard web application. All architectural design strictly adheres to the editorial telemetry HUD layout (`media_1790689465780.png`).
+> **Source of Truth (v3.0.0 Dual-Mode Edition)**
+> This document defines every feature, behavior, and constraint of the Pool Scoreboard web application.
+> It introduces a dual-mode engine allowing players to toggle instantly between:
+> 1. **Cash Ring Game Mode** (Original "Dưa Hết Tiền Đây" zero-sum betting).
+> 2. **Tournament Frame Mode** (WPA Championship race-to-X rules with precision shot clock).
 
 ---
 
-## 1. Ergonomics & Display Protocols
+## 1. Dual-Mode Architecture
 
-### 1.1 Keep Screen Awake (Screen Wake Lock)
-- **Active by default (no toggle needed).**
-- Automatically acquires `navigator.wakeLock.request('screen')` on page load.
-- Re-acquires the lock automatically on `visibilitychange` when returning to the tab so the screen never dims or locks while resting on the pool table rail.
-
-### 1.2 Fullscreen Mode
-- Top masthead button with fullscreen icon (`fullscreen` / `fullscreen_exit`).
-- Toggles between native fullscreen viewport and browser chrome on mobile and desktop devices.
+### 1.1 The Mode Switcher
+- Located directly in the top masthead next to the table identifier.
+- Two interactive pill toggles:
+  - `💰 CASH RING` (Default)
+  - `🏆 TOURNAMENT`
+- Toggling modes dynamically swaps the viewports, rule engines, and telemetry displays while preserving player names and core preferences.
 
 ---
 
-## 2. Player Roster Management (2 to 4 Players)
+## 2. Mode 1: Cash Ring Game ("Dưa Hết Tiền Đây")
 
-### 2.1 Default State
-- App launches with **2 players** (e.g. "Johnny Archer" as active breaker, "Shane Van Boening").
-- Each player has: unique ID, editable name, score (CURRENT FRAMES), breaker flag, and telemetry stats.
+### 2.1 Zero-Sum Scoring Engine
+- Designed for cash betting and ring games where every point won offsets a point lost.
+- Negative scores are fully supported (e.g. `Johnny Archer: +20`, `Francisco Bustamante: -11`, `Efren Reyes: +13`, `Earl Strickland: -12`).
+- Score formatting: Negative scores display naturally as `-1`, `-3`, `-11` without zero-padding; positive scores display as `00`, `08`, `20`.
 
-### 2.2 Add Player
-- Button: **ADD PLAYER (N/4)**.
-- Adds a player to the match array.
-- **Hard cap: 4 players maximum.** If the user tries to add a 5th, the button flashes red and displays a toast ("Maximum 4 players allowed").
+### 2.2 Mathematically Bulletproof Zero-Sum Balance Bar
+- Evaluates the true mathematical sum across all players:
+  $$\text{Discrepancy} = \sum_{i=1}^{N} \text{Score}_i$$
+- **Balanced State ($\text{Discrepancy} = 0$):**
+  - Dot: Solid green (`#22c55e`).
+  - Text: `ZERO-SUM BALANCED (0)`
+  - Number: `BALANCED`
+  - Hotcell: **OFF** (cards remain in crisp surface dark theme).
+- **Unbalanced State ($\text{Discrepancy} \neq 0$):**
+  - Dot: Pulsing amber alert (`#f59e0b`).
+  - Text: `TABLE UNBALANCED (+10 DISCREPANCY)`
+  - Number: `+10` (or negative offset).
+  - Hotcell: **ON** (all player cards illuminate with a subtle `rgba(255, 255, 255, 0.45)` border and `#1a1b1f` elevation).
 
-### 2.3 Remove Player
-- Button: **REMOVE**.
-- Removes the **last** player from the array.
-- **Hard floor: 1 player minimum.** If only 1 player remains, the button flashes red and displays a toast ("Minimum 1 player required").
+### 2.3 Pairwise Settlement & Cash Transfers
+- Each player's net earnings = $\text{Score} \times \text{Stake Rate}$.
+- "WHO PAYS WHOM" button in the cash bar opens a direct debtor-to-creditor transfer ledger minimizing cash transactions (e.g. *Francisco pays Johnny $11.00*).
 
-### 2.4 Custom Name Editing
-- Inline text field using large Newsreader serif typography.
-- Click to edit directly. Pressing **Enter** commits the name and blurs the field.
-
-### 2.5 Breaker Status & Swap
-- Tapping the `❖ ACTIVE BREAKER` / `INNING WAITING` badge sets that player as the active breaker and demotes others.
-- Dedicated tactical button **SWAP SEAT / BREAK** passes the break sequentially to the next player.
-
----
-
-## 3. Scoring System
-
-### 3.1 Increment / Decrement
-- Giant square touch controls: **`−`** (left) and **`+`** (right) surrounding the massive score numeral.
-- Scores cannot go below 0 (triggers an alert vibration and toast).
-- Target race milestone alert triggers when a player reaches the configured target (e.g. Race to 15).
-
-### 3.2 Visual Feedback & Pop Animation
-- Massive Newsreader serif numerals readable from up to 40 feet.
-- Scale-pop animation on tap (scales up to 1.12x in 140ms).
-
-### 3.3 Match Leader Identification
-- The match leader receives a distinctive bold outline (`is-leader` class).
-- Inverted black HUD ticker displays the active lead: `LEAD: J. ARCHER (+4)`.
+### 2.4 Compact Shot Clock
+- Sleek 1-row horizontal pill in the cash bar (`45s [START] [+30s] [↻]`). Provides shot clock capability without consuming 50% of the screen.
 
 ---
 
-## 4. Zero-Sum / Balance Checker ("Hotcell" Indicator)
+## 3. Mode 2: Tournament Frame (WPA Championship)
 
-### 4.1 Original Zero-Sum Game Logic
-- Built for pool betting matches where one player's win offsets another player's loss.
-- Negative numbers are permitted (e.g. winning player is `+3`, losing player is `-3`).
-- Tracks running total balance (`totalSum`).
-- Points discrepancy is displayed in `#totalSum`:
-  - When scores sum to zero, `#totalSum` is empty (`""`).
-  - When scores do not sum to zero, `#totalSum` displays the outstanding discrepancy (`-1 * totalSum`).
+### 3.1 Race-to-X Rules
+- Scores represent frames won and are strictly non-negative ($0$ to $\text{Race Target}$). Decrementing below 0 is rejected.
+- Selectable targets: Race to 7, 9, 11, 15, 21.
+- Milestone Alert: Reaching the target race triggers a championship toast and halts the shot clock.
 
-### 4.2 Subtle Hotcell Highlight (No Red Alerts)
-- When points do not add up to zero:
-  - All player score cards activate the subtle `.hotcell` state with a highlighted border (`rgba(255, 255, 255, 0.4)`) and background shift (`rgb(48, 45, 45)` in dark mode, `#e2e2e4` in light mode).
-  - Clean and non-intrusive: no screaming red alert banners.
-- As soon as player scores balance back to zero, `.hotcell` turns off and the discrepancy number clears automatically.
+### 3.2 Precision Shot Clock Hero
+- Full-sized tournament countdown card:
+  - Modes: 30S, 45S, 60S chips.
+  - Large Newsreader serif digits with `SEC REMAINING` and live status chips (`STANDBY`, `RUNNING`, `TIME FOUL`).
+  - Smooth 1px progress line bar.
+  - `+30S EXT` extension button (tracks $1/1$ extensions).
+  - Tournament audio beeps at 10s and 5s–1s, foul buzzer at 0s.
 
----
+### 3.3 Inverted Black Telemetry Strip
+- Broadcast TV HUD band displaying table ID, frame status, active lead (`LEAD: J. ARCHER (+4)`), and delta.
 
-## 5. Pro Shot Clock & Timer
-
-### 5.1 Modes & Readout
-- Modes: **30S**, **45S**, and **60S** switchable chips.
-- Giant countdown display with `SEC REMAINING` and status tags (`STANDBY`, `RUNNING`, `TIME FOUL`).
-- Smooth 1px progress line bar.
-
-### 5.2 Controls
-- **START CLOCK / PAUSE CLOCK**: High-contrast primary button with play/pause icons.
-- **+30S EXT**: Grants a 30-second extension, tracking remaining extensions (`EXTENSIONS: 1 / 1 LEFT`).
-- **Quick Reset (↻)**: Resets the shot clock immediately to current mode duration.
-
-### 5.3 Tournament Audio & Haptics
-- At **10 seconds**: Warning click tone (660 Hz).
-- At **5s, 4s, 3s, 2s, 1s**: Critical countdown beeps (880 Hz) + mobile haptic vibration.
-- At **0 seconds**: Loud foul alarm buzzer (220 Hz) + haptic burst + "TIME FOUL" banner.
+### 3.4 Chronological Rack Ledger
+- Expandable audit drawer logging rack winners with timestamps and 180s focus-blur protection.
 
 ---
 
-## 6. Stakes Ledger, Pot & Target Frame
+## 4. Player Roster Management (2 to 4 Players)
 
-### 6.1 Triad Telemetry Cards
-- **PER RACK VALUE**: Configurable rate per point/rack (e.g. `$1.00 / PT`). Tap to open config modal.
-- **CURRENT POT / SPREAD**: Total pot accumulation based on total frames and rate.
-- **TARGET FRAME**: Match goal (e.g. `RACE 15`). Tap to switch target race (Race 7, 9, 11, 15, 21).
-
-### 6.2 Pairwise Financial Settlement
-- Multi-player pool calculation: each player's net earnings is the sum of rack differences against every other player multiplied by the stake rate.
-- Displays live net cash on each player card (`FINANCIAL NET: +$4.00` or `-$4.00`).
-- Minimum transfer ledger in modal outputs exact directional payments (e.g., *Shane Van Boening pays Johnny Archer: $4.00*).
+- Starts with 2 players by default.
+- `+ ADD PLAYER (N/4)` adds up to 4 players (flashes red at cap).
+- `− REMOVE` removes down to 1 player (flashes red at floor).
+- Names are editable inline; pressing **Enter** commits.
+- Breaker toggle allows one active breaker at a time; `SWAP SEAT / BREAK` advances the break sequentially.
 
 ---
 
-## 7. Keyboard Shortcuts
+## 5. Universal Ergonomics & Device Support
 
-| Key | Action |
-|:---|:---|
-| `Space` | Start / Pause Shot Clock |
-| `Q` / `W` | Player 1: Decrement / Increment |
-| `O` / `P` | Player 2: Decrement / Increment |
-| `E` | +30s Shot Clock Extension |
-| `R` | Reset Shot Clock |
-| `Ctrl+Z` / `Cmd+Z` | Undo Last Score |
-
----
-
-## 8. Undo / Redo & Rack History (180s Focus Mode)
-
-### 8.1 In-Memory Action Stack
-- Full undo and redo capabilities for point corrections without manual math.
-- Synchronized with rack history entries.
-
-### 8.2 Chronological Rack Ledger
-- Records every winning rack with timestamps: `R-21 · Johnny Archer · +1 · 19:48`.
-- **180s Focus Blur**: After 180 seconds of inactivity, the ledger applies a subtle blur (`filter: blur(4px); opacity: 0.25`) to keep player focus on the table.
-- Tapping anywhere or registering a new rack immediately wakes the ledger to razor-sharp clarity.
-
----
-
-## 9. Safety Hold-to-Reset & Quick Reset
-
-- **HOLD 2S RESET**: Requires a 2-second continuous hold with a red progress fill animation to prevent accidental match wipes.
-- **QUICK RESET**: Masthead button with confirmation dialog for rapid table turnover.
-
----
-
-## 10. Design Architecture & Typography
-
-- **Reference Design Alignment:** Direct reproduction of `media_1790689465780.png`.
-- **Monochrome Editorial Palette:** Strict contrast, flat elevation, razor-sharp 0px borders.
-- **Typography:**
-  - `Newsreader`: Editorial headlines, player names, and massive score digits.
-  - `Inter`: UI labels, telemetry descriptions.
-  - `JetBrains Mono`: Masthead badges, clock hero, and financial metrics.
+- **Screen Wake Lock:** Active by default on all modern devices via `navigator.wakeLock`. Automatically re-acquired on tab focus.
+- **Fullscreen API:** One-tap toggle in the masthead.
+- **Web Audio API:** Synthetic resin ball strike clicks on every score change.
+- **Keyboard Shortcuts:**
+  - `Space`: Start / Pause Shot Clock
+  - `Q` / `W`: Player 1 Decrement / Increment
+  - `O` / `P`: Player 2 Decrement / Increment
+  - `E`: Claim +30s Extension
+  - `R`: Reset Shot Clock
+  - `Ctrl+Z`: Undo Last Action
+- **Offline Progressive:** Zero build tools, 100% client-side HTML/CSS/JS deployed directly to GitHub Pages.

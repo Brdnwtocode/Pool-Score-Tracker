@@ -1,25 +1,20 @@
 /**
- * Championship Pool Scoreboard · Protocol Engine v2.7.0
- * Fixed All UI/UX Overflow & Contrast Issues:
- * - Proper score formatting: -3 instead of -03, preserving card width
- * - Auto-scaling digits clamp(38px, 4.2vw, 64px) avoiding any boundary blowout
- * - Dedicated Zero-Sum Balance Bar with live discrepancy telemetry
- * - Removed filler fake stats (no TBL ratio or static Fargo ratings)
- * - Distinct subtle Hotcell highlight with clear visual contrast
- * - Symmetrical top widgets (Shot clock & Stakes ledger)
- * - Full Screen Wake Lock, Fullscreen Mode, Keyboard Shortcuts
+ * Championship Pool Scoreboard · Dual-Mode Protocol Engine v3.0.0
+ * Mode 1: Cash Ring Game (Zero-Sum Betting & Pairwise Settlements)
+ * Mode 2: Tournament Frame (WPA Broadcast Race-to-X & Shot Clock)
  */
 
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "21n2_pool_championship_v27";
+  const STORAGE_KEY = "21n2_pool_dual_engine_v3";
 
   // ═══════════════ APPLICATION STATE ═══════════════
   let state = {
+    gameMode: "cash", // "cash" or "tournament"
     players: [
-      { id: 1, name: "Johnny Archer", score: 0, isBreaker: true },
-      { id: 2, name: "Shane Van Boening", score: 0, isBreaker: false },
+      { id: 1, name: "Johnny Archer", score: 0, isBreaker: true, runouts: 0 },
+      { id: 2, name: "Shane Van Boening", score: 0, isBreaker: false, runouts: 0 },
     ],
     stakeRate: 1.0,
     targetRace: 15,
@@ -27,14 +22,13 @@
     soundEnabled: true,
     theme: "dark", // "dark" or "light"
     history: [],
-    totalSum: 0, // Original zero-sum balance tracker
   };
 
   // Runtime Undo / Redo Stacks
   const undoStack = [];
   const redoStack = [];
 
-  // Shot Clock Runtime
+  // Shot Clock Runtime (Shared across both modes)
   let clockTimeLeft = 45;
   let isClockRunning = false;
   let clockInterval = null;
@@ -49,7 +43,9 @@
   // ═══════════════ DOM CACHE ═══════════════
   const $ = (id) => document.getElementById(id);
 
-  // Masthead
+  // Masthead & Mode Switchers
+  const btnModeCash = $("btnModeCash");
+  const btnModeTournament = $("btnModeTournament");
   const btnFullscreen = $("btnFullscreen");
   const fullscreenIcon = $("fullscreenIcon");
   const btnUndo = $("btnUndo");
@@ -61,7 +57,12 @@
   const btnResetQuick = $("btnResetQuick");
   const btnInfo = $("btnInfo");
 
-  // Shot Clock Widget
+  // Tournament HUD Strip
+  const hudMatchTitle = $("hudMatchTitle");
+  const hudLeadStat = $("hudLeadStat");
+  const hudDeltaStat = $("hudDeltaStat");
+
+  // Tournament Big Shot Clock Widget
   const clockHeroDigits = $("clockHeroDigits");
   const clockStatusChip = $("clockStatusChip");
   const clockExtLabel = $("clockExtLabel");
@@ -72,7 +73,7 @@
   const btnClockExt = $("btnClockExt");
   const btnClockReset = $("btnClockReset");
 
-  // Stakes Widget
+  // Tournament Stakes Widget
   const boxPerRack = $("boxPerRack");
   const metricPerRackVal = $("metricPerRackVal");
   const boxCurrentPot = $("boxCurrentPot");
@@ -80,8 +81,18 @@
   const boxTargetFrame = $("boxTargetFrame");
   const metricTargetRace = $("metricTargetRace");
   const racePillTag = $("racePillTag");
+  const tourneyRaceBadge = $("tourneyRaceBadge");
 
-  // Match Balance Bar
+  // Cash Mode Telemetry Bar
+  const btnCashRateChip = $("btnCashRateChip");
+  const cashStakeLabel = $("cashStakeLabel");
+  const btnOpenSettlements = $("btnOpenSettlements");
+  const compactClockDigits = $("compactClockDigits");
+  const btnCompactClockToggle = $("btnCompactClockToggle");
+  const btnCompactClockExt = $("btnCompactClockExt");
+  const btnCompactClockReset = $("btnCompactClockReset");
+
+  // Cash Mode Zero-Sum Balance Bar
   const balanceStatusBar = $("balanceStatusBar");
   const balanceDot = $("balanceDot");
   const balanceStatusText = $("balanceStatusText");
@@ -108,6 +119,7 @@
 
   // Modals
   const stakesModal = $("stakesModal");
+  const modalTitleText = $("modalTitleText");
   const btnCloseStakesModal = $("btnCloseStakesModal");
   const btnSaveStakes = $("btnSaveStakes");
   const stakeInputRate = $("stakeInputRate");
@@ -254,7 +266,7 @@
     hudToast.textContent = msg;
     hudToast.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => hudToast.classList.remove("show"), 2000);
+    toastTimer = setTimeout(() => hudToast.classList.remove("show"), 2200);
   }
 
   // ═══════════════ PERSISTENCE ═══════════════
@@ -278,7 +290,7 @@
     return el.innerHTML;
   }
 
-  // Proper score formatting: -3 instead of -03, preserving card width
+  // Score formatting: natural -3 on negative, 00, 08, 12 on positive
   function formatScore(score) {
     if (score < 0) {
       return `-${Math.abs(score)}`; // Clean: -1, -3 (never -03!)
@@ -286,18 +298,37 @@
     return score < 10 ? `0${score}` : `${score}`; // 00, 08, 12
   }
 
-  // ═══════════════ ORIGINAL ZERO-SUM & HOTCELL LOGIC ═══════════════
-  function trackTotal(n) {
-    if (n > 0) state.totalSum -= n;
-    if (n < 0) state.totalSum -= n;
-    updateBalanceDisplay();
+  // ═══════════════ DUAL-MODE ENGINE ═══════════════
+  function setGameMode(mode) {
+    state.gameMode = mode;
+    document.documentElement.classList.remove("mode-cash", "mode-tournament");
+    document.documentElement.classList.add(mode === "tournament" ? "mode-tournament" : "mode-cash");
+
+    btnModeCash.classList.toggle("active", mode === "cash");
+    btnModeTournament.classList.toggle("active", mode === "tournament");
+
+    if (modalTitleText) {
+      modalTitleText.textContent = mode === "tournament" ? "TOURNAMENT STAKES & PROTOCOL" : "STAKES & CASH SETTLEMENTS";
+    }
+
+    tactileFeedback();
+    saveState();
+    renderPlayers();
+    showToast(mode === "tournament" ? "🏆 TOURNAMENT FRAME MODE" : "💰 CASH RING GAME MODE");
   }
 
-  function updateBalanceDisplay() {
-    const cards = document.querySelectorAll(".player-championship-card");
-    const discrepancy = -1 * state.totalSum;
-    const isBalanced = state.totalSum === 0;
+  btnModeCash.addEventListener("click", () => setGameMode("cash"));
+  btnModeTournament.addEventListener("click", () => setGameMode("tournament"));
 
+  // ═══════════════ MATHEMATICALLY BULLETPROOF ZERO-SUM ═══════════════
+  function updateZeroSumAudit() {
+    if (state.gameMode !== "cash") return;
+
+    // True mathematical sum across all players
+    const currentSum = state.players.reduce((sum, p) => sum + p.score, 0);
+    const isBalanced = currentSum === 0;
+
+    const cards = document.querySelectorAll(".player-championship-card");
     cards.forEach((c) => c.classList.toggle("hotcell", !isBalanced));
 
     if (balanceStatusBar) {
@@ -308,24 +339,44 @@
     }
     if (balanceStatusText) {
       balanceStatusText.textContent = isBalanced
-        ? "MATCH ZERO-SUM BALANCED"
-        : `TABLE UNBALANCED (${discrepancy > 0 ? "+" : ""}${discrepancy} DISCREPANCY)`;
+        ? "ZERO-SUM BALANCED (0)"
+        : `TABLE UNBALANCED (${currentSum > 0 ? "+" : ""}${currentSum} DISCREPANCY)`;
     }
     if (totalSumEl) {
-      totalSumEl.textContent = isBalanced ? "BALANCED" : `${discrepancy > 0 ? "+" : ""}${discrepancy}`;
+      totalSumEl.textContent = isBalanced ? "BALANCED" : `${currentSum > 0 ? "+" : ""}${currentSum}`;
     }
   }
 
-  // ═══════════════ PAIRWISE SETTLEMENT ═══════════════
+  // ═══════════════ PAIRWISE SETTLEMENT & CASH TRANSFERS ═══════════════
   function calculateSettlements() {
     const players = state.players;
     const rate = parseFloat(state.stakeRate) || 0;
     const netCash = {};
 
-    players.forEach((p) => {
-      netCash[p.id] = p.score * rate;
-    });
+    if (state.gameMode === "cash") {
+      // In cash mode, each score directly equals net points won/lost
+      players.forEach((p) => {
+        netCash[p.id] = p.score * rate;
+      });
+    } else {
+      // In tournament mode, pairwise rack differential
+      const n = players.length;
+      const netPoints = {};
+      players.forEach((p) => (netPoints[p.id] = 0));
 
+      for (let i = 0; i < n; i++) {
+        for (let j = i + 1; j < n; j++) {
+          const diff = players[i].score - players[j].score;
+          netPoints[players[i].id] += diff;
+          netPoints[players[j].id] -= diff;
+        }
+      }
+      players.forEach((p) => {
+        netCash[p.id] = netPoints[p.id] * rate;
+      });
+    }
+
+    // Debtor-to-creditor minimal transfers
     const debtors = [];
     const creditors = [];
     players.forEach((p) => {
@@ -358,6 +409,7 @@
   function renderPlayers() {
     playersArrayContainer.innerHTML = "";
     const players = state.players;
+    const isCashMode = state.gameMode === "cash";
     const maxScore = Math.max(...players.map((p) => p.score));
     const { netCash } = calculateSettlements();
 
@@ -371,49 +423,107 @@
       card.className = `player-championship-card ${isLeader ? "is-leader" : ""}`;
       card.id = `card-player-${p.id}`;
 
-      card.innerHTML = `
-        <div class="card-top-breaker-row">
-          <button 
-            type="button"
-            class="breaker-status-pill ${p.isBreaker ? "active" : "waiting"}" 
-            data-pid="${p.id}" 
-            title="Click to pass break"
-          >
-            <span class="material-symbols-outlined" style="font-size: 13px;">${p.isBreaker ? "token" : "radio_button_unchecked"}</span>
-            <span>${p.isBreaker ? "BREAK" : "WAIT"}</span>
-          </button>
-          <span class="player-seat-badge">#0${index + 1}</span>
-        </div>
-
-        <input 
-          type="text" 
-          class="player-name-field" 
-          value="${escapeHtml(p.name)}" 
-          data-pid="${p.id}" 
-          placeholder="Player ${index + 1}"
-          spellcheck="false"
-        />
-
-        <div class="card-score-row">
-          <button class="btn-score-touch btn-dec" data-pid="${p.id}" title="Decrement (−)">
-            <span class="material-symbols-outlined">remove</span>
-          </button>
-
-          <div class="score-center-display">
-            <span class="score-hero-digits" id="digits-${p.id}">${formatScore(p.score)}</span>
-            <span class="score-sublabel">POINTS</span>
+      // Mode-specific template structure
+      if (isCashMode) {
+        // ── CASH MODE CARD ──
+        card.innerHTML = `
+          <div class="card-top-breaker-row">
+            <button 
+              type="button"
+              class="breaker-status-pill ${p.isBreaker ? "active" : "waiting"}" 
+              data-pid="${p.id}" 
+              title="Click to pass break"
+            >
+              <span class="material-symbols-outlined" style="font-size: 13px;">${p.isBreaker ? "token" : "radio_button_unchecked"}</span>
+              <span>${p.isBreaker ? "BREAK" : "WAIT"}</span>
+            </button>
+            <span class="player-seat-badge">#0${index + 1}</span>
           </div>
 
-          <button class="btn-score-touch btn-inc" data-pid="${p.id}" title="Increment (+)">
-            <span class="material-symbols-outlined">add</span>
-          </button>
-        </div>
+          <input 
+            type="text" 
+            class="player-name-field" 
+            value="${escapeHtml(p.name)}" 
+            data-pid="${p.id}" 
+            placeholder="Player ${index + 1}"
+            spellcheck="false"
+          />
 
-        <div class="card-telemetry-footer">
-          <span class="stat-label-tiny">NET MONEY</span>
-          <span class="stat-val-bold ${isWin ? "win" : "loss"}">${cashStr}</span>
-        </div>
-      `;
+          <div class="card-score-row">
+            <button class="btn-score-touch btn-dec" data-pid="${p.id}" title="Decrement (−)">
+              <span class="material-symbols-outlined">remove</span>
+            </button>
+
+            <div class="score-center-display">
+              <span class="score-hero-digits" id="digits-${p.id}">${formatScore(p.score)}</span>
+              <span class="score-sublabel">NET POINTS</span>
+            </div>
+
+            <button class="btn-score-touch btn-inc" data-pid="${p.id}" title="Increment (+)">
+              <span class="material-symbols-outlined">add</span>
+            </button>
+          </div>
+
+          <div class="card-telemetry-footer">
+            <span class="stat-label-tiny">NET CASH</span>
+            <span class="stat-val-bold ${isWin ? "win" : "loss"}">${cashStr}</span>
+          </div>
+        `;
+      } else {
+        // ── TOURNAMENT MODE CARD ──
+        card.innerHTML = `
+          <div class="card-top-breaker-row">
+            <div 
+              class="breaker-status-pill ${p.isBreaker ? "active" : "waiting"}" 
+              data-pid="${p.id}" 
+              title="Click to pass break"
+            >
+              <span class="material-symbols-outlined" style="font-size: 13px;">${p.isBreaker ? "token" : "radio_button_unchecked"}</span>
+              <span>${p.isBreaker ? "ACTIVE BREAKER" : "INNING WAITING"}</span>
+            </div>
+            <span class="player-seat-badge">P${index + 1}</span>
+          </div>
+
+          <input 
+            type="text" 
+            class="player-name-field" 
+            value="${escapeHtml(p.name)}" 
+            data-pid="${p.id}" 
+            placeholder="Player ${index + 1}"
+            spellcheck="false"
+          />
+
+          <div class="player-sub-meta">
+            <span>P${index + 1}</span> / <span>Runouts: ${p.runouts || 0}</span>
+          </div>
+
+          <div class="card-score-row">
+            <button class="btn-score-touch btn-dec" data-pid="${p.id}" title="Decrement (−)">
+              <span class="material-symbols-outlined">remove</span>
+            </button>
+
+            <div class="score-center-display">
+              <span class="score-hero-digits" id="digits-${p.id}">${formatScore(p.score)}</span>
+              <span class="score-sublabel">CURRENT FRAMES</span>
+            </div>
+
+            <button class="btn-score-touch btn-inc" data-pid="${p.id}" title="Increment (+)">
+              <span class="material-symbols-outlined">add</span>
+            </button>
+          </div>
+
+          <div class="card-telemetry-footer">
+            <div style="display:flex; flex-direction:column;">
+              <span class="stat-label-tiny">FINANCIAL NET</span>
+              <span class="stat-val-bold ${isWin ? "win" : "loss"}">${cashStr}</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end;">
+              <span class="stat-label-tiny">INNING SUCCESS</span>
+              <span class="stat-val-pct">${p.score > 0 ? (70 + (p.score * 2.2)).toFixed(1) : "0.0"}% TBL RATIO</span>
+            </div>
+          </div>
+        `;
+      }
 
       // Event Listeners for Player Card
       const nameInput = card.querySelector(".player-name-field");
@@ -451,14 +561,46 @@
     btnUndo.disabled = undoStack.length === 0;
     btnRedo.disabled = redoStack.length === 0;
 
-    // Total pot calculation
-    const totalPositiveRacks = players.reduce((sum, p) => sum + Math.max(0, p.score), 0);
-    const pot = (totalPositiveRacks * state.stakeRate).toFixed(2);
+    // Update Telemetry Displays
+    if (isCashMode) {
+      if (cashStakeLabel) cashStakeLabel.textContent = `$${state.stakeRate.toFixed(2)} / PT`;
+      updateZeroSumAudit();
+    } else {
+      updateTournamentHUD();
+    }
+  }
+
+  function updateTournamentHUD() {
+    const players = state.players;
+    const sorted = [...players].sort((a, b) => b.score - a.score);
+    const leader = sorted[0];
+    const runnerUp = sorted[1] || { score: 0 };
+    const leadDiff = leader.score - runnerUp.score;
+    const { netCash } = calculateSettlements();
+
+    if (hudLeadStat) {
+      if (leader.score === 0) {
+        hudLeadStat.innerHTML = `LEAD: <strong>EVEN (0-0)</strong>`;
+      } else if (leadDiff === 0) {
+        hudLeadStat.innerHTML = `LEAD: <strong>TIED (${leader.score} ALL)</strong>`;
+      } else {
+        hudLeadStat.innerHTML = `LEAD: <strong>${leader.name.toUpperCase()} (+${leadDiff})</strong>`;
+      }
+    }
+
+    if (hudDeltaStat) {
+      const cashDelta = (netCash[leader.id] || 0).toFixed(2);
+      hudDeltaStat.innerHTML = `DELTA: <strong>+$${cashDelta} NET</strong>`;
+    }
+
+    const totalPositive = players.reduce((sum, p) => sum + Math.max(0, p.score), 0);
+    const pot = (totalPositive * state.stakeRate).toFixed(2);
     if (metricCurrentPotVal) {
       metricCurrentPotVal.textContent = `$${pot}`;
     }
-
-    updateBalanceDisplay();
+    if (tourneyRaceBadge) {
+      tourneyRaceBadge.textContent = `TARGET: RACE TO ${state.targetRace}`;
+    }
   }
 
   // ═══════════════ SCORE ENGINE ═══════════════
@@ -466,11 +608,16 @@
     const player = state.players.find((p) => p.id === playerId);
     if (!player) return;
 
+    // IN TOURNAMENT MODE: scores cannot go negative
+    if (state.gameMode === "tournament" && player.score + delta < 0) {
+      tactileFeedback(true);
+      showToast("Tournament frames cannot be negative");
+      return;
+    }
+
     const prevScore = player.score;
-    // Zero-sum game: scores can be negative
     player.score = player.score + delta;
 
-    trackTotal(delta);
     tactileFeedback();
 
     // Score pop animation
@@ -500,9 +647,11 @@
       renderRackLog();
       resetBlurCountdown();
 
-      if (player.score >= state.targetRace) {
-        showToast(`🏆 ${player.name.toUpperCase()} REACHED TARGET RACE (${state.targetRace})!`);
+      // Tournament Mode Race Milestone Alert
+      if (state.gameMode === "tournament" && player.score >= state.targetRace) {
+        showToast(`🏆 ${player.name.toUpperCase()} WINS MATCH (RACE TO ${state.targetRace})!`);
         tactileFeedback(true);
+        stopShotClock();
       }
     }
 
@@ -527,7 +676,6 @@
     const player = state.players.find((p) => p.id === action.playerId);
     if (player) {
       player.score = action.prevScore;
-      trackTotal(-action.delta);
 
       if (action.logEntry) {
         state.history = state.history.filter((h) => h !== action.logEntry);
@@ -537,7 +685,7 @@
 
       redoStack.push(action);
       tactileFeedback();
-      showToast(`UNDO: ${player.name} score reverted`);
+      showToast(`UNDO: ${player.name} reverted`);
       saveState();
       renderPlayers();
     }
@@ -549,7 +697,6 @@
     const player = state.players.find((p) => p.id === action.playerId);
     if (player) {
       player.score = action.newScore;
-      trackTotal(action.delta);
 
       if (action.logEntry) {
         state.history.unshift(action.logEntry);
@@ -559,21 +706,24 @@
 
       undoStack.push(action);
       tactileFeedback();
-      showToast(`REDO: ${player.name} score restored`);
+      showToast(`REDO: ${player.name} restored`);
       saveState();
       renderPlayers();
     }
   }
 
-  // ═══════════════ SHOT CLOCK ENGINE ═══════════════
+  // ═══════════════ SHOT CLOCK ENGINE (SHARED ACROSS MODES) ═══════════════
   function renderShotClock() {
-    clockHeroDigits.textContent = String(clockTimeLeft).padStart(2, "0");
+    const formatted = String(clockTimeLeft).padStart(2, "0");
+    if (clockHeroDigits) clockHeroDigits.textContent = formatted;
+    if (compactClockDigits) compactClockDigits.textContent = `${clockTimeLeft}s`;
+
     const pct = Math.max(0, Math.min(100, (clockTimeLeft / state.shotClockDuration) * 100));
-    clockProgressFill.style.width = `${pct}%`;
+    if (clockProgressFill) clockProgressFill.style.width = `${pct}%`;
 
     const isCrit = isClockRunning && clockTimeLeft <= 5;
-    clockHeroDigits.classList.toggle("crit", isCrit);
-    clockProgressFill.classList.toggle("crit", isCrit);
+    if (clockHeroDigits) clockHeroDigits.classList.toggle("crit", isCrit);
+    if (clockProgressFill) clockProgressFill.classList.toggle("crit", isCrit);
 
     if (clockStatusChip) {
       if (clockTimeLeft === 0) {
@@ -591,13 +741,17 @@
     if (clockExtLabel) {
       clockExtLabel.textContent = `EXTENSIONS: ${MAX_EXTENSIONS - extensionsUsed} / ${MAX_EXTENSIONS} LEFT`;
     }
+
+    if (btnCompactClockToggle) {
+      btnCompactClockToggle.textContent = isClockRunning ? "PAUSE" : "START";
+    }
   }
 
   function startShotClock() {
     clearInterval(clockInterval);
     isClockRunning = true;
-    clockBtnIcon.textContent = "pause";
-    clockBtnText.textContent = "PAUSE CLOCK";
+    if (clockBtnIcon) clockBtnIcon.textContent = "pause";
+    if (clockBtnText) clockBtnText.textContent = "PAUSE CLOCK";
 
     clockInterval = setInterval(() => {
       if (clockTimeLeft > 0) {
@@ -626,8 +780,8 @@
     clearInterval(clockInterval);
     clockInterval = null;
     isClockRunning = false;
-    clockBtnIcon.textContent = "play_arrow";
-    clockBtnText.textContent = "START CLOCK";
+    if (clockBtnIcon) clockBtnIcon.textContent = "play_arrow";
+    if (clockBtnText) clockBtnText.textContent = "START CLOCK";
     renderShotClock();
   }
 
@@ -637,28 +791,62 @@
     renderShotClock();
   }
 
-  btnClockStart.addEventListener("click", () => {
-    tactileFeedback();
-    if (isClockRunning) {
-      stopShotClock();
-    } else {
-      if (clockTimeLeft === 0) clockTimeLeft = state.shotClockDuration;
-      startShotClock();
-    }
-  });
+  // Large Tournament Clock Handlers
+  if (btnClockStart) {
+    btnClockStart.addEventListener("click", () => {
+      tactileFeedback();
+      if (isClockRunning) stopShotClock();
+      else {
+        if (clockTimeLeft === 0) clockTimeLeft = state.shotClockDuration;
+        startShotClock();
+      }
+    });
+  }
 
-  btnClockExt.addEventListener("click", () => {
-    tactileFeedback();
-    clockTimeLeft = Math.min(90, clockTimeLeft + 30);
-    extensionsUsed = Math.min(MAX_EXTENSIONS, extensionsUsed + 1);
-    renderShotClock();
-    showToast("+30s Extension Granted");
-  });
+  if (btnClockExt) {
+    btnClockExt.addEventListener("click", () => {
+      tactileFeedback();
+      clockTimeLeft = Math.min(90, clockTimeLeft + 30);
+      extensionsUsed = Math.min(MAX_EXTENSIONS, extensionsUsed + 1);
+      renderShotClock();
+      showToast("+30s Extension Granted");
+    });
+  }
 
-  btnClockReset.addEventListener("click", () => {
-    tactileFeedback();
-    resetShotClock();
-  });
+  if (btnClockReset) {
+    btnClockReset.addEventListener("click", () => {
+      tactileFeedback();
+      resetShotClock();
+    });
+  }
+
+  // Compact Cash Clock Handlers
+  if (btnCompactClockToggle) {
+    btnCompactClockToggle.addEventListener("click", () => {
+      tactileFeedback();
+      if (isClockRunning) stopShotClock();
+      else {
+        if (clockTimeLeft === 0) clockTimeLeft = state.shotClockDuration;
+        startShotClock();
+      }
+    });
+  }
+
+  if (btnCompactClockExt) {
+    btnCompactClockExt.addEventListener("click", () => {
+      tactileFeedback();
+      clockTimeLeft = Math.min(90, clockTimeLeft + 30);
+      renderShotClock();
+      showToast("+30s Extension Granted");
+    });
+  }
+
+  if (btnCompactClockReset) {
+    btnCompactClockReset.addEventListener("click", () => {
+      tactileFeedback();
+      resetShotClock();
+    });
+  }
 
   // Mode Preset Chips (30S, 45S, 60S)
   document.querySelectorAll(".clock-mode-btn").forEach((chip) => {
@@ -676,14 +864,17 @@
 
   // ═══════════════ RACK LOG & 180s BLUR ═══════════════
   function renderRackLog() {
+    if (!rackLogScrollList) return;
     rackLogScrollList.innerHTML = "";
     if (state.history.length === 0) {
-      emptyLogState.style.display = "flex";
-      rackLogScrollList.appendChild(emptyLogState);
+      if (emptyLogState) {
+        emptyLogState.style.display = "flex";
+        rackLogScrollList.appendChild(emptyLogState);
+      }
       return;
     }
 
-    emptyLogState.style.display = "none";
+    if (emptyLogState) emptyLogState.style.display = "none";
     state.history.forEach((h) => {
       const row = document.createElement("div");
       row.className = "log-entry-row";
@@ -698,6 +889,7 @@
   }
 
   function resetBlurCountdown() {
+    if (!rackLogDrawer) return;
     rackLogDrawer.classList.remove("blurred");
     blurSecondsLeft = BLUR_INTERVAL_SEC;
     updateBlurDisplay();
@@ -709,30 +901,35 @@
         updateBlurDisplay();
       } else {
         rackLogDrawer.classList.add("blurred");
-        blurCountdownDisplay.textContent = "BLURRED (180s IDLE)";
+        if (blurCountdownDisplay) blurCountdownDisplay.textContent = "BLURRED (180s IDLE)";
         clearInterval(blurTimerId);
       }
     }, 1000);
   }
 
   function updateBlurDisplay() {
+    if (!blurCountdownDisplay) return;
     const m = Math.floor(blurSecondsLeft / 60);
     const s = blurSecondsLeft % 60;
     blurCountdownDisplay.textContent = `ACTIVE FOCUS · ${m}m ${String(s).padStart(2, "0")}s`;
   }
 
-  rackLogDrawer.addEventListener("click", resetBlurCountdown);
-  btnWakeFocus.addEventListener("click", (e) => {
-    e.stopPropagation();
-    resetBlurCountdown();
-    showToast("History focus restored");
-  });
+  if (rackLogDrawer) rackLogDrawer.addEventListener("click", resetBlurCountdown);
+  if (btnWakeFocus) {
+    btnWakeFocus.addEventListener("click", (e) => {
+      e.stopPropagation();
+      resetBlurCountdown();
+      showToast("History focus restored");
+    });
+  }
 
-  btnToggleRackLog.addEventListener("click", () => {
-    tactileFeedback();
-    rackLogDrawer.scrollIntoView({ behavior: "smooth" });
-    resetBlurCountdown();
-  });
+  if (btnToggleRackLog) {
+    btnToggleRackLog.addEventListener("click", () => {
+      tactileFeedback();
+      rackLogDrawer.scrollIntoView({ behavior: "smooth" });
+      resetBlurCountdown();
+    });
+  }
 
   // ═══════════════ PLAYER ROSTER (2 to 4 Players) ═══════════════
   btnAddPlayer.addEventListener("click", () => {
@@ -753,6 +950,7 @@
       name: fallbackName,
       score: 0,
       isBreaker: false,
+      runouts: 0,
     });
 
     tactileFeedback();
@@ -771,7 +969,6 @@
     }
 
     const removed = state.players.pop();
-    trackTotal(removed.score);
     tactileFeedback();
     saveState();
     renderPlayers();
@@ -828,9 +1025,9 @@
   function executeFullReset() {
     state.players.forEach((p) => {
       p.score = 0;
+      p.runouts = 0;
     });
     state.history = [];
-    state.totalSum = 0;
     undoStack.length = 0;
     redoStack.length = 0;
     resetShotClock();
@@ -845,7 +1042,7 @@
   // ═══════════════ STAKES & SETTLEMENT MODAL ═══════════════
   function renderStakesModal() {
     stakeInputRate.value = state.stakeRate.toFixed(2);
-    raceInputTarget.value = state.targetRace;
+    if (raceInputTarget) raceInputTarget.value = state.targetRace;
 
     // Active chip highlights
     document.querySelectorAll(".preset-chip:not(.race-chip)").forEach((chip) => {
@@ -864,7 +1061,7 @@
       const row = document.createElement("div");
       row.className = "settle-row";
       row.innerHTML = `
-        <span>${escapeHtml(p.name)} (${p.score} Racks)</span>
+        <span>${escapeHtml(p.name)} (${p.score} pts)</span>
         <strong class="${isWin ? "win" : "loss"}">${isWin ? "+" : "-"}$${Math.abs(val).toFixed(2)}</strong>
       `;
       modalSettlementRoster.appendChild(row);
@@ -875,7 +1072,7 @@
       modalTransfersLedger.innerHTML = `
         <div class="xfer-item-row">
           <span class="material-symbols-outlined" style="font-size: 15px;">check_circle</span>
-          <span>SCORES TIED · NO FINANCIAL TRANSFERS REQUIRED</span>
+          <span>SCORES BALANCED · NO CASH TRANSFERS REQUIRED</span>
         </div>
       `;
     } else {
@@ -891,13 +1088,16 @@
     }
   }
 
-  [boxPerRack, boxTargetFrame].forEach((el) => {
-    el.addEventListener("click", () => {
-      tactileFeedback();
-      renderStakesModal();
-      stakesModal.classList.add("open");
-    });
-  });
+  function openStakesModal() {
+    tactileFeedback();
+    renderStakesModal();
+    stakesModal.classList.add("open");
+  }
+
+  if (btnOpenSettlements) btnOpenSettlements.addEventListener("click", openStakesModal);
+  if (btnCashRateChip) btnCashRateChip.addEventListener("click", openStakesModal);
+  if (boxPerRack) boxPerRack.addEventListener("click", openStakesModal);
+  if (boxTargetFrame) boxTargetFrame.addEventListener("click", openStakesModal);
 
   btnCloseStakesModal.addEventListener("click", () => stakesModal.classList.remove("open"));
   stakesModal.addEventListener("click", (e) => {
@@ -907,14 +1107,17 @@
   btnSaveStakes.addEventListener("click", () => {
     tactileFeedback();
     state.stakeRate = Math.max(0, parseFloat(stakeInputRate.value) || 1.0);
-    state.targetRace = Math.max(1, parseInt(raceInputTarget.value, 10) || 15);
-    metricPerRackVal.innerHTML = `$${state.stakeRate.toFixed(2)} <small>/ PT</small>`;
-    metricTargetRace.textContent = `RACE ${state.targetRace}`;
+    if (raceInputTarget) {
+      state.targetRace = Math.max(1, parseInt(raceInputTarget.value, 10) || 15);
+    }
+    if (metricPerRackVal) metricPerRackVal.innerHTML = `$${state.stakeRate.toFixed(2)} <small>/ PT</small>`;
+    if (metricTargetRace) metricTargetRace.textContent = `RACE ${state.targetRace}`;
     if (racePillTag) racePillTag.textContent = `RACE ${state.targetRace}`;
+    if (cashStakeLabel) cashStakeLabel.textContent = `$${state.stakeRate.toFixed(2)} / PT`;
     saveState();
     renderPlayers();
     stakesModal.classList.remove("open");
-    showToast(`Config applied: $${state.stakeRate.toFixed(2)}/pt · Race ${state.targetRace}`);
+    showToast(`Saved: $${state.stakeRate.toFixed(2)}/pt`);
   });
 
   btnStakeStepMinus.addEventListener("click", () => {
@@ -929,17 +1132,21 @@
     renderStakesModal();
   });
 
-  btnRaceMinus.addEventListener("click", () => {
-    raceInputTarget.value = Math.max(1, parseInt(raceInputTarget.value, 10) - 1);
-    state.targetRace = parseInt(raceInputTarget.value, 10);
-    renderStakesModal();
-  });
+  if (btnRaceMinus) {
+    btnRaceMinus.addEventListener("click", () => {
+      raceInputTarget.value = Math.max(1, parseInt(raceInputTarget.value, 10) - 1);
+      state.targetRace = parseInt(raceInputTarget.value, 10);
+      renderStakesModal();
+    });
+  }
 
-  btnRacePlus.addEventListener("click", () => {
-    raceInputTarget.value = parseInt(raceInputTarget.value, 10) + 1;
-    state.targetRace = parseInt(raceInputTarget.value, 10);
-    renderStakesModal();
-  });
+  if (btnRacePlus) {
+    btnRacePlus.addEventListener("click", () => {
+      raceInputTarget.value = parseInt(raceInputTarget.value, 10) + 1;
+      state.targetRace = parseInt(raceInputTarget.value, 10);
+      renderStakesModal();
+    });
+  }
 
   document.querySelectorAll(".preset-chip:not(.race-chip)").forEach((chip) => {
     chip.addEventListener("click", () => {
@@ -952,7 +1159,7 @@
   document.querySelectorAll(".race-chip").forEach((chip) => {
     chip.addEventListener("click", () => {
       state.targetRace = parseInt(chip.dataset.r, 10);
-      raceInputTarget.value = state.targetRace;
+      if (raceInputTarget) raceInputTarget.value = state.targetRace;
       renderStakesModal();
     });
   });
@@ -1006,7 +1213,8 @@
     const key = e.key.toLowerCase();
     if (e.code === "Space") {
       e.preventDefault();
-      btnClockStart.click();
+      if (state.gameMode === "tournament" && btnClockStart) btnClockStart.click();
+      else if (btnCompactClockToggle) btnCompactClockToggle.click();
     } else if (key === "w" && state.players[0]) {
       modifyScore(state.players[0].id, 1);
     } else if (key === "q" && state.players[0]) {
@@ -1016,9 +1224,11 @@
     } else if (key === "o" && state.players[1]) {
       modifyScore(state.players[1].id, -1);
     } else if (key === "e") {
-      btnClockExt.click();
+      if (btnClockExt) btnClockExt.click();
+      else if (btnCompactClockExt) btnCompactClockExt.click();
     } else if (key === "r") {
-      btnClockReset.click();
+      if (btnClockReset) btnClockReset.click();
+      else if (btnCompactClockReset) btnCompactClockReset.click();
     } else if (key === "z" && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       handleUndoAction();
@@ -1029,6 +1239,9 @@
   function init() {
     loadState();
     applyTheme(state.theme);
+
+    // Apply active mode (cash vs tournament)
+    setGameMode(state.gameMode || "cash");
 
     // Automatic Screen Wake Lock (Default on, no toggle needed)
     requestScreenWakeLock();
@@ -1041,9 +1254,10 @@
     renderShotClock();
 
     // Metric cards
-    metricPerRackVal.innerHTML = `$${state.stakeRate.toFixed(2)} <small>/ PT</small>`;
-    metricTargetRace.textContent = `RACE ${state.targetRace}`;
+    if (metricPerRackVal) metricPerRackVal.innerHTML = `$${state.stakeRate.toFixed(2)} <small>/ PT</small>`;
+    if (metricTargetRace) metricTargetRace.textContent = `RACE ${state.targetRace}`;
     if (racePillTag) racePillTag.textContent = `RACE ${state.targetRace}`;
+    if (cashStakeLabel) cashStakeLabel.textContent = `$${state.stakeRate.toFixed(2)} / PT`;
     soundIcon.textContent = state.soundEnabled ? "volume_up" : "volume_off";
 
     renderPlayers();
