@@ -1,304 +1,155 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#0d0e0f" />
-    <title>Pool Scoreboard · 21N2</title>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0d0e0f">
+  <title>Pool Scoreboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
-    <!-- Google Fonts: Editorial Monochrome Typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Google Material Symbols Outlined -->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-    />
-
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
-  <body>
-    <!-- Main Application Shell (No decorative header, direct mobile-first control telemetry) -->
-    <div class="app-container">
-      <!-- Top Action & Telemetry Bar -->
-      <section class="top-bar">
-        <div class="bar-row bar-row-primary">
-          <!-- Shot Clock Widget -->
-          <div class="shot-clock-card" id="shotClockCard">
-            <div class="clock-meta">
-              <span class="material-symbols-outlined icon-sm">timer</span>
-              <span class="meta-label">SHOT CLOCK</span>
-              <div class="clock-mode-selector">
-                <button class="mode-chip active" id="clockMode30" type="button">30s</button>
-                <button class="mode-chip" id="clockMode45" type="button">45s</button>
-              </div>
-            </div>
-
-            <div class="clock-display-wrap">
-              <span class="clock-digits" id="clockDigits">30</span>
-              <span class="clock-unit">SEC</span>
-            </div>
-
-            <div class="clock-progress-track">
-              <div class="clock-progress-bar" id="clockProgressBar" style="width: 100%"></div>
-            </div>
-
-            <div class="clock-actions">
-              <button class="btn-clock" id="clockToggleBtn" type="button">START</button>
-              <button class="btn-clock btn-secondary" id="clockExtBtn" type="button">+30s EXT</button>
-              <button class="btn-clock btn-ghost" id="clockResetBtn" type="button" title="Reset Shot Clock">
-                <span class="material-symbols-outlined">restart_alt</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Utility Control Palette (Undo, Redo, Stakes, Sound, Theme) -->
-          <div class="utility-palette">
-            <!-- Stakes Quick Summary -->
-            <button class="tool-btn stakes-trigger" id="stakesModalBtn" type="button" title="Stakes & Settlement Calculator">
-              <span class="material-symbols-outlined">payments</span>
-              <span class="stakes-chip-val" id="stakesSummaryText">$1.00/PT</span>
-            </button>
-
-            <!-- Undo & Redo -->
-            <div class="history-btn-group">
-              <button class="tool-btn" id="undoBtn" type="button" title="Undo Last Score" disabled>
-                <span class="material-symbols-outlined">undo</span>
-              </button>
-              <button class="tool-btn" id="redoBtn" type="button" title="Redo Score" disabled>
-                <span class="material-symbols-outlined">redo</span>
-              </button>
-            </div>
-
-            <!-- Sound & Haptic Toggle -->
-            <button class="tool-btn" id="soundToggleBtn" type="button" title="Toggle Ball Click & Sound Feedback">
-              <span class="material-symbols-outlined" id="soundIcon">volume_up</span>
-            </button>
-
-            <!-- Theme Toggle -->
-            <button class="tool-btn" id="themeToggleBtn" type="button" title="Toggle Light/Dark Editorial">
-              <span class="material-symbols-outlined" id="themeIcon">contrast</span>
-            </button>
-
-            <!-- Info & Author Modal Trigger -->
-            <button class="tool-btn" id="infoModalBtn" type="button" title="Project Info, Developer & Contact">
-              <span class="material-symbols-outlined">info</span>
-            </button>
+  <div class="app">
+    <!-- ── Top Bar: Clock + Utilities ── -->
+    <div class="top-bar">
+      <div class="clock-card">
+        <div class="clock-header">
+          <span class="material-symbols-outlined" style="font-size:16px">timer</span>
+          <span class="label">SHOT CLOCK</span>
+          <div class="clock-modes">
+            <button class="chip active" id="mode30">30s</button>
+            <button class="chip" id="mode45">45s</button>
           </div>
         </div>
-
-        <!-- Telemetry Balance Status (Zero-sum hot balance indicator) -->
-        <div class="balance-bar" id="balanceBar">
-          <div class="balance-inner">
-            <span class="material-symbols-outlined icon-sm">balance</span>
-            <span class="balance-text" id="balanceStatusText">TABLE BALANCED · 0 NET</span>
-            <span class="balance-tag" id="balanceTag">AUDIT OK</span>
-          </div>
+        <div class="clock-readout">
+          <span class="clock-num" id="clockNum">30</span>
+          <span class="clock-sec">SEC</span>
         </div>
-      </section>
-
-      <!-- Player Score Grid (Strict Mobile-First, Bento Columns on Tablet/Desktop) -->
-      <main class="player-grid-section">
-        <div class="player-roster" id="playerContainer">
-          <!-- Dynamically Rendered Player Cards -->
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="clock-btns">
+          <button class="btn-pri" id="clockToggle">START</button>
+          <button class="btn-sec" id="clockExt">+30s EXT</button>
+          <button class="btn-icon" id="clockReset" title="Reset"><span class="material-symbols-outlined">restart_alt</span></button>
         </div>
+      </div>
 
-        <!-- Roster Modification Actions -->
-        <div class="roster-actions">
-          <button class="btn-action" id="addPlayerBtn" type="button">
-            <span class="material-symbols-outlined">person_add</span>
-            <span>ADD PLAYER</span>
-          </button>
-          <button class="btn-action btn-outline" id="removePlayerBtn" type="button">
-            <span class="material-symbols-outlined">person_remove</span>
-            <span>REMOVE</span>
-          </button>
-          <div class="hold-reset-wrap">
-            <button class="btn-action btn-danger" id="holdResetBtn" type="button">
-              <span class="material-symbols-outlined">restart_alt</span>
-              <span id="resetHoldLabel">HOLD 2S RESET</span>
-            </button>
-            <div class="hold-progress" id="holdResetProgress"></div>
-          </div>
-        </div>
-      </main>
-
-      <!-- Rack History & Match Log (Blurs out after 180s) -->
-      <section class="history-section" id="historySection">
-        <div class="history-header">
-          <div class="history-title-wrap">
-            <span class="material-symbols-outlined icon-sm">history_edu</span>
-            <span class="meta-label">RACK CHRONOLOGICAL LEDGER</span>
-          </div>
-          <div class="history-status" id="historyStatusIndicator">
-            <span class="pulse-dot"></span>
-            <span id="blurCountdownText">ACTIVE</span>
-            <button class="btn-text-action" id="wakeHistoryBtn" type="button">TAP TO FOCUS</button>
-          </div>
-        </div>
-
-        <div class="history-scroll-ledger" id="historyLedgerList">
-          <div class="history-empty" id="historyEmptyState">
-            <span class="material-symbols-outlined">sports_score</span>
-            <p>NO RACKS RECORDED YET. TAP + ON ANY PLAYER TO START.</p>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- Stakes & Payout Settlement Modal / Drawer -->
-    <div class="modal-backdrop" id="stakesModal">
-      <div class="modal-sheet">
-        <div class="modal-header">
-          <div class="modal-title-row">
-            <span class="material-symbols-outlined">attach_money</span>
-            <h2>STAKES &amp; SETTLEMENT AUDIT</h2>
-          </div>
-          <button class="btn-close" id="closeStakesModalBtn" type="button">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <!-- Stake Rate Settings -->
-          <div class="stake-input-group">
-            <label class="input-label" for="stakeRateInput">RATE PER POINT / RACK ($)</label>
-            <div class="stake-stepper">
-              <button class="btn-step" id="stakeMinusBtn" type="button">−$0.50</button>
-              <div class="stake-value-box">
-                <span class="currency-prefix">$</span>
-                <input
-                  type="number"
-                  step="0.25"
-                  min="0"
-                  id="stakeRateInput"
-                  value="1.00"
-                  class="stake-number-input"
-                />
-              </div>
-              <button class="btn-step" id="stakePlusBtn" type="button">+$0.50</button>
-            </div>
-            <!-- Preset Quick Chips -->
-            <div class="preset-chips">
-              <button class="chip-rate" data-rate="0.50" type="button">$0.50</button>
-              <button class="chip-rate active" data-rate="1.00" type="button">$1.00</button>
-              <button class="chip-rate" data-rate="2.00" type="button">$2.00</button>
-              <button class="chip-rate" data-rate="5.00" type="button">$5.00</button>
-              <button class="chip-rate" data-rate="10.00" type="button">$10.00</button>
-            </div>
-          </div>
-
-          <!-- Calculation Rule Explanation -->
-          <div class="stake-formula-box">
-            <span class="meta-label">SETTLEMENT FORMULA</span>
-            <p>
-              Pairwise differential: Each player pays/receives the net rack difference multiplied by the stake rate.
-            </p>
-          </div>
-
-          <!-- Net Payout Breakdown Table -->
-          <div class="settlement-results">
-            <span class="meta-label">NET BALANCE ROSTER</span>
-            <div class="payout-list" id="payoutList">
-              <!-- Rendered via JS -->
-            </div>
-
-            <!-- Transfer Directions -->
-            <span class="meta-label mt-sm">WHO PAYS WHOM</span>
-            <div class="transfer-ledger" id="transferLedger">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn-modal-primary" id="saveStakesBtn" type="button">APPLY &amp; CLOSE</button>
-        </div>
+      <div class="tools">
+        <button class="tool-btn wide" id="stakesBtn" title="Stakes Calculator">
+          <span class="material-symbols-outlined">payments</span>
+          <span class="tool-label" id="stakeLabel">$1.00/PT</span>
+        </button>
+        <button class="tool-btn" id="undoBtn" title="Undo" disabled><span class="material-symbols-outlined">undo</span></button>
+        <button class="tool-btn" id="redoBtn" title="Redo" disabled><span class="material-symbols-outlined">redo</span></button>
+        <button class="tool-btn" id="soundBtn" title="Sound"><span class="material-symbols-outlined" id="soundIcon">volume_up</span></button>
+        <button class="tool-btn" id="themeBtn" title="Theme"><span class="material-symbols-outlined" id="themeIcon">contrast</span></button>
+        <button class="tool-btn" id="infoBtn" title="Info"><span class="material-symbols-outlined">info</span></button>
       </div>
     </div>
 
-    <!-- Developer & Project Info Modal -->
-    <div class="modal-backdrop" id="infoModal">
-      <div class="modal-sheet">
-        <div class="modal-header">
-          <div class="modal-title-row">
-            <span class="material-symbols-outlined">info</span>
-            <h2>SYSTEM INFORMATION &amp; AUTHOR</h2>
-          </div>
-          <button class="btn-close" id="closeInfoModalBtn" type="button">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
+    <!-- ── Balance Bar ── -->
+    <div class="balance-bar" id="balanceBar">
+      <span class="material-symbols-outlined" style="font-size:16px">balance</span>
+      <span class="balance-text" id="balanceText">MATCH READY</span>
+      <span class="balance-tag" id="balanceTagEl">READY</span>
+    </div>
 
-        <div class="modal-body">
-          <div class="info-card-author">
-            <div class="author-avatar-wrap">
-              <span class="material-symbols-outlined icon-author">sports_bar</span>
-            </div>
-            <div class="author-meta">
-              <span class="meta-label">LEAD DEVELOPER</span>
-              <h3 class="author-name">Phạm Nam Hào</h3>
-              <span class="author-handle">@Brdnwtocode</span>
-            </div>
-          </div>
+    <!-- ── Player Cards ── -->
+    <div class="players" id="players"></div>
 
-          <div class="info-links-grid">
-            <a href="https://github.com/Brdnwtocode" target="_blank" rel="noopener noreferrer" class="info-link-row">
-              <div class="info-link-left">
-                <span class="material-symbols-outlined">code</span>
-                <div>
-                  <span class="link-label">GITHUB PROFILE</span>
-                  <span class="link-val">github.com/Brdnwtocode</span>
-                </div>
-              </div>
-              <span class="material-symbols-outlined icon-sm">open_in_new</span>
-            </a>
-
-            <a href="https://github.com/Brdnwtocode/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS" target="_blank" rel="noopener noreferrer" class="info-link-row">
-              <div class="info-link-left">
-                <span class="material-symbols-outlined">folder_special</span>
-                <div>
-                  <span class="link-label">PROJECT REPOSITORY</span>
-                  <span class="link-val">21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS</span>
-                </div>
-              </div>
-              <span class="material-symbols-outlined icon-sm">open_in_new</span>
-            </a>
-
-            <a href="mailto:phmnamhao@gmail.com" class="info-link-row">
-              <div class="info-link-left">
-                <span class="material-symbols-outlined">mail</span>
-                <div>
-                  <span class="link-label">DIRECT CONTACT / EMAIL</span>
-                  <span class="link-val">phmnamhao@gmail.com</span>
-                </div>
-              </div>
-              <span class="material-symbols-outlined icon-sm">send</span>
-            </a>
-          </div>
-
-          <div class="stake-formula-box">
-            <span class="meta-label">ABOUT THIS ENGINE</span>
-            <p>
-              Engineered with a strict Monochrome Editorial design language (zero-radius sharp geometry, Swiss modernist typographic scale, flat elevation, Web Audio API synthesis, and pairwise stakes settlement).
-            </p>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn-modal-primary" id="dismissInfoBtn" type="button">CLOSE</button>
-        </div>
+    <!-- ── Actions ── -->
+    <div class="actions">
+      <button class="act-btn" id="addBtn"><span class="material-symbols-outlined">person_add</span> ADD PLAYER</button>
+      <button class="act-btn outline" id="removeBtn"><span class="material-symbols-outlined">person_remove</span> REMOVE</button>
+      <div class="hold-wrap">
+        <button class="act-btn danger" id="holdResetBtn"><span class="material-symbols-outlined">restart_alt</span> <span id="holdLabel">HOLD 2S RESET</span></button>
+        <div class="hold-fill" id="holdFill"></div>
       </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div class="toast-indicator" id="toastIndicator"></div>
+    <!-- ── Rack History ── -->
+    <div class="history" id="historyBox">
+      <div class="hist-head">
+        <div class="hist-title"><span class="material-symbols-outlined" style="font-size:16px">history_edu</span><span class="label">RACK LOG</span></div>
+        <div class="hist-status"><span class="dot"></span><span id="blurText">ACTIVE</span><button class="wake-btn" id="wakeBtn">TAP TO FOCUS</button></div>
+      </div>
+      <div class="hist-list" id="histList">
+        <div class="hist-empty" id="histEmpty"><span class="material-symbols-outlined">sports_score</span><p>NO RACKS RECORDED YET</p></div>
+      </div>
+    </div>
+  </div>
 
-    <script src="js/script.js"></script>
-  </body>
+  <!-- ══ STAKES MODAL ══ -->
+  <div class="modal-bg" id="stakesModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div class="modal-title"><span class="material-symbols-outlined">attach_money</span><h2>STAKES &amp; SETTLEMENT</h2></div>
+        <button class="close-btn" id="closeStakes"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <span class="label">RATE PER POINT ($)</span>
+          <div class="stepper">
+            <button class="step-btn" id="rateMinus">&minus;$0.50</button>
+            <div class="rate-box"><span class="prefix">$</span><input type="number" step="0.25" min="0" id="rateInput" value="1.00"></div>
+            <button class="step-btn" id="ratePlus">+$0.50</button>
+          </div>
+          <div class="presets">
+            <button class="preset" data-r="0.50">$0.50</button>
+            <button class="preset active" data-r="1.00">$1.00</button>
+            <button class="preset" data-r="2.00">$2.00</button>
+            <button class="preset" data-r="5.00">$5.00</button>
+            <button class="preset" data-r="10.00">$10.00</button>
+          </div>
+        </div>
+        <div class="info-box"><span class="label">FORMULA</span><p>Each player pays/receives the net rack difference multiplied by the stake rate.</p></div>
+        <div class="results">
+          <span class="label">NET BALANCE</span>
+          <div id="payoutRows"></div>
+          <span class="label" style="margin-top:8px">WHO PAYS WHOM</span>
+          <div id="transferRows"></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button class="btn-pri full" id="applyStakes">APPLY &amp; CLOSE</button></div>
+    </div>
+  </div>
+
+  <!-- ══ INFO MODAL ══ -->
+  <div class="modal-bg" id="infoModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div class="modal-title"><span class="material-symbols-outlined">info</span><h2>INFO &amp; AUTHOR</h2></div>
+        <button class="close-btn" id="closeInfo"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="author-card">
+          <div class="avatar"><span class="material-symbols-outlined" style="font-size:24px">sports_bar</span></div>
+          <div><span class="label">LEAD DEVELOPER</span><h3 class="author-name">Phạm Nam Hào</h3><span class="handle">@Brdnwtocode</span></div>
+        </div>
+        <div class="link-list">
+          <a href="https://github.com/Brdnwtocode" target="_blank" class="link-row">
+            <div class="link-left"><span class="material-symbols-outlined">code</span><div><span class="label">GITHUB PROFILE</span><span class="link-val">github.com/Brdnwtocode</span></div></div>
+            <span class="material-symbols-outlined" style="font-size:16px">open_in_new</span>
+          </a>
+          <a href="https://github.com/Brdnwtocode/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS" target="_blank" class="link-row">
+            <div class="link-left"><span class="material-symbols-outlined">folder_special</span><div><span class="label">THIS REPOSITORY</span><span class="link-val">21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS</span></div></div>
+            <span class="material-symbols-outlined" style="font-size:16px">open_in_new</span>
+          </a>
+          <a href="mailto:phmnamhao@gmail.com" class="link-row">
+            <div class="link-left"><span class="material-symbols-outlined">mail</span><div><span class="label">CONTACT</span><span class="link-val">phmnamhao@gmail.com</span></div></div>
+            <span class="material-symbols-outlined" style="font-size:16px">send</span>
+          </a>
+        </div>
+        <div class="info-box"><span class="label">ABOUT</span><p>Monochrome Editorial design, Web Audio synthesis, pairwise stakes settlement, mobile-first architecture.</p></div>
+      </div>
+      <div class="modal-foot"><button class="btn-pri full" id="dismissInfo">CLOSE</button></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="js/script.js"></script>
+</body>
 </html>
