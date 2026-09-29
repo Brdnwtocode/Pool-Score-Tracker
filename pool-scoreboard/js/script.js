@@ -1,28 +1,28 @@
 /**
- * Championship Pool Scoreboard · Protocol Engine v2.5.0
- * Aligned with UI Reference (media_1790689465780.png)
+ * Championship Pool Scoreboard · Protocol Engine
  * Features:
- * - Default Screen Wake Lock (Keeps screen awake automatically)
+ * - True Zero-Sum point scoring (negative scores allowed for betting losses)
+ * - Original subtle hotcell highlight & #totalSum discrepancy indicator
+ * - Default Screen Wake Lock (keeps screen awake automatically)
  * - Fullscreen Mode Button
  * - 30S / 45S / 60S Pro Shot Clock with extension & audio cues
- * - Original Zero-Sum Balance Checker with "Hotcell" Glow & Discrepancy Panel
- * - Player Roster Management (2 to 4 players with max/min flash alerts)
+ * - Player Roster Management (2 to 4 players)
  * - Pairwise Financial Stakes & Race-To Target Frame
  * - Web Audio API Ball Strike Clicks & Native Haptics
- * - Keyboard Shortcuts (Space, Q/W, O/P, E, R, Z)
+ * - Keyboard Shortcuts (Space, Q/W, O/P, E, R, Ctrl+Z)
  * - LocalStorage Auto-Save
  */
 
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "21n2_pool_championship_v25";
+  const STORAGE_KEY = "21n2_pool_championship_v26";
 
   // ═══════════════ APPLICATION STATE ═══════════════
   let state = {
     players: [
-      { id: 1, name: "Johnny Archer", score: 12, isBreaker: true, runouts: 4, fargo: 812 },
-      { id: 2, name: "Shane Van Boening", score: 8, isBreaker: false, runouts: 3, fargo: 824 },
+      { id: 1, name: "Johnny Archer", score: 0, isBreaker: true, runouts: 0, fargo: 812 },
+      { id: 2, name: "Shane Van Boening", score: 0, isBreaker: false, runouts: 0, fargo: 824 },
     ],
     stakeRate: 1.0,
     targetRace: 15,
@@ -30,7 +30,7 @@
     soundEnabled: true,
     theme: "dark", // "dark" or "light"
     history: [],
-    totalSumDiscrepancy: 0,
+    totalSum: 0, // Original zero-sum balance tracker
   };
 
   // Runtime Undo / Redo Stacks
@@ -64,11 +64,6 @@
   const btnResetQuick = $("btnResetQuick");
   const btnInfo = $("btnInfo");
 
-  // HUD Bar
-  const hudMatchTitle = $("hudMatchTitle");
-  const hudLeadStat = $("hudLeadStat");
-  const hudDeltaStat = $("hudDeltaStat");
-
   // Shot Clock Widget
   const clockHeroDigits = $("clockHeroDigits");
   const clockStatusChip = $("clockStatusChip");
@@ -90,13 +85,9 @@
   const btnTagFoul = $("btnTagFoul");
   const btnTagSafe = $("btnTagSafe");
 
-  // Championship Header
-  const raceTrackerBadge = $("raceTrackerBadge");
-
-  // Players Array & Zero Sum
+  // Players Array & Original Zero-Sum TotalSum element
   const playersArrayContainer = $("playersArrayContainer");
-  const zeroSumPanel = $("zeroSumPanel");
-  const zeroSumNumDisplay = $("zeroSumNumDisplay");
+  const totalSumEl = $("totalSum");
 
   // Tactical Actions
   const btnAddPlayer = $("btnAddPlayer");
@@ -113,9 +104,6 @@
   const btnWakeFocus = $("btnWakeFocus");
   const rackLogScrollList = $("rackLogScrollList");
   const emptyLogState = $("emptyLogState");
-
-  // Bottom Feed
-  const feedTickerText = $("feedTickerText");
 
   // Modals
   const stakesModal = $("stakesModal");
@@ -135,7 +123,7 @@
   const btnDismissInfo = $("btnDismissInfo");
   const hudToast = $("hudToast");
 
-  // ═══════════════ SCREEN WAKE LOCK ═══════════════
+  // ═══════════════ SCREEN WAKE LOCK (DEFAULT ACTIVE) ═══════════════
   let wakeLockSentinel = null;
 
   async function requestScreenWakeLock() {
@@ -146,12 +134,11 @@
           wakeLockSentinel = null;
         });
       } catch {
-        // Wake Lock not granted or supported
+        // Ignored if unsupported
       }
     }
   }
 
-  // Re-acquire on tab visibility return
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
       requestScreenWakeLock();
@@ -174,7 +161,7 @@
     if (fullscreenIcon) {
       fullscreenIcon.textContent = isFull ? "fullscreen_exit" : "fullscreen";
     }
-    showToast(isFull ? "FULLSCREEN ACTIVATED" : "WINDOWED MODE");
+    showToast(isFull ? "FULLSCREEN ON" : "WINDOWED");
   });
 
   // ═══════════════ AUDIO & HAPTIC SYSTEM ═══════════════
@@ -268,7 +255,7 @@
     hudToast.textContent = msg;
     hudToast.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => hudToast.classList.remove("show"), 2200);
+    toastTimer = setTimeout(() => hudToast.classList.remove("show"), 2000);
   }
 
   // ═══════════════ PERSISTENCE ═══════════════
@@ -292,29 +279,57 @@
     return el.innerHTML;
   }
 
-  // ═══════════════ PAIRWISE STAKES ENGINE ═══════════════
+  function formatScore(score) {
+    if (score < 0) {
+      return "-" + String(Math.abs(score)).padStart(2, "0");
+    }
+    return String(score).padStart(2, "0");
+  }
+
+  // ═══════════════ ORIGINAL ZERO-SUM & HOTCELL LOGIC ═══════════════
+  /**
+   * Exact original zero-sum logic from Duahettienday_WebApp:
+   * When score increases (+1): totalSum -= 1
+   * When score decreases (-1): totalSum -= (-1) => totalSum += 1
+   * If totalSum == 0: hotcell class removed, totalSum text is ""
+   * If totalSum != 0: hotcell class added, totalSum text is -1 * totalSum
+   */
+  function trackTotal(n) {
+    if (n > 0) state.totalSum -= n;
+    if (n < 0) state.totalSum -= n;
+
+    const cards = document.querySelectorAll(".player-championship-card");
+
+    if (state.totalSum === 0) {
+      cards.forEach((c) => c.classList.remove("hotcell"));
+      if (totalSumEl) totalSumEl.innerText = "";
+    } else {
+      cards.forEach((c) => c.classList.add("hotcell"));
+      if (totalSumEl) totalSumEl.innerText = -1 * state.totalSum;
+    }
+  }
+
+  function reapplyHotcellState() {
+    const cards = document.querySelectorAll(".player-championship-card");
+    if (state.totalSum === 0) {
+      cards.forEach((c) => c.classList.remove("hotcell"));
+      if (totalSumEl) totalSumEl.innerText = "";
+    } else {
+      cards.forEach((c) => c.classList.add("hotcell"));
+      if (totalSumEl) totalSumEl.innerText = -1 * state.totalSum;
+    }
+  }
+
+  // ═══════════════ PAIRWISE SETTLEMENT ═══════════════
   function calculateSettlements() {
     const players = state.players;
     const rate = parseFloat(state.stakeRate) || 0;
-    const n = players.length;
-
-    const netPoints = {};
-    players.forEach((p) => (netPoints[p.id] = 0));
-
-    for (let i = 0; i < n; i++) {
-      for (let j = i + 1; j < n; j++) {
-        const diff = players[i].score - players[j].score;
-        netPoints[players[i].id] += diff;
-        netPoints[players[j].id] -= diff;
-      }
-    }
-
     const netCash = {};
+
     players.forEach((p) => {
-      netCash[p.id] = netPoints[p.id] * rate;
+      netCash[p.id] = p.score * rate;
     });
 
-    // Debtor-to-creditor matching for minimum cash transfers
     const debtors = [];
     const creditors = [];
     players.forEach((p) => {
@@ -340,73 +355,14 @@
       if (creditors[c].balance <= 0.01) c++;
     }
 
-    return { netPoints, netCash, transfers };
-  }
-
-  // ═══════════════ ZERO-SUM & HOTCELL SYSTEM ═══════════════
-  /**
-   * Original Requirement:
-   * "If points don't add up to zero, player boards glow with a highlighted border and background (hotcell),
-   * and the discrepancy number appears in large text at the bottom.
-   * Once all scores balance out back to zero, the highlight turns off."
-   */
-  function updateZeroSumAndTelemetry() {
-    const players = state.players;
-    const totalRacks = players.reduce((sum, p) => sum + p.score, 0);
-    const { netCash } = calculateSettlements();
-
-    // Check if points are balanced or if there is a discrepancy
-    // In a zero-sum money match, discrepancy is the non-zero balance of net cash or odd delta
-    const discrepancy = state.totalSumDiscrepancy;
-    const hasDiscrepancy = discrepancy !== 0;
-
-    // Apply hotcell to all player cards if discrepancy exists
-    const cards = document.querySelectorAll(".player-championship-card");
-    cards.forEach((card) => {
-      card.classList.toggle("hotcell", hasDiscrepancy);
-    });
-
-    // Zero-sum panel visibility
-    if (zeroSumPanel && zeroSumNumDisplay) {
-      zeroSumPanel.classList.toggle("visible", hasDiscrepancy);
-      zeroSumNumDisplay.textContent = discrepancy > 0 ? `+${discrepancy}` : `${discrepancy}`;
-    }
-
-    // Lead calculations
-    const sorted = [...players].sort((a, b) => b.score - a.score);
-    const leader = sorted[0];
-    const runnerUp = sorted[1] || { score: 0 };
-    const leadDiff = leader.score - runnerUp.score;
-
-    if (totalRacks === 0) {
-      hudLeadStat.innerHTML = `LEAD: <strong>EVEN (0-0)</strong>`;
-      hudDeltaStat.innerHTML = `DELTA: <strong>$0.00 NET (BALANCED)</strong>`;
-    } else if (leadDiff === 0) {
-      hudLeadStat.innerHTML = `LEAD: <strong>TIED (${leader.score} ALL)</strong>`;
-      hudDeltaStat.innerHTML = `DELTA: <strong>$0.00 NET (TIED)</strong>`;
-    } else {
-      const cashDelta = (netCash[leader.id] || 0).toFixed(2);
-      hudLeadStat.innerHTML = `LEAD: <strong>${leader.name.toUpperCase()} (+${leadDiff})</strong>`;
-      hudDeltaStat.innerHTML = `DELTA: <strong>+$${cashDelta} NET (${hasDiscrepancy ? "UNBALANCED" : "BALANCED"})</strong>`;
-    }
-
-    // Race frame badge update
-    if (raceTrackerBadge) {
-      raceTrackerBadge.textContent = `RACK ${String(totalRacks).padStart(2, "0")} / ${state.targetRace} ■`;
-    }
-
-    // Total pot calculation (Total racks * stakeRate)
-    const pot = (totalRacks * state.stakeRate).toFixed(2);
-    if (metricCurrentPotVal) {
-      metricCurrentPotVal.textContent = `$${pot}`;
-    }
+    return { netCash, transfers };
   }
 
   // ═══════════════ RENDER PLAYERS ═══════════════
   function renderPlayers() {
     playersArrayContainer.innerHTML = "";
     const players = state.players;
-    const maxScore = Math.max(...players.map((p) => p.score), 0);
+    const maxScore = Math.max(...players.map((p) => p.score));
     const { netCash } = calculateSettlements();
 
     players.forEach((p, index) => {
@@ -456,7 +412,7 @@
           </button>
 
           <div class="score-center-display">
-            <span class="score-hero-digits" id="digits-${p.id}">${String(p.score).padStart(2, "0")}</span>
+            <span class="score-hero-digits" id="digits-${p.id}">${formatScore(p.score)}</span>
             <span class="score-sublabel">CURRENT FRAMES</span>
           </div>
 
@@ -472,7 +428,7 @@
           </div>
           <div class="footer-stat-group" style="align-items: flex-end;">
             <span class="stat-label-tiny">INNING SUCCESS</span>
-            <span class="stat-val-pct">${p.score > 0 ? (70 + (p.score * 2.5)).toFixed(1) : "0.0"}% TBL RATIO</span>
+            <span class="stat-val-pct">${p.score !== 0 ? (70 + Math.abs(p.score) * 2).toFixed(1) : "0.0"}% TBL RATIO</span>
           </div>
         </div>
       `;
@@ -482,7 +438,7 @@
       nameInput.addEventListener("change", (e) => {
         p.name = e.target.value.trim() || `Player ${index + 1}`;
         saveState();
-        updateZeroSumAndTelemetry();
+        renderStakesModal();
       });
 
       nameInput.addEventListener("keydown", (e) => {
@@ -497,7 +453,6 @@
         p.isBreaker = true;
         saveState();
         renderPlayers();
-        setFeedText(`${p.name} was awarded the break.`);
       });
 
       // Score buttons
@@ -514,33 +469,32 @@
     btnUndo.disabled = undoStack.length === 0;
     btnRedo.disabled = redoStack.length === 0;
 
-    updateZeroSumAndTelemetry();
+    // Total pot calculation
+    const totalPositiveRacks = players.reduce((sum, p) => sum + Math.max(0, p.score), 0);
+    const pot = (totalPositiveRacks * state.stakeRate).toFixed(2);
+    if (metricCurrentPotVal) {
+      metricCurrentPotVal.textContent = `$${pot}`;
+    }
+
+    reapplyHotcellState();
   }
 
-  // ═══════════════ SCORE ENGINE ═══════════════
+  // ═══════════════ SCORE ENGINE (ALLOWS NEGATIVE NUMBERS FOR ZERO-SUM) ═══════════════
   function modifyScore(playerId, delta, isUndoRedo = false) {
     const player = state.players.find((p) => p.id === playerId);
     if (!player) return;
 
-    if (player.score + delta < 0) {
-      tactileFeedback(true);
-      showToast("Scores cannot be negative");
-      return;
-    }
-
     const prevScore = player.score;
-    player.score = Math.max(0, player.score + delta);
+    // Zero-sum game: scores CAN be negative!
+    player.score = player.score + delta;
 
-    // Track original totalSum discrepancy for zero-sum indicator
-    if (delta > 0) state.totalSumDiscrepancy += delta;
-    if (delta < 0) state.totalSumDiscrepancy += delta;
-
+    trackTotal(delta);
     tactileFeedback();
 
     // Score pop animation
     const digitsEl = document.getElementById(`digits-${playerId}`);
     if (digitsEl) {
-      digitsEl.textContent = String(player.score).padStart(2, "0");
+      digitsEl.textContent = formatScore(player.score);
       digitsEl.classList.remove("score-pop-anim");
       void digitsEl.offsetWidth;
       digitsEl.classList.add("score-pop-anim");
@@ -551,7 +505,7 @@
     if (delta > 0 && !isUndoRedo) {
       const now = new Date();
       const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-      const totalRacks = state.players.reduce((sum, p) => sum + p.score, 0);
+      const totalRacks = state.players.reduce((sum, p) => sum + Math.max(0, p.score), 0);
 
       logEntry = {
         rackNum: totalRacks,
@@ -564,11 +518,8 @@
       renderRackLog();
       resetBlurCountdown();
 
-      setFeedText(`Rack ${totalRacks}: ${player.name} pocketed winning ball (+1 pt, +$${state.stakeRate.toFixed(2)} net)`);
-
-      // Target race victory alert
       if (player.score >= state.targetRace) {
-        showToast(`🏆 ${player.name.toUpperCase()} WINS THE MATCH (RACE TO ${state.targetRace})!`);
+        showToast(`🏆 ${player.name.toUpperCase()} REACHED TARGET RACE (${state.targetRace})!`);
         tactileFeedback(true);
       }
     }
@@ -594,7 +545,7 @@
     const player = state.players.find((p) => p.id === action.playerId);
     if (player) {
       player.score = action.prevScore;
-      state.totalSumDiscrepancy -= action.delta;
+      trackTotal(-action.delta);
 
       if (action.logEntry) {
         state.history = state.history.filter((h) => h !== action.logEntry);
@@ -616,7 +567,7 @@
     const player = state.players.find((p) => p.id === action.playerId);
     if (player) {
       player.score = action.newScore;
-      state.totalSumDiscrepancy += action.delta;
+      trackTotal(action.delta);
 
       if (action.logEntry) {
         state.history.unshift(action.logEntry);
@@ -681,9 +632,8 @@
 
         if (clockTimeLeft === 0) {
           tactileFeedback(true);
-          showToast("⚠️ SHOT CLOCK EXPIRED: TIME FOUL!");
+          showToast("SHOT CLOCK EXPIRED: FOUL");
           stopShotClock();
-          setFeedText("Shot clock expired. Ball-in-hand awarded to opponent.");
         }
       }
     }, 1000);
@@ -721,7 +671,6 @@
     extensionsUsed = Math.min(MAX_EXTENSIONS, extensionsUsed + 1);
     renderShotClock();
     showToast("+30s Extension Granted");
-    setFeedText("30-second extension claimed.");
   });
 
   btnClockReset.addEventListener("click", () => {
@@ -829,8 +778,7 @@
     tactileFeedback();
     saveState();
     renderPlayers();
-    showToast(`Added ${fallbackName} to match array`);
-    setFeedText(`${fallbackName} joined the match roster.`);
+    showToast(`Added ${fallbackName}`);
   });
 
   btnRemovePlayer.addEventListener("click", () => {
@@ -843,11 +791,12 @@
     }
 
     const removed = state.players.pop();
+    // Reverse any score contribution from removed player to totalSum
+    trackTotal(removed.score);
     tactileFeedback();
     saveState();
     renderPlayers();
     showToast(`Removed ${removed.name}`);
-    setFeedText(`${removed.name} left the match roster.`);
   });
 
   btnSwapBreak.addEventListener("click", () => {
@@ -858,7 +807,6 @@
     saveState();
     renderPlayers();
     showToast(`Break passed to ${state.players[nextIdx].name}`);
-    setFeedText(`${state.players[nextIdx].name} took over the break.`);
   });
 
   // ═══════════════ HOLD 2S RESET SAFETY ═══════════════
@@ -904,7 +852,7 @@
       p.runouts = 0;
     });
     state.history = [];
-    state.totalSumDiscrepancy = 0;
+    state.totalSum = 0;
     undoStack.length = 0;
     redoStack.length = 0;
     resetShotClock();
@@ -914,7 +862,6 @@
     resetBlurCountdown();
     tactileFeedback(true);
     showToast("MATCH SCORES RESET TO ZERO");
-    setFeedText("Match reset. Scores cleared to 00-00.");
   }
 
   // ═══════════════ STAKES & SETTLEMENT MODAL ═══════════════
@@ -1076,22 +1023,15 @@
   btnTagFoul.addEventListener("click", () => {
     tactileFeedback(true);
     showToast("FOUL LOGGED: Ball-in-hand awarded");
-    setFeedText("Foul recorded on active shooter.");
   });
 
   btnTagSafe.addEventListener("click", () => {
     tactileFeedback();
     showToast("DEFENSIVE SAFETY LOGGED");
-    setFeedText("Defensive safety executed.");
   });
-
-  function setFeedText(txt) {
-    if (feedTickerText) feedTickerText.textContent = txt;
-  }
 
   // ═══════════════ KEYBOARD SHORTCUTS ═══════════════
   window.addEventListener("keydown", (e) => {
-    // Ignore when typing in an input
     if (e.target.tagName === "INPUT") return;
 
     const key = e.key.toLowerCase();

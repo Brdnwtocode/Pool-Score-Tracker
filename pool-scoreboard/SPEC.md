@@ -64,14 +64,18 @@
 ## 4. Zero-Sum / Balance Checker ("Hotcell" Indicator)
 
 ### 4.1 Original Zero-Sum Game Logic
-- Designed for betting and zero-sum pool games where one player's win is another player's loss.
-- A running balance discrepancy is tracked across all frame adjustments.
+- Built for pool betting matches where one player's win offsets another player's loss.
+- Negative numbers are permitted (e.g. winning player is `+3`, losing player is `-3`).
+- Tracks running total balance (`totalSum`).
+- Points discrepancy is displayed in `#totalSum`:
+  - When scores sum to zero, `#totalSum` is empty (`""`).
+  - When scores do not sum to zero, `#totalSum` displays the outstanding discrepancy (`-1 * totalSum`).
 
-### 4.2 Hotcell Visual Glow
-- If points do not add up to zero:
-  - All player score cards activate the `.hotcell` state with a highlighted border and alert background shift.
-  - The **Zero-Sum Balance Checker Panel** appears below the cards with the discrepancy number in large text (e.g., `-1`, `+2`).
-- Once scores balance out back to zero, the `.hotcell` glow turns off and the discrepancy panel disappears automatically.
+### 4.2 Subtle Hotcell Highlight (No Red Alerts)
+- When points do not add up to zero:
+  - All player score cards activate the subtle `.hotcell` state with a highlighted border (`rgba(255, 255, 255, 0.4)`) and background shift (`rgb(48, 45, 45)` in dark mode, `#e2e2e4` in light mode).
+  - Clean and non-intrusive: no screaming red alert banners.
+- As soon as player scores balance back to zero, `.hotcell` turns off and the discrepancy number clears automatically.
 
 ---
 

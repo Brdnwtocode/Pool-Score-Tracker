@@ -1,7 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    CHAMPIONSHIP POOL SCOREBOARD · EDITORIAL MONOCHROME PROTOCOL
-   Exact implementation of reference UI (media_1790689465780.png)
-   Mobile-First · Zero Border Radius · High-Contrast Precision Typography
+   Cleaned UI Layout · Zero Border Radius · Subtle Hotcell Highlight
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
@@ -9,23 +8,16 @@
   --bg-surface: #ffffff;
   --bg-inset: #f3f3f5;
   --bg-elevated: #eeeeee;
-  --bg-dark-strip: #0d0e0f;
-  --bg-dark-surface: #141517;
 
   --text-primary: #111111;
   --text-secondary: #666668;
   --text-muted: #8e8e93;
-  --text-inverted: #ffffff;
-  --text-inverted-muted: #8a8d91;
 
   --border-hairline: #e2e2e5;
   --border-medium: #c4c7c7;
   --border-bold: #111111;
-  --border-dark: #282a2e;
 
   --accent-red: #ba1a1a;
-  --accent-red-bg: #ffdad6;
-  --accent-gold: #c5a059;
 
   --font-serif: "Newsreader", Georgia, serif;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
@@ -37,22 +29,16 @@ html.dark {
   --bg-surface: #111214;
   --bg-inset: #18191c;
   --bg-elevated: #212226;
-  --bg-dark-strip: #000000;
-  --bg-dark-surface: #0a0a0c;
 
   --text-primary: #f2f2f5;
   --text-secondary: #9aa0a6;
   --text-muted: #6e7378;
-  --text-inverted: #0d0e0f;
-  --text-inverted-muted: #494c50;
 
   --border-hairline: #24262a;
   --border-medium: #383b40;
   --border-bold: #f2f2f5;
-  --border-dark: #1b1d20;
 
   --accent-red: #ff5252;
-  --accent-red-bg: #2d1214;
 }
 
 /* ── Global Reset ── */
@@ -244,81 +230,6 @@ a {
   margin-left: 6px;
 }
 
-/* ── 2. Live Secondary HUD Inverted Telemetry Strip ── */
-.hud-ticker-band {
-  background: var(--bg-dark-strip);
-  color: var(--text-inverted);
-  border-bottom: 1px solid var(--border-dark);
-  padding: 8px 16px;
-}
-
-.hud-ticker-inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.hud-ticker-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.hud-pill {
-  background: #ffffff;
-  color: #000000;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 2px 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.hud-dot {
-  width: 6px;
-  height: 6px;
-  background: #ff3333;
-  display: inline-block;
-  animation: pulseDot 1.4s infinite;
-}
-
-@keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
-}
-
-.hud-title {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: var(--text-inverted-muted);
-}
-
-.hud-ticker-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.05em;
-  color: var(--text-inverted-muted);
-}
-
-.hud-stat strong {
-  color: var(--text-inverted);
-}
-
-.hud-divider {
-  opacity: 0.4;
-}
-
 /* ── Main Viewport Content ── */
 .main-content {
   flex: 1;
@@ -331,7 +242,7 @@ a {
   gap: 16px;
 }
 
-/* ── 3. High-Stakes Telemetry Dual Widgets ── */
+/* ── 2. Telemetry Dual Widgets ── */
 .telemetry-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -365,11 +276,6 @@ a {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--text-primary);
 }
 
 .icon-accent {
@@ -399,16 +305,6 @@ a {
   background: var(--text-primary);
   color: var(--bg-surface);
   border-color: var(--text-primary);
-}
-
-.hud-chip-tag {
-  background: var(--text-primary);
-  color: var(--bg-surface);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 3px 8px;
 }
 
 /* Clock Hero display */
@@ -663,40 +559,7 @@ a {
   border-color: var(--text-primary);
 }
 
-/* ── 4. Championship Score Array Header ── */
-.score-array-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 12px 0 6px 0;
-}
-
-.array-headline {
-  font-family: var(--font-serif);
-  font-size: 32px;
-  font-weight: 400;
-  line-height: 1.1;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-}
-
-.array-subhead {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
-
-.race-tracker-badge {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--text-secondary);
-}
-
-/* ── 5. Dynamic Player Roster Array ── */
+/* ── 3. Dynamic Player Roster Array ── */
 .players-array-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -724,20 +587,27 @@ a {
   flex-direction: column;
   gap: 12px;
   position: relative;
-  transition: all 140ms ease;
+  transition: all 120ms ease;
 }
 
-/* Leader card inverted emphasis */
+/* Leader card emphasis */
 .player-championship-card.is-leader {
   border-color: var(--border-bold);
-  box-shadow: 0 0 0 1px var(--border-bold);
 }
 
-/* HOTCELL Zero-Sum Warning State */
+/* ── ORIGINAL HOTCELL SLIGHT HIGHLIGHTED EFFECT ── */
+/* Subtle highlighted effect matching original app (no screaming red alert) */
 .player-championship-card.hotcell {
-  border: 2px solid var(--accent-red) !important;
-  background-color: var(--accent-red-bg) !important;
-  transition: all 100ms ease-in-out;
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  background-color: rgb(48, 45, 45) !important;
+  color: rgb(215, 210, 210) !important;
+  transition: ease-in-out 100ms;
+}
+
+html:not(.dark) .player-championship-card.hotcell {
+  border: 2px solid #555555 !important;
+  background-color: #e2e2e4 !important;
+  color: #111111 !important;
 }
 
 .card-top-breaker-row {
@@ -907,59 +777,20 @@ a {
   color: var(--text-primary);
 }
 
-/* ── 6. Zero-Sum Balance Checker Panel ── */
-.zero-sum-indicator-panel {
-  display: none;
-  background: var(--accent-red-bg);
-  border: 1px solid var(--accent-red);
-  padding: 12px 16px;
-  color: var(--text-primary);
-}
-
-.zero-sum-indicator-panel.visible {
-  display: block;
-}
-
-.zero-sum-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.zero-sum-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.icon-alert {
-  color: var(--accent-red);
-  font-size: 24px;
-}
-
-.zero-sum-message strong {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: var(--accent-red);
-  display: block;
-}
-
-.zero-sum-message p {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.zero-sum-num-display {
+/* ── 4. Original Zero-Sum Total Balance Indicator ── */
+.total-sum-display {
+  text-align: center;
   font-family: var(--font-serif);
-  font-size: 40px;
-  font-weight: 700;
-  color: var(--accent-red);
-  line-height: 1;
+  font-size: 3.2rem;
+  line-height: 4rem;
+  color: rgba(171, 163, 163, 0.7);
+  min-height: 4rem;
+  letter-spacing: 0.02em;
+  transition: ease-in-out 200ms;
+  user-select: none;
 }
 
-/* ── 7. Tactical Control Actions Row ── */
+/* ── 5. Tactical Control Actions Row ── */
 .tactical-actions-strip {
   display: flex;
   align-items: center;
@@ -1040,7 +871,7 @@ a {
   transition: width 40ms linear;
 }
 
-/* ── 8. Rack History Drawer ── */
+/* ── 6. Rack History Drawer ── */
 .rack-log-drawer {
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
@@ -1091,6 +922,11 @@ a {
   background: var(--text-primary);
   display: inline-block;
   animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
 }
 
 .btn-wake-focus {
@@ -1154,55 +990,6 @@ a {
 .log-timestamp {
   color: var(--text-muted);
   font-size: 10px;
-}
-
-/* ── 9. Bottom Global Feed Bar ── */
-.bottom-feed-bar {
-  background: var(--bg-surface);
-  border-top: 1px solid var(--border-hairline);
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-}
-
-.feed-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.feed-pill {
-  background: var(--text-primary);
-  color: var(--bg-surface);
-  font-weight: 700;
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  padding: 2px 6px;
-}
-
-.icon-spin {
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.feed-text {
-  color: var(--text-secondary);
-}
-
-.footer-meta {
-  color: var(--text-muted);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-}
-
-.divider {
-  opacity: 0.4;
-  margin: 0 4px;
 }
 
 /* ══════════ MODALS ══════════ */
