@@ -217,6 +217,28 @@ html.mode-tournament .cash-only {
   pointer-events: none;
 }
 
+.lang-toggle-btn {
+  height: 32px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--border-hairline);
+  background: var(--bg-inset);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.lang-toggle-btn:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-medium);
+}
+
 .text-tool-btn {
   height: 32px;
   padding: 0 10px;
@@ -658,13 +680,13 @@ html.mode-tournament .cash-only {
   letter-spacing: 0.04em;
 }
 
-/* ── 3B. CASH MODE: Compact Telemetry Bar ── */
+/* ── 3B. CASH MODE: Unified Telemetry & Zero-Sum Balance Card ── */
 .cash-telemetry-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   padding: 8px 12px;
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
@@ -757,24 +779,25 @@ html.mode-tournament .cash-only {
   justify-content: center;
 }
 
-/* ── 4. CASH MODE: Bulletproof Zero-Sum Balance Bar ── */
-.match-balance-bar {
+/* Integrated Zero-Sum Balance Readout inside Upper Card */
+.cash-balance-inline {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
-  background: var(--bg-surface);
+  gap: 12px;
+  padding: 6px 12px;
+  background: var(--bg-inset);
   border: 1px solid var(--border-hairline);
   font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   transition: all 140ms ease;
   box-sizing: border-box;
 }
 
-.match-balance-bar.unbalanced {
+.cash-balance-inline.unbalanced {
   border-color: var(--border-bold);
-  background: var(--bg-inset);
+  background: var(--bg-canvas);
 }
 
 .balance-left {
@@ -788,6 +811,7 @@ html.mode-tournament .cash-only {
   height: 7px;
   background: var(--accent-green);
   display: inline-block;
+  flex-shrink: 0;
 }
 
 .balance-dot.alert {
@@ -798,12 +822,14 @@ html.mode-tournament .cash-only {
 .balance-title {
   font-weight: 700;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .balance-right {
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .balance-tag {
@@ -813,8 +839,15 @@ html.mode-tournament .cash-only {
 
 .balance-number {
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-primary);
+}
+
+@media(max-width: 780px) {
+  .cash-balance-inline {
+    width: 100%;
+    order: 3;
+  }
 }
 
 /* ── 5. Tournament Race Header ── */
@@ -1241,79 +1274,20 @@ html:not(.dark) .player-championship-card.hotcell {
   display: flex;
 }
 
-/* ══════════ FLOATING HOLD-AND-DRAG SCRUBBER HUD ══════════ */
-.scrubber-hud-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 3000;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(2px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-  touch-action: none;
+/* ── Direct Hold & Drag In-Place Feedback ── */
+.score-hero-digits.scrubbing-live {
+  color: var(--accent-amber) !important;
+  transform: scale(1.08);
+  transition: transform 50ms ease;
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
 }
 
-.scrubber-hud-overlay.active {
-  display: flex;
-}
-
-.scrubber-card {
-  background: var(--bg-surface);
-  border: 2px solid var(--border-bold);
-  padding: 24px 28px;
-  min-width: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-  animation: scrubPop 120ms ease-out;
-}
-
-@keyframes scrubPop {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.scrubber-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
-}
-
-.scrubber-val {
-  font-family: var(--font-serif);
-  font-size: 72px;
-  font-weight: 700;
-  line-height: 1;
+.log-point-delta.inc {
   color: var(--text-primary);
-  letter-spacing: -0.04em;
 }
 
-.scrubber-scale {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 6px 4px 2px 4px;
-  border-top: 1px solid var(--border-hairline);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--text-secondary);
-}
-
-.scrub-tick {
-  font-weight: 600;
-}
-
-.scrubber-hint {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--text-muted);
-  text-align: center;
+.log-point-delta.dec {
+  color: var(--accent-red);
 }
 
 /* ══════════ MODALS ══════════ */

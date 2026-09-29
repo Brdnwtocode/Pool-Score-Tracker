@@ -21,22 +21,27 @@
     <!-- ── 1. Top Masthead Navigation ── -->
     <header class="masthead">
       <div class="masthead-left">
-        <span class="table-badge">TABLE <strong id="tableIdText">#01</strong></span>
+        <span class="table-badge"><span id="lblTablePrefix">TABLE</span> <strong id="tableIdText">#01</strong></span>
         
         <!-- DUAL-MODE TOGGLE SWITCH -->
         <div class="mode-toggle-group">
           <button class="mode-switch-btn active" id="btnModeCash" type="button" title="Switch to Cash Ring Game (Zero-Sum Betting)">
             <span class="material-symbols-outlined">payments</span>
-            <span>CASH RING</span>
+            <span id="lblModeCash">CASH RING</span>
           </button>
           <button class="mode-switch-btn" id="btnModeTournament" type="button" title="Switch to WPA Tournament Frame (Race-to-X & Shot Clock)">
             <span class="material-symbols-outlined">emoji_events</span>
-            <span>TOURNAMENT</span>
+            <span id="lblModeTourney">TOURNAMENT</span>
           </button>
         </div>
       </div>
 
       <div class="masthead-right">
+        <!-- Language Switcher (VI / EN) -->
+        <button class="lang-toggle-btn" id="btnLang" type="button" title="Switch Language / Đổi ngôn ngữ (VI / EN)">
+          <span class="material-symbols-outlined" style="font-size: 15px;">language</span>
+          <span id="langDisplayText">EN</span>
+        </button>
         <button class="icon-tool" id="btnFullscreen" type="button" title="Toggle Fullscreen">
           <span class="material-symbols-outlined" id="fullscreenIcon">fullscreen</span>
         </button>
@@ -54,7 +59,7 @@
         </button>
         <button class="text-tool-btn" id="btnResetQuick" type="button" title="Quick Reset">
           <span class="material-symbols-outlined">restart_alt</span>
-          <span>RESET</span>
+          <span id="lblResetQuick">RESET</span>
         </button>
         <button class="user-avatar-btn" id="btnInfo" type="button" title="Author & System Specifications">
           <span class="material-symbols-outlined">person</span>
@@ -88,7 +93,7 @@
           <div class="card-head">
             <div class="card-title">
               <span class="material-symbols-outlined icon-accent">timer</span>
-              <span class="card-title-text">SHOT CLOCK PRECISION READOUT</span>
+              <span class="card-title-text" id="lblShotClockTitle">SHOT CLOCK PRECISION READOUT</span>
             </div>
             <div class="mode-chips">
               <button class="clock-mode-btn" data-sec="30" type="button">30S</button>
@@ -100,7 +105,7 @@
           <div class="clock-hero-row">
             <div class="clock-digits-wrap">
               <span class="clock-digits-hero" id="clockHeroDigits">45</span>
-              <span class="clock-digits-sub">SEC REMAINING</span>
+              <span class="clock-digits-sub" id="lblClockSecRem">SEC REMAINING</span>
             </div>
             <div class="clock-status-meta">
               <span class="status-chip" id="clockStatusChip">STANDBY</span>
@@ -119,7 +124,7 @@
             </button>
             <button class="btn-clock-sec" id="btnClockExt" type="button">
               <span class="material-symbols-outlined">history</span>
-              <span>+30S EXT</span>
+              <span id="lblClockExtBtn">+30S EXT</span>
             </button>
             <button class="btn-clock-icon" id="btnClockReset" type="button" title="Reset Shot Clock">
               <span class="material-symbols-outlined">refresh</span>
@@ -132,50 +137,62 @@
           <div class="card-head">
             <div class="card-title">
               <span class="material-symbols-outlined icon-accent">payments</span>
-              <span class="card-title-text">STAKES LEDGER &amp; PROTOCOL</span>
+              <span class="card-title-text" id="lblStakesProtocolTitle">STAKES LEDGER &amp; PROTOCOL</span>
             </div>
             <span class="header-badge" id="racePillTag">RACE 15</span>
           </div>
 
           <div class="stakes-metrics-triad">
             <div class="stake-metric-box" id="boxPerRack" title="Click to adjust stake rate">
-              <span class="metric-label">PER RACK VALUE</span>
+              <span class="metric-label" id="lblPerRackVal">PER RACK VALUE</span>
               <span class="metric-val" id="metricPerRackVal">$1.00 <small>/ PT</small></span>
             </div>
             <div class="stake-metric-box" id="boxCurrentPot">
-              <span class="metric-label">CURRENT POT</span>
+              <span class="metric-label" id="lblCurrentPot">CURRENT POT</span>
               <span class="metric-val" id="metricCurrentPotVal">$0.00</span>
             </div>
             <div class="stake-metric-box" id="boxTargetFrame" title="Click to change target race">
-              <span class="metric-label">TARGET FRAME</span>
+              <span class="metric-label" id="lblTargetFrame">TARGET FRAME</span>
               <span class="metric-val" id="metricTargetRace">RACE 15</span>
             </div>
           </div>
 
           <div class="stakes-shortcuts-row">
             <div class="shortcuts-legend">
-              <span class="label-dim">SHORTCUTS:</span>
+              <span class="label-dim" id="lblShortcuts">SHORTCUTS:</span>
               <code>Space: Clock</code>
               <code>Q/W: P1 ±</code>
               <code>O/P: P2 ±</code>
             </div>
-            <span class="shortcut-hint">Tap box to edit</span>
+            <span class="shortcut-hint" id="lblShortcutHint">Tap box to edit</span>
           </div>
         </article>
 
       </section>
 
-      <!-- ── 3B. CASH-ONLY: Compact Money & Compact Clock Bar ── -->
+      <!-- ── 3B. CASH-ONLY: Unified Cash Telemetry & Zero-Sum Balance Card ── -->
       <section class="cash-telemetry-bar cash-only">
         <div class="cash-telemetry-left">
           <button class="cash-rate-chip" id="btnCashRateChip" type="button" title="Configure stake rate">
             <span class="material-symbols-outlined" style="font-size: 15px;">payments</span>
-            <span>STAKE: <strong id="cashStakeLabel">$1.00 / PT</strong></span>
+            <span><span id="lblStakePrefix">STAKE:</span> <strong id="cashStakeLabel">$1.00 / PT</strong></span>
           </button>
           <button class="cash-payout-btn" id="btnOpenSettlements" type="button" title="Open Cash Settlement Transfers">
             <span class="material-symbols-outlined" style="font-size: 15px;">receipt_long</span>
-            <span>WHO PAYS WHOM</span>
+            <span id="lblWhoPaysWhom">WHO PAYS WHOM</span>
           </button>
+        </div>
+
+        <!-- Integrated Zero-Sum Balance Status Bar -->
+        <div class="cash-balance-inline" id="balanceStatusBar">
+          <div class="balance-left">
+            <span class="balance-dot" id="balanceDot"></span>
+            <span class="balance-title" id="balanceStatusText">ZERO-SUM BALANCED (0)</span>
+          </div>
+          <div class="balance-right">
+            <span class="balance-tag" id="lblDiscrepancyTag">DISCREPANCY:</span>
+            <span class="balance-number" id="totalSum">BALANCED</span>
+          </div>
         </div>
 
         <!-- Compact Shot Clock in Cash Mode -->
@@ -190,23 +207,11 @@
         </div>
       </section>
 
-      <!-- ── 4. CASH-ONLY: Mathematically Bulletproof Zero-Sum Balance Bar ── -->
-      <section class="match-balance-bar cash-only" id="balanceStatusBar">
-        <div class="balance-left">
-          <span class="balance-dot" id="balanceDot"></span>
-          <span class="balance-title" id="balanceStatusText">ZERO-SUM BALANCED (0)</span>
-        </div>
-        <div class="balance-right">
-          <span class="balance-tag">DISCREPANCY:</span>
-          <span class="balance-number" id="totalSum">BALANCED</span>
-        </div>
-      </section>
-
       <!-- ── 5. TOURNAMENT-ONLY: Race Header ── -->
       <section class="tournament-race-header tournament-only">
         <div class="race-header-title">
           <span class="material-symbols-outlined">sports_score</span>
-          <span>CHAMPIONSHIP SCORE ARRAY</span>
+          <span id="lblTourneyArrayTitle">CHAMPIONSHIP SCORE ARRAY</span>
         </div>
         <span class="race-target-label" id="tourneyRaceBadge">TARGET: RACE TO 15</span>
       </section>
@@ -221,11 +226,11 @@
         <div class="tactical-left">
           <button class="tactical-btn" id="btnAddPlayer" type="button">
             <span class="material-symbols-outlined">person_add</span>
-            <span>ADD PLAYER (<span id="playerCountVal">2</span>/4)</span>
+            <span id="lblAddPlayerBtn">ADD PLAYER (<span id="playerCountVal">2</span>/4)</span>
           </button>
           <button class="tactical-btn outline" id="btnRemovePlayer" type="button">
             <span class="material-symbols-outlined">person_remove</span>
-            <span>REMOVE</span>
+            <span id="lblRemovePlayerBtn">REMOVE</span>
           </button>
         </div>
 
@@ -240,7 +245,7 @@
 
           <button class="tactical-btn inverted" id="btnToggleRackLog" type="button">
             <span class="material-symbols-outlined">menu_book</span>
-            <span>RACK LOG</span>
+            <span id="lblRackLogBtn">RACK LOG</span>
           </button>
         </div>
       </section>
@@ -250,7 +255,7 @@
         <div class="drawer-header">
           <div class="drawer-title">
             <span class="material-symbols-outlined">history_edu</span>
-            <span>CHRONOLOGICAL RACK LEDGER</span>
+            <span id="lblChronDrawerTitle">CHRONOLOGICAL RACK LEDGER</span>
           </div>
 
           <div class="drawer-controls">
@@ -270,29 +275,13 @@
         <div class="rack-log-scroll" id="rackLogScrollList">
           <div class="empty-log-state" id="emptyLogState">
             <span class="material-symbols-outlined">sports_score</span>
-            <p>NO RACKS RECORDED YET · TAP + ON ANY PLAYER CARD TO LOG A FRAME</p>
+            <p id="lblEmptyLog">NO RACKS RECORDED YET · TAP + ON ANY PLAYER CARD TO LOG A FRAME</p>
           </div>
         </div>
       </section>
 
     </main>
 
-  </div>
-
-  <!-- ══════════ FLOATING HOLD-AND-DRAG SCRUBBER HUD ══════════ -->
-  <div class="scrubber-hud-overlay" id="scrubberHudOverlay">
-    <div class="scrubber-card" id="scrubberCard">
-      <div class="scrubber-label" id="scrubberLabel">HOLD &amp; DRAG TO ADJUST</div>
-      <div class="scrubber-val" id="scrubberVal">+1</div>
-      <div class="scrubber-scale" id="scrubberScale">
-        <span class="scrub-tick">1</span>
-        <span class="scrub-tick">3</span>
-        <span class="scrub-tick">6</span>
-        <span class="scrub-tick">9</span>
-        <span class="scrub-tick">12</span>
-      </div>
-      <div class="scrubber-hint">Drag up/down · Release to apply (max 12 pts)</div>
-    </div>
   </div>
 
   <!-- ══════════ CASH SETTLEMENTS & CONFIG MODAL ══════════ -->
@@ -310,7 +299,7 @@
 
       <div class="modal-body">
         <div class="config-section">
-          <label class="config-label" for="stakeInputRate">RATE PER POINT / RACK ($)</label>
+          <label class="config-label" for="stakeInputRate" id="lblRatePerPoint">RATE PER POINT / RACK ($)</label>
           <div class="stepper-row">
             <button class="btn-step" id="btnStakeStepMinus" type="button">−$0.50</button>
             <div class="input-rate-box">
@@ -330,7 +319,7 @@
         </div>
 
         <div class="config-section tournament-only">
-          <label class="config-label" for="raceInputTarget">TARGET MATCH RACE (FIRST TO X)</label>
+          <label class="config-label" for="raceInputTarget" id="lblTargetMatchRace">TARGET MATCH RACE (FIRST TO X)</label>
           <div class="stepper-row">
             <button class="btn-step" id="btnRaceMinus" type="button">−1</button>
             <div class="input-rate-box">
@@ -349,7 +338,7 @@
         </div>
 
         <div class="settlement-breakdown-box">
-          <div class="breakdown-header">WHO PAYS WHOM (DIRECT CASH TRANSFERS)</div>
+          <div class="breakdown-header" id="lblBreakdownHeader">WHO PAYS WHOM (DIRECT CASH TRANSFERS)</div>
           <div class="settlement-roster-list" id="modalSettlementRoster"></div>
           <div class="transfers-ledger-list" id="modalTransfersLedger"></div>
         </div>
@@ -367,7 +356,7 @@
       <div class="modal-head">
         <div class="modal-title-row">
           <span class="material-symbols-outlined">info</span>
-          <h2>SYSTEM SPECIFICATIONS &amp; AUTHOR</h2>
+          <h2 id="lblInfoModalTitle">SYSTEM SPECIFICATIONS &amp; AUTHOR</h2>
         </div>
         <button class="btn-modal-close" id="btnCloseInfoModal" type="button">
           <span class="material-symbols-outlined">close</span>
@@ -378,7 +367,7 @@
         <div class="author-banner">
           <div class="author-avatar"><span class="material-symbols-outlined">sports_bar</span></div>
           <div class="author-info">
-            <span class="meta-tag">ARCHITECT &amp; LEAD DEVELOPER</span>
+            <span class="meta-tag" id="lblArchitectTag">ARCHITECT &amp; LEAD DEVELOPER</span>
             <h3 class="author-name">Phạm Nam Hào</h3>
             <span class="author-handle">@Brdnwtocode</span>
           </div>
@@ -420,11 +409,11 @@
         </div>
 
         <div class="system-specs-summary">
-          <span class="meta-tag">DUAL-MODE ARCHITECTURE</span>
-          <ul>
+          <span class="meta-tag" id="lblSpecsSummaryTag">DUAL-MODE ARCHITECTURE</span>
+          <ul id="lblSpecsList">
             <li><strong>💰 Cash Ring Game Mode:</strong> Zero-sum betting logic where scores balance to 0, negative points permitted, live discrepancy tracker, subtle hotcell highlight.</li>
             <li><strong>🏆 Tournament Mode:</strong> WPA official race-to-X frames (0 to Target Race), 30s/45s/60s shot clock, and chronological audit log.</li>
-            <li><strong>Hold &amp; Drag Gesture:</strong> Hold + / − for 1s and drag up/down to adjust 1–12 points instantly.</li>
+            <li><strong>Hold &amp; Drag Gesture:</strong> Hold + / − for 0.7s and drag up/down to adjust 1–12 points instantly with direct card digits update.</li>
             <li><strong>Keep Screen Awake:</strong> Automatically active via Screen Wake Lock API.</li>
           </ul>
         </div>
