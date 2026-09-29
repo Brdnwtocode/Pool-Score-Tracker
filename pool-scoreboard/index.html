@@ -62,11 +62,12 @@
       <!-- ── 2. Telemetry Dual Widgets ── -->
       <section class="telemetry-grid">
 
-        <!-- Widget A: Shot Clock Precision Readout (Title removed per request) -->
+        <!-- Widget A: Shot Clock Precision Readout -->
         <article class="telemetry-card clock-readout-card">
           <div class="card-head">
             <div class="card-title">
               <span class="material-symbols-outlined icon-accent">timer</span>
+              <span class="card-title-text">SHOT CLOCK</span>
             </div>
             <div class="mode-chips">
               <button class="clock-mode-btn" data-sec="30" type="button">30S</button>
@@ -105,15 +106,23 @@
           </div>
         </article>
 
-        <!-- Widget B: Stakes Ledger (Header removed per request) -->
+        <!-- Widget B: Stakes Ledger & Match Race -->
         <article class="telemetry-card stakes-protocol-card">
+          <div class="card-head">
+            <div class="card-title">
+              <span class="material-symbols-outlined icon-accent">payments</span>
+              <span class="card-title-text">STAKES &amp; MATCH RACE</span>
+            </div>
+            <span class="header-badge" id="racePillTag">RACE 15</span>
+          </div>
+
           <div class="stakes-metrics-triad">
             <div class="stake-metric-box" id="boxPerRack" title="Click to adjust stake rate">
               <span class="metric-label">PER RACK VALUE</span>
               <span class="metric-val" id="metricPerRackVal">$1.00 <small>/ PT</small></span>
             </div>
             <div class="stake-metric-box" id="boxCurrentPot">
-              <span class="metric-label">CURRENT POT / SPREAD</span>
+              <span class="metric-label">CURRENT POT</span>
               <span class="metric-val" id="metricCurrentPotVal">$0.00</span>
             </div>
             <div class="stake-metric-box" id="boxTargetFrame" title="Click to change target race">
@@ -129,22 +138,28 @@
               <code>Q/W: P1 ±</code>
               <code>O/P: P2 ±</code>
             </div>
-            <div class="stakes-quick-tags">
-              <button class="quick-tag-btn" id="btnTagFoul" type="button">FOUL</button>
-              <button class="quick-tag-btn" id="btnTagSafe" type="button">SAFE</button>
-            </div>
+            <span class="shortcut-hint">Tap any box to configure</span>
           </div>
         </article>
 
       </section>
 
-      <!-- ── 3. Dynamic Player Roster Array (2 to 4 Players) ── -->
+      <!-- ── 3. Zero-Sum Balance Status Bar ── -->
+      <section class="match-balance-bar" id="balanceStatusBar">
+        <div class="balance-left">
+          <span class="balance-dot" id="balanceDot"></span>
+          <span class="balance-title" id="balanceStatusText">MATCH ZERO-SUM BALANCED</span>
+        </div>
+        <div class="balance-right">
+          <span class="balance-tag">DISCREPANCY:</span>
+          <span class="balance-number" id="totalSum">BALANCED</span>
+        </div>
+      </section>
+
+      <!-- ── 4. Dynamic Player Roster Array (2 to 4 Players) ── -->
       <section class="players-array-grid" id="playersArrayContainer">
         <!-- Rendered dynamically by script.js with .hotcell slight highlighted effect -->
       </section>
-
-      <!-- ── 4. Original Zero-Sum Total Balance Indicator ── -->
-      <div class="total-sum-display" id="totalSum"></div>
 
       <!-- ── 5. Tactical Control Actions Row ── -->
       <section class="tactical-actions-strip">

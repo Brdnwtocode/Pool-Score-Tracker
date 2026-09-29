@@ -86,6 +86,12 @@ You can access developer and system information directly inside the web app by t
 - ✉️ **Direct Contact / Email:** [phmnamhao@gmail.com](mailto:phmnamhao@gmail.com)
 - 💼 **Portfolio:** [Brdnwtocode's GitHub Projects](https://github.com/Brdnwtocode?tab=repositories)
 
+## 📚 Technical Documentation & Engineering Lifecycle
+
+- 📖 **[Building, Testing & Improving Process Document](BUILDING_TESTING_IMPROVING.md):** Comprehensive engineering lifecycle breakdown covering architecture, testing verification, and iterative problem solving.
+- 📐 **[Functionality Specification (SPEC.md)](pool-scoreboard/SPEC.md):** Complete source-of-truth functional contract for the Championship Edition.
+- 🎨 **[Monochrome Editorial Design System (DESIGN.md)](pool-scoreboard/reference/DESIGN.md):** Structural design specifications, typography, color tokens, and layout guidelines.
+
 ---
 
 ## 🚀 Getting Started & Local Usage

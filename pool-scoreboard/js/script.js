@@ -1,28 +1,25 @@
 /**
- * Championship Pool Scoreboard · Protocol Engine
- * Features:
- * - True Zero-Sum point scoring (negative scores allowed for betting losses)
- * - Original subtle hotcell highlight & #totalSum discrepancy indicator
- * - Default Screen Wake Lock (keeps screen awake automatically)
- * - Fullscreen Mode Button
- * - 30S / 45S / 60S Pro Shot Clock with extension & audio cues
- * - Player Roster Management (2 to 4 players)
- * - Pairwise Financial Stakes & Race-To Target Frame
- * - Web Audio API Ball Strike Clicks & Native Haptics
- * - Keyboard Shortcuts (Space, Q/W, O/P, E, R, Ctrl+Z)
- * - LocalStorage Auto-Save
+ * Championship Pool Scoreboard · Protocol Engine v2.7.0
+ * Fixed All UI/UX Overflow & Contrast Issues:
+ * - Proper score formatting: -3 instead of -03, preserving card width
+ * - Auto-scaling digits clamp(38px, 4.2vw, 64px) avoiding any boundary blowout
+ * - Dedicated Zero-Sum Balance Bar with live discrepancy telemetry
+ * - Removed filler fake stats (no TBL ratio or static Fargo ratings)
+ * - Distinct subtle Hotcell highlight with clear visual contrast
+ * - Symmetrical top widgets (Shot clock & Stakes ledger)
+ * - Full Screen Wake Lock, Fullscreen Mode, Keyboard Shortcuts
  */
 
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "21n2_pool_championship_v26";
+  const STORAGE_KEY = "21n2_pool_championship_v27";
 
   // ═══════════════ APPLICATION STATE ═══════════════
   let state = {
     players: [
-      { id: 1, name: "Johnny Archer", score: 0, isBreaker: true, runouts: 0, fargo: 812 },
-      { id: 2, name: "Shane Van Boening", score: 0, isBreaker: false, runouts: 0, fargo: 824 },
+      { id: 1, name: "Johnny Archer", score: 0, isBreaker: true },
+      { id: 2, name: "Shane Van Boening", score: 0, isBreaker: false },
     ],
     stakeRate: 1.0,
     targetRace: 15,
@@ -82,12 +79,16 @@
   const metricCurrentPotVal = $("metricCurrentPotVal");
   const boxTargetFrame = $("boxTargetFrame");
   const metricTargetRace = $("metricTargetRace");
-  const btnTagFoul = $("btnTagFoul");
-  const btnTagSafe = $("btnTagSafe");
+  const racePillTag = $("racePillTag");
 
-  // Players Array & Original Zero-Sum TotalSum element
-  const playersArrayContainer = $("playersArrayContainer");
+  // Match Balance Bar
+  const balanceStatusBar = $("balanceStatusBar");
+  const balanceDot = $("balanceDot");
+  const balanceStatusText = $("balanceStatusText");
   const totalSumEl = $("totalSum");
+
+  // Players Array Container
+  const playersArrayContainer = $("playersArrayContainer");
 
   // Tactical Actions
   const btnAddPlayer = $("btnAddPlayer");
@@ -133,9 +134,7 @@
         wakeLockSentinel.addEventListener("release", () => {
           wakeLockSentinel = null;
         });
-      } catch {
-        // Ignored if unsupported
-      }
+      } catch {}
     }
   }
 
@@ -198,7 +197,7 @@
       osc1.start(t);
       osc1.stop(t + 0.035);
 
-      // Deep phenolic body resonance
+      // Body resonance
       const osc2 = ctx.createOscillator();
       const gain2 = ctx.createGain();
       osc2.type = "sine";
@@ -279,44 +278,41 @@
     return el.innerHTML;
   }
 
+  // Proper score formatting: -3 instead of -03, preserving card width
   function formatScore(score) {
     if (score < 0) {
-      return "-" + String(Math.abs(score)).padStart(2, "0");
+      return `-${Math.abs(score)}`; // Clean: -1, -3 (never -03!)
     }
-    return String(score).padStart(2, "0");
+    return score < 10 ? `0${score}` : `${score}`; // 00, 08, 12
   }
 
   // ═══════════════ ORIGINAL ZERO-SUM & HOTCELL LOGIC ═══════════════
-  /**
-   * Exact original zero-sum logic from Duahettienday_WebApp:
-   * When score increases (+1): totalSum -= 1
-   * When score decreases (-1): totalSum -= (-1) => totalSum += 1
-   * If totalSum == 0: hotcell class removed, totalSum text is ""
-   * If totalSum != 0: hotcell class added, totalSum text is -1 * totalSum
-   */
   function trackTotal(n) {
     if (n > 0) state.totalSum -= n;
     if (n < 0) state.totalSum -= n;
-
-    const cards = document.querySelectorAll(".player-championship-card");
-
-    if (state.totalSum === 0) {
-      cards.forEach((c) => c.classList.remove("hotcell"));
-      if (totalSumEl) totalSumEl.innerText = "";
-    } else {
-      cards.forEach((c) => c.classList.add("hotcell"));
-      if (totalSumEl) totalSumEl.innerText = -1 * state.totalSum;
-    }
+    updateBalanceDisplay();
   }
 
-  function reapplyHotcellState() {
+  function updateBalanceDisplay() {
     const cards = document.querySelectorAll(".player-championship-card");
-    if (state.totalSum === 0) {
-      cards.forEach((c) => c.classList.remove("hotcell"));
-      if (totalSumEl) totalSumEl.innerText = "";
-    } else {
-      cards.forEach((c) => c.classList.add("hotcell"));
-      if (totalSumEl) totalSumEl.innerText = -1 * state.totalSum;
+    const discrepancy = -1 * state.totalSum;
+    const isBalanced = state.totalSum === 0;
+
+    cards.forEach((c) => c.classList.toggle("hotcell", !isBalanced));
+
+    if (balanceStatusBar) {
+      balanceStatusBar.classList.toggle("unbalanced", !isBalanced);
+    }
+    if (balanceDot) {
+      balanceDot.classList.toggle("alert", !isBalanced);
+    }
+    if (balanceStatusText) {
+      balanceStatusText.textContent = isBalanced
+        ? "MATCH ZERO-SUM BALANCED"
+        : `TABLE UNBALANCED (${discrepancy > 0 ? "+" : ""}${discrepancy} DISCREPANCY)`;
+    }
+    if (totalSumEl) {
+      totalSumEl.textContent = isBalanced ? "BALANCED" : `${discrepancy > 0 ? "+" : ""}${discrepancy}`;
     }
   }
 
@@ -377,18 +373,16 @@
 
       card.innerHTML = `
         <div class="card-top-breaker-row">
-          <div 
+          <button 
+            type="button"
             class="breaker-status-pill ${p.isBreaker ? "active" : "waiting"}" 
             data-pid="${p.id}" 
             title="Click to pass break"
           >
             <span class="material-symbols-outlined" style="font-size: 13px;">${p.isBreaker ? "token" : "radio_button_unchecked"}</span>
-            <span>${p.isBreaker ? "ACTIVE BREAKER" : "INNING WAITING"}</span>
-          </div>
-
-          <span class="material-symbols-outlined card-status-icon-badge ${p.isBreaker ? "active" : ""}">
-            ${p.isBreaker ? "verified" : "radio_button_unchecked"}
-          </span>
+            <span>${p.isBreaker ? "BREAK" : "WAIT"}</span>
+          </button>
+          <span class="player-seat-badge">#0${index + 1}</span>
         </div>
 
         <input 
@@ -400,36 +394,24 @@
           spellcheck="false"
         />
 
-        <div class="player-sub-meta">
-          <span>P${index + 1}</span> / 
-          <span>Fargo: ${p.fargo || 800}</span> / 
-          <span>Runouts: ${p.runouts || 0}</span>
-        </div>
-
         <div class="card-score-row">
-          <button class="btn-score-touch btn-dec" data-pid="${p.id}" title="Decrement Rack (−)">
+          <button class="btn-score-touch btn-dec" data-pid="${p.id}" title="Decrement (−)">
             <span class="material-symbols-outlined">remove</span>
           </button>
 
           <div class="score-center-display">
             <span class="score-hero-digits" id="digits-${p.id}">${formatScore(p.score)}</span>
-            <span class="score-sublabel">CURRENT FRAMES</span>
+            <span class="score-sublabel">POINTS</span>
           </div>
 
-          <button class="btn-score-touch btn-inc" data-pid="${p.id}" title="Increment Rack (+)">
+          <button class="btn-score-touch btn-inc" data-pid="${p.id}" title="Increment (+)">
             <span class="material-symbols-outlined">add</span>
           </button>
         </div>
 
         <div class="card-telemetry-footer">
-          <div class="footer-stat-group">
-            <span class="stat-label-tiny">FINANCIAL NET</span>
-            <span class="stat-val-bold ${isWin ? "win" : "loss"}">${cashStr}</span>
-          </div>
-          <div class="footer-stat-group" style="align-items: flex-end;">
-            <span class="stat-label-tiny">INNING SUCCESS</span>
-            <span class="stat-val-pct">${p.score !== 0 ? (70 + Math.abs(p.score) * 2).toFixed(1) : "0.0"}% TBL RATIO</span>
-          </div>
+          <span class="stat-label-tiny">NET MONEY</span>
+          <span class="stat-val-bold ${isWin ? "win" : "loss"}">${cashStr}</span>
         </div>
       `;
 
@@ -476,16 +458,16 @@
       metricCurrentPotVal.textContent = `$${pot}`;
     }
 
-    reapplyHotcellState();
+    updateBalanceDisplay();
   }
 
-  // ═══════════════ SCORE ENGINE (ALLOWS NEGATIVE NUMBERS FOR ZERO-SUM) ═══════════════
+  // ═══════════════ SCORE ENGINE ═══════════════
   function modifyScore(playerId, delta, isUndoRedo = false) {
     const player = state.players.find((p) => p.id === playerId);
     if (!player) return;
 
     const prevScore = player.score;
-    // Zero-sum game: scores CAN be negative!
+    // Zero-sum game: scores can be negative
     player.score = player.score + delta;
 
     trackTotal(delta);
@@ -771,8 +753,6 @@
       name: fallbackName,
       score: 0,
       isBreaker: false,
-      runouts: 0,
-      fargo: 800,
     });
 
     tactileFeedback();
@@ -791,7 +771,6 @@
     }
 
     const removed = state.players.pop();
-    // Reverse any score contribution from removed player to totalSum
     trackTotal(removed.score);
     tactileFeedback();
     saveState();
@@ -849,7 +828,6 @@
   function executeFullReset() {
     state.players.forEach((p) => {
       p.score = 0;
-      p.runouts = 0;
     });
     state.history = [];
     state.totalSum = 0;
@@ -932,6 +910,7 @@
     state.targetRace = Math.max(1, parseInt(raceInputTarget.value, 10) || 15);
     metricPerRackVal.innerHTML = `$${state.stakeRate.toFixed(2)} <small>/ PT</small>`;
     metricTargetRace.textContent = `RACE ${state.targetRace}`;
+    if (racePillTag) racePillTag.textContent = `RACE ${state.targetRace}`;
     saveState();
     renderPlayers();
     stakesModal.classList.remove("open");
@@ -1020,16 +999,6 @@
     saveState();
   });
 
-  btnTagFoul.addEventListener("click", () => {
-    tactileFeedback(true);
-    showToast("FOUL LOGGED: Ball-in-hand awarded");
-  });
-
-  btnTagSafe.addEventListener("click", () => {
-    tactileFeedback();
-    showToast("DEFENSIVE SAFETY LOGGED");
-  });
-
   // ═══════════════ KEYBOARD SHORTCUTS ═══════════════
   window.addEventListener("keydown", (e) => {
     if (e.target.tagName === "INPUT") return;
@@ -1074,6 +1043,7 @@
     // Metric cards
     metricPerRackVal.innerHTML = `$${state.stakeRate.toFixed(2)} <small>/ PT</small>`;
     metricTargetRace.textContent = `RACE ${state.targetRace}`;
+    if (racePillTag) racePillTag.textContent = `RACE ${state.targetRace}`;
     soundIcon.textContent = state.soundEnabled ? "volume_up" : "volume_off";
 
     renderPlayers();
