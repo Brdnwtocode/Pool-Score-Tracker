@@ -89,6 +89,11 @@
   const transferLedger = document.getElementById("transferLedger");
   const toastIndicator = document.getElementById("toastIndicator");
 
+  const infoModalBtn = document.getElementById("infoModalBtn");
+  const infoModal = document.getElementById("infoModal");
+  const closeInfoModalBtn = document.getElementById("closeInfoModalBtn");
+  const dismissInfoBtn = document.getElementById("dismissInfoBtn");
+
   // ===== Audio Synthesis (Web Audio API) =====
   let audioCtx = null;
 
@@ -975,6 +980,32 @@
       renderStakesModal();
     });
   });
+
+  // ===== Info & Developer Modal Events =====
+  if (infoModalBtn && infoModal) {
+    infoModalBtn.addEventListener("click", () => {
+      triggerTactileFeedback();
+      infoModal.classList.add("open");
+    });
+
+    if (closeInfoModalBtn) {
+      closeInfoModalBtn.addEventListener("click", () => {
+        infoModal.classList.remove("open");
+      });
+    }
+
+    if (dismissInfoBtn) {
+      dismissInfoBtn.addEventListener("click", () => {
+        infoModal.classList.remove("open");
+      });
+    }
+
+    infoModal.addEventListener("click", (e) => {
+      if (e.target === infoModal) {
+        infoModal.classList.remove("open");
+      }
+    });
+  }
 
   // ===== Utility Helpers =====
   function escapeHtml(str) {

@@ -292,8 +292,8 @@ input {
   background-color: var(--surface-container-low);
   border: 1px solid var(--outline-variant);
   padding: 10px 12px;
-  display: grid;
-  grid-template-columns: 1fr repeat(3, auto);
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   align-items: center;
 }
@@ -1119,4 +1119,93 @@ input {
     background-color: var(--error) !important;
     color: var(--on-error) !important;
   }
+}
+
+/* ===== Info Modal & Author Cards ===== */
+.info-card-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: var(--surface-container);
+  border: 1px solid var(--outline-variant);
+}
+
+.author-avatar-wrap {
+  width: 44px;
+  height: 44px;
+  background-color: var(--primary);
+  color: var(--on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-author {
+  font-size: 24px;
+}
+
+.author-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--on-surface);
+}
+
+.author-handle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--on-surface-variant);
+  letter-spacing: 0.04em;
+}
+
+.info-links-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-link-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background-color: var(--surface-container-high);
+  border: 1px solid var(--outline-variant);
+  color: var(--on-surface);
+  text-decoration: none;
+  transition: background-color 100ms, border-color 100ms;
+}
+
+.info-link-row:hover {
+  background-color: var(--surface-container-highest);
+  border-color: var(--outline);
+}
+
+.info-link-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.link-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--on-surface-variant);
+}
+
+.link-val {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--on-surface);
 }

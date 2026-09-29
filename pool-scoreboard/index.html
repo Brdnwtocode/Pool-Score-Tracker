@@ -84,6 +84,11 @@
             <button class="tool-btn" id="themeToggleBtn" type="button" title="Toggle Light/Dark Editorial">
               <span class="material-symbols-outlined" id="themeIcon">contrast</span>
             </button>
+
+            <!-- Info & Author Modal Trigger -->
+            <button class="tool-btn" id="infoModalBtn" type="button" title="Project Info, Developer & Contact">
+              <span class="material-symbols-outlined">info</span>
+            </button>
           </div>
         </div>
 
@@ -213,6 +218,80 @@
 
         <div class="modal-footer">
           <button class="btn-modal-primary" id="saveStakesBtn" type="button">APPLY &amp; CLOSE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Developer & Project Info Modal -->
+    <div class="modal-backdrop" id="infoModal">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <div class="modal-title-row">
+            <span class="material-symbols-outlined">info</span>
+            <h2>SYSTEM INFORMATION &amp; AUTHOR</h2>
+          </div>
+          <button class="btn-close" id="closeInfoModalBtn" type="button">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="info-card-author">
+            <div class="author-avatar-wrap">
+              <span class="material-symbols-outlined icon-author">sports_bar</span>
+            </div>
+            <div class="author-meta">
+              <span class="meta-label">LEAD DEVELOPER</span>
+              <h3 class="author-name">Phạm Nam Hào</h3>
+              <span class="author-handle">@Brdnwtocode</span>
+            </div>
+          </div>
+
+          <div class="info-links-grid">
+            <a href="https://github.com/Brdnwtocode" target="_blank" rel="noopener noreferrer" class="info-link-row">
+              <div class="info-link-left">
+                <span class="material-symbols-outlined">code</span>
+                <div>
+                  <span class="link-label">GITHUB PROFILE</span>
+                  <span class="link-val">github.com/Brdnwtocode</span>
+                </div>
+              </div>
+              <span class="material-symbols-outlined icon-sm">open_in_new</span>
+            </a>
+
+            <a href="https://github.com/Brdnwtocode/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS" target="_blank" rel="noopener noreferrer" class="info-link-row">
+              <div class="info-link-left">
+                <span class="material-symbols-outlined">folder_special</span>
+                <div>
+                  <span class="link-label">PROJECT REPOSITORY</span>
+                  <span class="link-val">21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS</span>
+                </div>
+              </div>
+              <span class="material-symbols-outlined icon-sm">open_in_new</span>
+            </a>
+
+            <a href="mailto:phmnamhao@gmail.com" class="info-link-row">
+              <div class="info-link-left">
+                <span class="material-symbols-outlined">mail</span>
+                <div>
+                  <span class="link-label">DIRECT CONTACT / EMAIL</span>
+                  <span class="link-val">phmnamhao@gmail.com</span>
+                </div>
+              </div>
+              <span class="material-symbols-outlined icon-sm">send</span>
+            </a>
+          </div>
+
+          <div class="stake-formula-box">
+            <span class="meta-label">ABOUT THIS ENGINE</span>
+            <p>
+              Engineered with a strict Monochrome Editorial design language (zero-radius sharp geometry, Swiss modernist typographic scale, flat elevation, Web Audio API synthesis, and pairwise stakes settlement).
+            </p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-modal-primary" id="dismissInfoBtn" type="button">CLOSE</button>
         </div>
       </div>
     </div>
