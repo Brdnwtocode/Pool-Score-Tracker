@@ -1,155 +1,414 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0d0e0f">
-  <title>Pool Scoreboard</title>
+  <title>Championship Pool Scoreboard · 21N2</title>
+
+  <!-- Typography: Newsreader (Editorial Serif), Inter (Clean UI), JetBrains Mono (Telemetry) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <div class="app">
-    <!-- ── Top Bar: Clock + Utilities ── -->
-    <div class="top-bar">
-      <div class="clock-card">
-        <div class="clock-header">
-          <span class="material-symbols-outlined" style="font-size:16px">timer</span>
-          <span class="label">SHOT CLOCK</span>
-          <div class="clock-modes">
-            <button class="chip active" id="mode30">30s</button>
-            <button class="chip" id="mode45">45s</button>
-          </div>
-        </div>
-        <div class="clock-readout">
-          <span class="clock-num" id="clockNum">30</span>
-          <span class="clock-sec">SEC</span>
-        </div>
-        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-        <div class="clock-btns">
-          <button class="btn-pri" id="clockToggle">START</button>
-          <button class="btn-sec" id="clockExt">+30s EXT</button>
-          <button class="btn-icon" id="clockReset" title="Reset"><span class="material-symbols-outlined">restart_alt</span></button>
-        </div>
+  <!-- ══════════ MASTER APP SHELL ══════════ -->
+  <div class="master-shell">
+
+    <!-- ── 1. Top Masthead Navigation ── -->
+    <header class="masthead">
+      <div class="masthead-left">
+        <span class="table-badge">TABLE <strong id="tableIdText">#01</strong></span>
+        <nav class="nav-links">
+          <button class="nav-tab active" id="tabScoreboard" type="button">SCOREBOARD</button>
+          <button class="nav-tab" id="tabInningsLog" type="button">INNINGS LOG</button>
+          <button class="nav-tab" id="tabArchive" type="button">ARCHIVE</button>
+          <button class="nav-tab" id="tabRules" type="button">RULES</button>
+        </nav>
       </div>
 
-      <div class="tools">
-        <button class="tool-btn wide" id="stakesBtn" title="Stakes Calculator">
-          <span class="material-symbols-outlined">payments</span>
-          <span class="tool-label" id="stakeLabel">$1.00/PT</span>
+      <div class="masthead-right">
+        <button class="icon-tool" id="btnFullscreen" type="button" title="Toggle Fullscreen">
+          <span class="material-symbols-outlined" id="fullscreenIcon">fullscreen</span>
         </button>
-        <button class="tool-btn" id="undoBtn" title="Undo" disabled><span class="material-symbols-outlined">undo</span></button>
-        <button class="tool-btn" id="redoBtn" title="Redo" disabled><span class="material-symbols-outlined">redo</span></button>
-        <button class="tool-btn" id="soundBtn" title="Sound"><span class="material-symbols-outlined" id="soundIcon">volume_up</span></button>
-        <button class="tool-btn" id="themeBtn" title="Theme"><span class="material-symbols-outlined" id="themeIcon">contrast</span></button>
-        <button class="tool-btn" id="infoBtn" title="Info"><span class="material-symbols-outlined">info</span></button>
+        <button class="icon-tool" id="btnUndo" type="button" title="Undo Last Score" disabled>
+          <span class="material-symbols-outlined">undo</span>
+        </button>
+        <button class="icon-tool" id="btnRedo" type="button" title="Redo Score" disabled>
+          <span class="material-symbols-outlined">redo</span>
+        </button>
+        <button class="icon-tool" id="btnSound" type="button" title="Toggle Ball Strike Sound & Haptics">
+          <span class="material-symbols-outlined" id="soundIcon">volume_up</span>
+        </button>
+        <button class="icon-tool" id="btnTheme" type="button" title="Toggle Dark / Light Theme">
+          <span class="material-symbols-outlined" id="themeIcon">contrast</span>
+        </button>
+        <button class="text-tool-btn" id="btnResetQuick" type="button" title="Quick Reset">
+          <span class="material-symbols-outlined">restart_alt</span>
+          <span>RESET</span>
+        </button>
+        <button class="user-avatar-btn" id="btnInfo" type="button" title="Author & System Specifications">
+          <span class="material-symbols-outlined">person</span>
+        </button>
       </div>
-    </div>
+    </header>
 
-    <!-- ── Balance Bar ── -->
-    <div class="balance-bar" id="balanceBar">
-      <span class="material-symbols-outlined" style="font-size:16px">balance</span>
-      <span class="balance-text" id="balanceText">MATCH READY</span>
-      <span class="balance-tag" id="balanceTagEl">READY</span>
-    </div>
-
-    <!-- ── Player Cards ── -->
-    <div class="players" id="players"></div>
-
-    <!-- ── Actions ── -->
-    <div class="actions">
-      <button class="act-btn" id="addBtn"><span class="material-symbols-outlined">person_add</span> ADD PLAYER</button>
-      <button class="act-btn outline" id="removeBtn"><span class="material-symbols-outlined">person_remove</span> REMOVE</button>
-      <div class="hold-wrap">
-        <button class="act-btn danger" id="holdResetBtn"><span class="material-symbols-outlined">restart_alt</span> <span id="holdLabel">HOLD 2S RESET</span></button>
-        <div class="hold-fill" id="holdFill"></div>
+    <!-- ── 2. Live Secondary HUD Inverted Telemetry Strip ── -->
+    <aside class="hud-ticker-band" id="hudTickerBand">
+      <div class="hud-ticker-inner">
+        <div class="hud-ticker-left">
+          <span class="hud-pill"><span class="hud-dot"></span> HUD ACTIVE</span>
+          <span class="hud-title" id="hudMatchTitle">TABLE #01 · 9-BALL CHAMPIONSHIP FRAME</span>
+        </div>
+        <div class="hud-ticker-right">
+          <span class="hud-stat" id="hudLeadStat">LEAD: <strong>EVEN</strong></span>
+          <span class="hud-divider">|</span>
+          <span class="hud-stat" id="hudDeltaStat">DELTA: <strong>$0.00 NET (BALANCED)</strong></span>
+        </div>
       </div>
-    </div>
+    </aside>
 
-    <!-- ── Rack History ── -->
-    <div class="history" id="historyBox">
-      <div class="hist-head">
-        <div class="hist-title"><span class="material-symbols-outlined" style="font-size:16px">history_edu</span><span class="label">RACK LOG</span></div>
-        <div class="hist-status"><span class="dot"></span><span id="blurText">ACTIVE</span><button class="wake-btn" id="wakeBtn">TAP TO FOCUS</button></div>
-      </div>
-      <div class="hist-list" id="histList">
-        <div class="hist-empty" id="histEmpty"><span class="material-symbols-outlined">sports_score</span><p>NO RACKS RECORDED YET</p></div>
-      </div>
-    </div>
-  </div>
+    <!-- ── Main Viewport Content ── -->
+    <main class="main-content">
 
-  <!-- ══ STAKES MODAL ══ -->
-  <div class="modal-bg" id="stakesModal">
-    <div class="modal-box">
-      <div class="modal-head">
-        <div class="modal-title"><span class="material-symbols-outlined">attach_money</span><h2>STAKES &amp; SETTLEMENT</h2></div>
-        <button class="close-btn" id="closeStakes"><span class="material-symbols-outlined">close</span></button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <span class="label">RATE PER POINT ($)</span>
-          <div class="stepper">
-            <button class="step-btn" id="rateMinus">&minus;$0.50</button>
-            <div class="rate-box"><span class="prefix">$</span><input type="number" step="0.25" min="0" id="rateInput" value="1.00"></div>
-            <button class="step-btn" id="ratePlus">+$0.50</button>
+      <!-- ── 3. High-Stakes Telemetry Dual Widgets ── -->
+      <section class="telemetry-grid">
+
+        <!-- Widget A: Shot Clock Precision Readout -->
+        <article class="telemetry-card clock-readout-card">
+          <div class="card-head">
+            <div class="card-title">
+              <span class="material-symbols-outlined icon-accent">timer</span>
+              <span>SHOT CLOCK PRECISION READOUT</span>
+            </div>
+            <div class="mode-chips">
+              <button class="clock-mode-btn" data-sec="30" type="button">30S</button>
+              <button class="clock-mode-btn active" data-sec="45" type="button">45S</button>
+              <button class="clock-mode-btn" data-sec="60" type="button">60S</button>
+            </div>
           </div>
-          <div class="presets">
-            <button class="preset" data-r="0.50">$0.50</button>
-            <button class="preset active" data-r="1.00">$1.00</button>
-            <button class="preset" data-r="2.00">$2.00</button>
-            <button class="preset" data-r="5.00">$5.00</button>
-            <button class="preset" data-r="10.00">$10.00</button>
+
+          <div class="clock-hero-row">
+            <div class="clock-digits-wrap">
+              <span class="clock-digits-hero" id="clockHeroDigits">45</span>
+              <span class="clock-digits-sub">SEC REMAINING</span>
+            </div>
+            <div class="clock-status-meta">
+              <span class="status-chip" id="clockStatusChip">STANDBY</span>
+              <span class="extension-label" id="clockExtLabel">EXTENSIONS: 1 / 1 LEFT</span>
+            </div>
+          </div>
+
+          <div class="clock-progress-line">
+            <div class="clock-progress-fill" id="clockProgressFill" style="width: 100%;"></div>
+          </div>
+
+          <div class="clock-controls-bar">
+            <button class="btn-clock-main" id="btnClockStart" type="button">
+              <span class="material-symbols-outlined" id="clockBtnIcon">play_arrow</span>
+              <span id="clockBtnText">START CLOCK</span>
+            </button>
+            <button class="btn-clock-sec" id="btnClockExt" type="button">
+              <span class="material-symbols-outlined">history</span>
+              <span>+30S EXT</span>
+            </button>
+            <button class="btn-clock-icon" id="btnClockReset" type="button" title="Reset Shot Clock">
+              <span class="material-symbols-outlined">refresh</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- Widget B: Stakes Ledger & Protocol State -->
+        <article class="telemetry-card stakes-protocol-card">
+          <div class="card-head">
+            <div class="card-title">
+              <span class="material-symbols-outlined icon-accent">payments</span>
+              <span>STAKES LEDGER &amp; PROTOCOL STATE</span>
+            </div>
+            <span class="hud-chip-tag" id="stakesProtocolBadge">WPA HIGH-STAKES HUD</span>
+          </div>
+
+          <div class="stakes-metrics-triad">
+            <div class="stake-metric-box" id="boxPerRack" title="Click to adjust stake rate">
+              <span class="metric-label">PER RACK VALUE</span>
+              <span class="metric-val" id="metricPerRackVal">$1.00 <small>/ PT</small></span>
+            </div>
+            <div class="stake-metric-box" id="boxCurrentPot">
+              <span class="metric-label">CURRENT POT / SPREAD</span>
+              <span class="metric-val" id="metricCurrentPotVal">$0.00</span>
+            </div>
+            <div class="stake-metric-box" id="boxTargetFrame" title="Click to change target race">
+              <span class="metric-label">TARGET FRAME</span>
+              <span class="metric-val" id="metricTargetRace">RACE 15</span>
+            </div>
+          </div>
+
+          <div class="stakes-shortcuts-row">
+            <div class="shortcuts-legend">
+              <span class="label-dim">SHORTCUTS:</span>
+              <code>Space: Clock</code>
+              <code>Q/W: P1 ±</code>
+              <code>O/P: P2 ±</code>
+            </div>
+            <div class="stakes-quick-tags">
+              <button class="quick-tag-btn" id="btnTagFoul" type="button">FOUL</button>
+              <button class="quick-tag-btn" id="btnTagSafe" type="button">SAFE</button>
+            </div>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- ── 4. Championship Score Array Header ── -->
+      <section class="score-array-header">
+        <div class="array-title-wrap">
+          <h1 class="array-headline">Championship Score Array</h1>
+          <p class="array-subhead">Live telemetry view optimized for table visibility up to 40 feet.</p>
+        </div>
+        <div class="array-meta-right">
+          <span class="race-tracker-badge" id="raceTrackerBadge">RACK 00 / 15 ■</span>
+        </div>
+      </section>
+
+      <!-- ── 5. Dynamic Player Roster Array (2 to 4 Players) ── -->
+      <section class="players-array-grid" id="playersArrayContainer">
+        <!-- Rendered dynamically by script.js -->
+      </section>
+
+      <!-- ── 6. Zero-Sum Balance Checker (Original Hotcell Discrepancy Indicator) ── -->
+      <section class="zero-sum-indicator-panel" id="zeroSumPanel">
+        <div class="zero-sum-content">
+          <div class="zero-sum-left">
+            <span class="material-symbols-outlined icon-alert">warning</span>
+            <div class="zero-sum-message">
+              <strong>ZERO-SUM BALANCE DISCREPANCY DETECTED</strong>
+              <p>Player points do not sum to zero. One player's win must offset another's loss.</p>
+            </div>
+          </div>
+          <div class="zero-sum-num-display" id="zeroSumNumDisplay">-1</div>
+        </div>
+      </section>
+
+      <!-- ── 7. Tactical Control Actions Row ── -->
+      <section class="tactical-actions-strip">
+        <div class="tactical-left">
+          <button class="tactical-btn" id="btnAddPlayer" type="button">
+            <span class="material-symbols-outlined">person_add</span>
+            <span>ADD PLAYER (<span id="playerCountVal">2</span>/4)</span>
+          </button>
+          <button class="tactical-btn outline" id="btnRemovePlayer" type="button">
+            <span class="material-symbols-outlined">person_remove</span>
+            <span>REMOVE</span>
+          </button>
+          <button class="tactical-btn outline" id="btnSwapBreak" type="button">
+            <span class="material-symbols-outlined">swap_horiz</span>
+            <span>SWAP SEAT / BREAK</span>
+          </button>
+        </div>
+
+        <div class="tactical-right">
+          <div class="hold-reset-container">
+            <button class="tactical-btn danger" id="btnHoldReset" type="button">
+              <span class="material-symbols-outlined">restart_alt</span>
+              <span id="holdResetLabel">HOLD 2S RESET</span>
+            </button>
+            <div class="hold-progress-bar" id="holdResetProgressBar"></div>
+          </div>
+
+          <button class="tactical-btn inverted" id="btnToggleRackLog" type="button">
+            <span class="material-symbols-outlined">menu_book</span>
+            <span>RACK LOG</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ── 8. Rack History Ledger (180s Focus / Blur) ── -->
+      <section class="rack-log-drawer" id="rackLogDrawer">
+        <div class="drawer-header">
+          <div class="drawer-title">
+            <span class="material-symbols-outlined">history_edu</span>
+            <span>CHRONOLOGICAL RACK LEDGER &amp; AUDIT</span>
+          </div>
+          <div class="drawer-status">
+            <span class="focus-pulse-dot"></span>
+            <span id="blurCountdownDisplay">ACTIVE FOCUS · 3m 00s</span>
+            <button class="btn-wake-focus" id="btnWakeFocus" type="button">WAKE FOCUS</button>
           </div>
         </div>
-        <div class="info-box"><span class="label">FORMULA</span><p>Each player pays/receives the net rack difference multiplied by the stake rate.</p></div>
-        <div class="results">
-          <span class="label">NET BALANCE</span>
-          <div id="payoutRows"></div>
-          <span class="label" style="margin-top:8px">WHO PAYS WHOM</span>
-          <div id="transferRows"></div>
+
+        <div class="rack-log-scroll" id="rackLogScrollList">
+          <div class="empty-log-state" id="emptyLogState">
+            <span class="material-symbols-outlined">sports_score</span>
+            <p>NO RACKS RECORDED YET · TAP + ON ANY PLAYER CARD TO LOG A FRAME</p>
+          </div>
         </div>
+      </section>
+
+    </main>
+
+    <!-- ── 9. Bottom Global Feed Bar ── -->
+    <footer class="bottom-feed-bar">
+      <div class="feed-content">
+        <span class="feed-pill">FEED</span>
+        <span class="material-symbols-outlined icon-spin">refresh</span>
+        <span class="feed-text" id="feedTickerText">Table initialized. Match ready for break off.</span>
       </div>
-      <div class="modal-foot"><button class="btn-pri full" id="applyStakes">APPLY &amp; CLOSE</button></div>
-    </div>
+      <div class="footer-meta">
+        <span>POOL SCOREBOARD PROTOCOL</span>
+        <span class="divider">|</span>
+        <span>v2.5.0 WPA EDITION</span>
+      </div>
+    </footer>
+
   </div>
 
-  <!-- ══ INFO MODAL ══ -->
-  <div class="modal-bg" id="infoModal">
-    <div class="modal-box">
+  <!-- ══════════ STAKES & TARGET MODAL ══════════ -->
+  <div class="modal-backdrop" id="stakesModal">
+    <div class="modal-window">
       <div class="modal-head">
-        <div class="modal-title"><span class="material-symbols-outlined">info</span><h2>INFO &amp; AUTHOR</h2></div>
-        <button class="close-btn" id="closeInfo"><span class="material-symbols-outlined">close</span></button>
+        <div class="modal-title-row">
+          <span class="material-symbols-outlined">payments</span>
+          <h2>STAKES, POT &amp; TARGET CONFIGURATION</h2>
+        </div>
+        <button class="btn-modal-close" id="btnCloseStakesModal" type="button">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
+
       <div class="modal-body">
-        <div class="author-card">
-          <div class="avatar"><span class="material-symbols-outlined" style="font-size:24px">sports_bar</span></div>
-          <div><span class="label">LEAD DEVELOPER</span><h3 class="author-name">Phạm Nam Hào</h3><span class="handle">@Brdnwtocode</span></div>
+        <div class="config-section">
+          <label class="config-label" for="stakeInputRate">RATE PER POINT / RACK ($)</label>
+          <div class="stepper-row">
+            <button class="btn-step" id="btnStakeStepMinus" type="button">−$0.50</button>
+            <div class="input-rate-box">
+              <span class="curr-symbol">$</span>
+              <input type="number" id="stakeInputRate" step="0.25" min="0" value="1.00">
+            </div>
+            <button class="btn-step" id="btnStakeStepPlus" type="button">+$0.50</button>
+          </div>
+
+          <div class="chip-preset-row">
+            <button class="preset-chip" data-v="0.50" type="button">$0.50</button>
+            <button class="preset-chip active" data-v="1.00" type="button">$1.00</button>
+            <button class="preset-chip" data-v="2.00" type="button">$2.00</button>
+            <button class="preset-chip" data-v="5.00" type="button">$5.00</button>
+            <button class="preset-chip" data-v="10.00" type="button">$10.00</button>
+          </div>
         </div>
-        <div class="link-list">
-          <a href="https://github.com/Brdnwtocode" target="_blank" class="link-row">
-            <div class="link-left"><span class="material-symbols-outlined">code</span><div><span class="label">GITHUB PROFILE</span><span class="link-val">github.com/Brdnwtocode</span></div></div>
-            <span class="material-symbols-outlined" style="font-size:16px">open_in_new</span>
-          </a>
-          <a href="https://github.com/Brdnwtocode/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS" target="_blank" class="link-row">
-            <div class="link-left"><span class="material-symbols-outlined">folder_special</span><div><span class="label">THIS REPOSITORY</span><span class="link-val">21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS</span></div></div>
-            <span class="material-symbols-outlined" style="font-size:16px">open_in_new</span>
-          </a>
-          <a href="mailto:phmnamhao@gmail.com" class="link-row">
-            <div class="link-left"><span class="material-symbols-outlined">mail</span><div><span class="label">CONTACT</span><span class="link-val">phmnamhao@gmail.com</span></div></div>
-            <span class="material-symbols-outlined" style="font-size:16px">send</span>
-          </a>
+
+        <div class="config-section">
+          <label class="config-label" for="raceInputTarget">TARGET MATCH RACE (FIRST TO X)</label>
+          <div class="stepper-row">
+            <button class="btn-step" id="btnRaceMinus" type="button">−1</button>
+            <div class="input-rate-box">
+              <span class="curr-symbol">RACE</span>
+              <input type="number" id="raceInputTarget" step="1" min="1" max="99" value="15">
+            </div>
+            <button class="btn-step" id="btnRacePlus" type="button">+1</button>
+          </div>
+          <div class="chip-preset-row">
+            <button class="preset-chip race-chip" data-r="7" type="button">RACE 7</button>
+            <button class="preset-chip race-chip" data-r="9" type="button">RACE 9</button>
+            <button class="preset-chip race-chip" data-r="11" type="button">RACE 11</button>
+            <button class="preset-chip race-chip active" data-r="15" type="button">RACE 15</button>
+            <button class="preset-chip race-chip" data-r="21" type="button">RACE 21</button>
+          </div>
         </div>
-        <div class="info-box"><span class="label">ABOUT</span><p>Monochrome Editorial design, Web Audio synthesis, pairwise stakes settlement, mobile-first architecture.</p></div>
+
+        <div class="settlement-breakdown-box">
+          <div class="breakdown-header">PAIRWISE FINANCIAL SETTLEMENT</div>
+          <div class="settlement-roster-list" id="modalSettlementRoster"></div>
+          <div class="transfers-ledger-list" id="modalTransfersLedger"></div>
+        </div>
       </div>
-      <div class="modal-foot"><button class="btn-pri full" id="dismissInfo">CLOSE</button></div>
+
+      <div class="modal-foot">
+        <button class="btn-modal-action" id="btnSaveStakes" type="button">APPLY &amp; SAVE</button>
+      </div>
     </div>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <!-- ══════════ DEVELOPER & SYSTEM INFO MODAL ══════════ -->
+  <div class="modal-backdrop" id="infoModal">
+    <div class="modal-window">
+      <div class="modal-head">
+        <div class="modal-title-row">
+          <span class="material-symbols-outlined">info</span>
+          <h2>SYSTEM SPECIFICATIONS &amp; AUTHOR</h2>
+        </div>
+        <button class="btn-modal-close" id="btnCloseInfoModal" type="button">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="author-banner">
+          <div class="author-avatar"><span class="material-symbols-outlined">sports_bar</span></div>
+          <div class="author-info">
+            <span class="meta-tag">ARCHITECT &amp; LEAD DEVELOPER</span>
+            <h3 class="author-name">Phạm Nam Hào</h3>
+            <span class="author-handle">@Brdnwtocode</span>
+          </div>
+        </div>
+
+        <div class="links-grid">
+          <a href="https://github.com/Brdnwtocode" target="_blank" rel="noopener noreferrer" class="link-card">
+            <div class="link-card-left">
+              <span class="material-symbols-outlined">code</span>
+              <div>
+                <span class="link-card-title">GITHUB PROFILE</span>
+                <span class="link-card-desc">github.com/Brdnwtocode</span>
+              </div>
+            </div>
+            <span class="material-symbols-outlined icon-ext">open_in_new</span>
+          </a>
+
+          <a href="https://github.com/Brdnwtocode/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS" target="_blank" rel="noopener noreferrer" class="link-card">
+            <div class="link-card-left">
+              <span class="material-symbols-outlined">folder_special</span>
+              <div>
+                <span class="link-card-title">REPOSITORY</span>
+                <span class="link-card-desc">21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS</span>
+              </div>
+            </div>
+            <span class="material-symbols-outlined icon-ext">open_in_new</span>
+          </a>
+
+          <a href="mailto:phmnamhao@gmail.com" class="link-card">
+            <div class="link-card-left">
+              <span class="material-symbols-outlined">mail</span>
+              <div>
+                <span class="link-card-title">CONTACT EMAIL</span>
+                <span class="link-card-desc">phmnamhao@gmail.com</span>
+              </div>
+            </div>
+            <span class="material-symbols-outlined icon-ext">send</span>
+          </a>
+        </div>
+
+        <div class="system-specs-summary">
+          <span class="meta-tag">CORE PROTOCOL HIGHLIGHTS</span>
+          <ul>
+            <li><strong>Keep Screen Awake:</strong> Automatically active via Screen Wake Lock API (no screen dimming during matches).</li>
+            <li><strong>Zero-Sum Hotcell:</strong> Alerts when player points don't balance to zero in betting matches.</li>
+            <li><strong>Audio &amp; Haptics:</strong> Web Audio API physical billiard ball strike synthesis + native mobile haptic pulses.</li>
+            <li><strong>Offline Progressive:</strong> Zero servers, zero bundler dependencies, pure web standards.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn-modal-action" id="btnDismissInfo" type="button">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="hud-toast" id="hudToast"></div>
+
   <script src="js/script.js"></script>
 </body>
 </html>

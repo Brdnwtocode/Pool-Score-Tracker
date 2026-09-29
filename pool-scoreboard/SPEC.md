@@ -1,336 +1,151 @@
 # Pool Scoreboard — Functionality Specification
 
-> **Source of Truth**
-> This document defines every feature, behavior, and constraint of the Pool Scoreboard web application as it exists today. All future development should reference and update this file.
+> **Source of Truth (v2.5.0 WPA Championship Edition)**
+> This document defines every feature, behavior, and constraint of the Pool Scoreboard web application. All architectural design strictly adheres to the editorial telemetry HUD layout (`media_1790689465780.png`).
 
 ---
 
-## 1. Player Roster Management
+## 1. Ergonomics & Display Protocols
 
-### 1.1 Default State
-- App launches with **2 players**: "Player 1" (breaker) and "Player 2".
-- Each player has: a unique ID, an editable name, a score (starts at 0), and a breaker flag.
+### 1.1 Keep Screen Awake (Screen Wake Lock)
+- **Active by default (no toggle needed).**
+- Automatically acquires `navigator.wakeLock.request('screen')` on page load.
+- Re-acquires the lock automatically on `visibilitychange` when returning to the tab so the screen never dims or locks while resting on the pool table rail.
 
-### 1.2 Add Player
-- Button: **ADD PLAYER**.
-- Adds a new player to the end of the roster with score 0 and breaker off.
-- **Hard cap: 4 players maximum.** If the user tries to add a 5th, the button flashes red and a toast reads "Max 4 players". No player is added.
+### 1.2 Fullscreen Mode
+- Top masthead button with fullscreen icon (`fullscreen` / `fullscreen_exit`).
+- Toggles between native fullscreen viewport and browser chrome on mobile and desktop devices.
 
-### 1.3 Remove Player
+---
+
+## 2. Player Roster Management (2 to 4 Players)
+
+### 2.1 Default State
+- App launches with **2 players** (e.g. "Johnny Archer" as active breaker, "Shane Van Boening").
+- Each player has: unique ID, editable name, score (CURRENT FRAMES), breaker flag, and telemetry stats.
+
+### 2.2 Add Player
+- Button: **ADD PLAYER (N/4)**.
+- Adds a player to the match array.
+- **Hard cap: 4 players maximum.** If the user tries to add a 5th, the button flashes red and displays a toast ("Maximum 4 players allowed").
+
+### 2.3 Remove Player
 - Button: **REMOVE**.
-- Removes the **last** player from the roster.
-- **Hard floor: 1 player minimum.** If only 1 player remains, the button flashes red and a toast reads "Min 1 player". No player is removed.
+- Removes the **last** player from the array.
+- **Hard floor: 1 player minimum.** If only 1 player remains, the button flashes red and displays a toast ("Minimum 1 player required").
 
-### 1.4 Player Name Editing
-- Each player card has an inline text input pre-filled with the player's name.
-- Name changes are committed on the `change` event (blur / tab away).
-- Pressing **Enter** blurs the input (commits the name).
-- If the input is left empty, it falls back to "Player N".
+### 2.4 Custom Name Editing
+- Inline text field using large Newsreader serif typography.
+- Click to edit directly. Pressing **Enter** commits the name and blurs the field.
 
-### 1.5 Breaker Toggle
-- Each player card displays a badge: **BREAK** (active) or **WAIT** (inactive).
-- Tapping any player's badge sets that player as the sole breaker and clears all others.
-- Only one player can hold the break at a time.
+### 2.5 Breaker Status & Swap
+- Tapping the `❖ ACTIVE BREAKER` / `INNING WAITING` badge sets that player as the active breaker and demotes others.
+- Dedicated tactical button **SWAP SEAT / BREAK** passes the break sequentially to the next player.
 
 ---
 
-## 2. Scoring System
+## 3. Scoring System
 
-### 2.1 Increment / Decrement
-- Each player card has a **`+`** (increment) and **`−`** (decrement) button.
-- Incrementing adds 1 to the player's score.
-- Decrementing subtracts 1 from the player's score.
-- **Score cannot go below 0.** If a decrement would result in a negative score, the action is rejected with a short haptic vibration.
+### 3.1 Increment / Decrement
+- Giant square touch controls: **`−`** (left) and **`+`** (right) surrounding the massive score numeral.
+- Scores cannot go below 0 (triggers an alert vibration and toast).
+- Target race milestone alert triggers when a player reaches the configured target (e.g. Race to 15).
 
-### 2.2 Score Display
-- Scores are displayed in 2-digit zero-padded format (e.g., `00`, `01`, `09`, `12`).
-- On every score change, the number plays a **scale pop animation** (scales up to 1.15x and back in 140ms).
+### 3.2 Visual Feedback & Pop Animation
+- Massive Newsreader serif numerals readable from up to 40 feet.
+- Scale-pop animation on tap (scales up to 1.12x in 140ms).
 
-### 2.3 Leader Highlighting
-- The player card with the highest score (and score > 0) receives a highlighted border (`lead` class) to visually distinguish the match leader.
-- If scores are tied, no card is highlighted as leader.
-
-### 2.4 Net Stake Display
-- Each player card displays a **NET STAKE** value at the bottom (e.g., `+$3.00` or `-$2.00`).
-- This value is derived from the pairwise settlement engine (see Section 6) and updates in real time.
+### 3.3 Match Leader Identification
+- The match leader receives a distinctive bold outline (`is-leader` class).
+- Inverted black HUD ticker displays the active lead: `LEAD: J. ARCHER (+4)`.
 
 ---
 
-## 3. Undo / Redo
+## 4. Zero-Sum / Balance Checker ("Hotcell" Indicator)
 
-### 3.1 Undo Stack
-- Every score change (increment or decrement) pushes an entry onto the **undo stack**.
-- Each entry records: player ID, delta (+1 or -1), previous score, new score, and any associated rack history log entry.
-- Pressing **Undo** restores the player's score to its previous value and removes the associated rack log entry (if any).
-- A toast confirms the action: "UNDO: {PlayerName}".
+### 4.1 Original Zero-Sum Game Logic
+- Designed for betting and zero-sum pool games where one player's win is another player's loss.
+- A running balance discrepancy is tracked across all frame adjustments.
 
-### 3.2 Redo Stack
-- Undone actions are pushed onto the **redo stack**.
-- Pressing **Redo** reapplies the undone action and re-inserts its rack log entry (if any).
-- A toast confirms: "REDO: {PlayerName}".
-
-### 3.3 Stack Clearing
-- Any **new** score change (not triggered by undo/redo) clears the entire redo stack.
-- A full match reset clears both stacks.
-
-### 3.4 Button State
-- The Undo button is **disabled** when the undo stack is empty.
-- The Redo button is **disabled** when the redo stack is empty.
+### 4.2 Hotcell Visual Glow
+- If points do not add up to zero:
+  - All player score cards activate the `.hotcell` state with a highlighted border and alert background shift.
+  - The **Zero-Sum Balance Checker Panel** appears below the cards with the discrepancy number in large text (e.g., `-1`, `+2`).
+- Once scores balance out back to zero, the `.hotcell` glow turns off and the discrepancy panel disappears automatically.
 
 ---
 
-## 4. Shot Clock / Timer
+## 5. Pro Shot Clock & Timer
 
-### 4.1 Dual Mode
-- Two selectable presets: **30 seconds** and **45 seconds**.
-- Mode chips at the top of the clock card: `30s` and `45s`. The active one is visually inverted (filled).
-- Switching modes **resets and stops** the clock to the new duration.
+### 5.1 Modes & Readout
+- Modes: **30S**, **45S**, and **60S** switchable chips.
+- Giant countdown display with `SEC REMAINING` and status tags (`STANDBY`, `RUNNING`, `TIME FOUL`).
+- Smooth 1px progress line bar.
 
-### 4.2 Controls
-- **START / PAUSE**: Toggles the clock between running and paused. Label changes to reflect state.
-- **+30s EXT**: Adds 30 seconds to the remaining time, capped at a maximum of 90 seconds. Shows a toast: "+30s Extension".
-- **Reset (icon)**: Stops and resets the clock to the full duration of the current mode.
+### 5.2 Controls
+- **START CLOCK / PAUSE CLOCK**: High-contrast primary button with play/pause icons.
+- **+30S EXT**: Grants a 30-second extension, tracking remaining extensions (`EXTENSIONS: 1 / 1 LEFT`).
+- **Quick Reset (↻)**: Resets the shot clock immediately to current mode duration.
 
-### 4.3 Countdown Behavior
-- Clock counts down 1 second at a time.
-- A horizontal progress bar tracks the remaining time visually.
-
-### 4.4 Critical State (≤ 5 seconds)
-- When ≤ 5 seconds remain and the clock is running:
-  - The digits turn red.
-  - The progress bar turns red.
-  - The digits pulse/scale with a 0.5s infinite animation.
-
-### 4.5 Audio Cues (when sound enabled)
-- At **10 seconds**: A single warning beep (660 Hz, 60ms).
-- At **5, 4, 3, 2, 1 seconds**: A countdown beep each second (880 Hz, 80ms) with a 15ms haptic vibration.
-- At **0 seconds (expiry)**: A loud foul buzzer (220 Hz, 350ms) with a strong haptic burst pattern [50ms, 40ms pause, 50ms]. A toast reads "SHOT CLOCK: FOUL".
-
-### 4.6 Auto-Stop on Expiry
-- When the clock reaches 0, it automatically stops (no looping, no negative values).
+### 5.3 Tournament Audio & Haptics
+- At **10 seconds**: Warning click tone (660 Hz).
+- At **5s, 4s, 3s, 2s, 1s**: Critical countdown beeps (880 Hz) + mobile haptic vibration.
+- At **0 seconds**: Loud foul alarm buzzer (220 Hz) + haptic burst + "TIME FOUL" banner.
 
 ---
 
-## 5. Sound & Haptic Feedback
+## 6. Stakes Ledger, Pot & Target Frame
 
-### 5.1 Billiard Ball Click Sound
-- Generated via the **Web Audio API** (no external audio files).
-- Synthesis: A two-oscillator model simulating a phenolic resin ball collision:
-  - Oscillator 1: Triangle wave, 2200 Hz → 800 Hz exponential ramp over 25ms, 35ms gain decay.
-  - Oscillator 2: Sine wave, 950 Hz → 320 Hz exponential ramp over 40ms, 50ms gain decay.
-- Triggered on every button tap (score changes, breaker toggle, clock controls, roster changes).
+### 6.1 Triad Telemetry Cards
+- **PER RACK VALUE**: Configurable rate per point/rack (e.g. `$1.00 / PT`). Tap to open config modal.
+- **CURRENT POT / SPREAD**: Total pot accumulation based on total frames and rate.
+- **TARGET FRAME**: Match goal (e.g. `RACE 15`). Tap to switch target race (Race 7, 9, 11, 15, 21).
 
-### 5.2 Haptic Vibration
-- Uses `navigator.vibrate()` on supported mobile devices.
-- Normal tap: 18ms single vibration.
-- Error/foul: [50ms on, 40ms off, 50ms on] burst pattern.
-- Rejection (score below 0, max players): [30ms, 20ms] pattern.
-
-### 5.3 Sound Toggle
-- A speaker icon button in the utility toolbar toggles all sound and haptics on/off.
-- Icon changes: `volume_up` (on) / `volume_off` (off).
-- State persists via LocalStorage.
+### 6.2 Pairwise Financial Settlement
+- Multi-player pool calculation: each player's net earnings is the sum of rack differences against every other player multiplied by the stake rate.
+- Displays live net cash on each player card (`FINANCIAL NET: +$4.00` or `-$4.00`).
+- Minimum transfer ledger in modal outputs exact directional payments (e.g., *Shane Van Boening pays Johnny Archer: $4.00*).
 
 ---
 
-## 6. Money / Stakes Calculator
+## 7. Keyboard Shortcuts
 
-### 6.1 Stake Rate
-- Default rate: **$1.00 per point/rack**.
-- Displayed in the utility toolbar as a chip (e.g., `$1.00/PT`).
-- Tapping the chip opens the **Stakes & Settlement Modal**.
-
-### 6.2 Stakes Modal Interface
-- **Stepper controls**: `−$0.50` and `+$0.50` buttons to decrement/increment the rate in $0.50 steps.
-- **Direct input**: A numeric input field for custom values (step: $0.25, min: $0.00).
-- **Preset chips**: Quick-select buttons for $0.50, $1.00, $2.00, $5.00, $10.00. The active rate chip is visually inverted.
-- **Apply & Close**: Saves the rate and closes the modal.
-
-### 6.3 Settlement Engine (Pairwise Differential)
-- For each pair of players (i, j), the net point differential is calculated: `score[i] - score[j]`.
-- Each player's total net points = sum of all pairwise differentials.
-- Each player's net cash = net points × stake rate.
-
-### 6.4 Settlement Display
-- **Net Balance Roster**: Lists each player with their score and net cash amount (`+$X.XX` or `-$X.XX`).
-- **Who Pays Whom**: A minimized transfer ledger showing directional payments (e.g., "Player 2 pays Player 1: $6.00"). Uses a greedy debtor-creditor matching algorithm to minimize the number of transfers.
-- If all scores are equal: "NO PAYOUTS REQUIRED".
-
-### 6.5 Real-Time Updates
-- Net stake values on each player card update immediately on any score change.
-- The modal recomputes settlements live when the rate input changes.
-
----
-
-## 7. Auto-Save (LocalStorage)
-
-### 7.1 Persisted State
-The following properties are saved to `localStorage` under the key `21n2_pool_v2`:
-- Player roster (IDs, names, scores, breaker flags)
-- Stake rate
-- Shot clock mode (30 or 45)
-- Sound on/off
-- Theme (dark/light)
-- Rack history log
-
-### 7.2 Save Trigger
-- State is saved after every: score change, name edit, player add/remove, breaker toggle, stake rate change, sound toggle, theme toggle, and match reset.
-
-### 7.3 Load on Init
-- On page load, the saved state (if any) is loaded and merged with defaults. The UI is fully restored: scores, names, theme, sound preference, clock mode, and history.
-
-### 7.4 Undo/Redo Stacks
-- Undo and redo stacks are **in-memory only** and are NOT persisted to LocalStorage. They reset on page refresh.
-
----
-
-## 8. Rack History / Match Log
-
-### 8.1 Automatic Logging
-- A rack log entry is created automatically every time a player's score is **incremented** (not decremented).
-- Each entry records: rack number (cumulative total of all players' scores at that moment), winning player's name, and timestamp (HH:MM format).
-- Entries are displayed in reverse chronological order (newest first).
-- Maximum 50 entries are retained; oldest are dropped.
-
-### 8.2 Log Display Format
-- Each row shows: `R-{NN}` (rack number) | Winner Name | `+1` | `HH:MM`.
-- When no racks exist, an empty state message is shown: "NO RACKS RECORDED YET".
-
-### 8.3 Undo/Redo Synchronization
-- Undoing a score increment removes its corresponding log entry.
-- Redoing restores the log entry.
-
-### 8.4 180-Second Gradual Blur-Out
-- After any activity (score change, page load, or manual wake), a **180-second countdown timer** starts.
-- During the countdown, the header shows: "FOCUS · Xm XXs".
-- When the timer expires, the entire history section transitions to a blurred state:
-  - `filter: blur(4px)`
-  - `opacity: 0.22`
-  - Transition duration: 1.5 seconds.
-- Purpose: Reduce visual clutter during active table play.
-
-### 8.5 Wake on Interaction
-- Tapping anywhere on the history section instantly removes the blur and restarts the 180-second timer.
-- A dedicated "TAP TO FOCUS" button also wakes the history and shows a toast: "History focused".
-
----
-
-## 9. Match Balance / Audit Telemetry Bar
-
-### 9.1 States
-- **MATCH READY** (tag: `READY`): All scores are 0. No visual alert.
-- **TIED** (tag: `TIED`): Total racks > 0 but all players have equal scores. No visual alert.
-- **ACTIVE** (tag: `ACTIVE`): Scores are unequal. Bar turns red-highlighted (`hot` class). Displays the leader's name and score: "LEAD: PLAYERNAME (+X) · N RACKS".
-
----
-
-## 10. Hold-to-Reset Safety
-
-### 10.1 Behavior
-- The reset button must be **held down for 2 full seconds** (1800ms) to trigger a match reset.
-- A red progress fill bar animates from 0% to 100% width behind the button text as the user holds.
-- If the user releases before 2 seconds, the fill resets to 0% and no reset occurs.
-
-### 10.2 Reset Action
-On successful 2-second hold:
-- All player scores set to 0.
-- Rack history cleared.
-- Undo and redo stacks cleared.
-- Shot clock stopped and reset to current mode duration.
-- A foul-style haptic/sound burst fires.
-- Toast reads: "MATCH RESET".
-
-### 10.3 Touch Support
-- Listens to both `mousedown`/`mouseup` (desktop) and `touchstart`/`touchend` (mobile).
-
----
-
-## 11. Theme Toggle (Dark / Light)
-
-### 11.1 Dark Theme (Default)
-- Background: `#0d0e0f` (near-black).
-- Foreground: `#f2f2f5` (near-white).
-- Full monochrome dark palette.
-
-### 11.2 Light Theme
-- Background: `#f9f9fb` (stark white).
-- Foreground: `#111` (ink black).
-- Full monochrome light palette.
-
-### 11.3 Toggle
-- A contrast icon button in the toolbar switches between themes.
-- Icon: `light_mode` (when dark) / `dark_mode` (when light).
-- Theme preference persists via LocalStorage.
-
----
-
-## 12. Info Modal
-
-### 12.1 Trigger
-- An **(i) info icon button** in the utility toolbar opens the modal.
-
-### 12.2 Content
-- **Author Card**: Avatar icon, "LEAD DEVELOPER" label, name "Phạm Nam Hào", handle "@Brdnwtocode".
-- **Links**:
-  - GitHub Profile → `github.com/Brdnwtocode`
-  - This Repository → `21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS`
-  - Contact Email → `phmnamhao@gmail.com`
-- **About blurb**: Brief description of the design language and technology stack.
-
-### 12.3 Close
-- Close via the `×` button, the "CLOSE" footer button, or tapping the backdrop.
-
----
-
-## 13. Toast Notifications
-
-- A small floating notification bar at the bottom center of the screen.
-- Appears for 2 seconds with a slide-up animation, then fades out.
-- Used for: undo/redo confirmations, player add/remove, stakes applied, shot clock events, sound toggle, match reset, and history focus.
-
----
-
-## 14. Design Constraints
-
-| Constraint | Value |
+| Key | Action |
 |:---|:---|
-| Border Radius | `0px` on every element (strict zero-radius mandate) |
-| Elevation | Completely flat: no drop shadows, no box-shadow, no glow |
-| Depth | 1px hairline borders + surface color shifts only |
-| Typography | Newsreader (scores/headlines), Inter (names/body), JetBrains Mono (tags/metrics/buttons) |
-| Layout Priority | **Mobile-first**. Single column on phone, 2-column grid at 480px, auto-fit at 800px |
-| Max Width | 960px centered container |
-| Icons | Google Material Symbols Outlined |
-| External Dependencies | Google Fonts CDN only. Zero npm/node/build dependencies. |
+| `Space` | Start / Pause Shot Clock |
+| `Q` / `W` | Player 1: Decrement / Increment |
+| `O` / `P` | Player 2: Decrement / Increment |
+| `E` | +30s Shot Clock Extension |
+| `R` | Reset Shot Clock |
+| `Ctrl+Z` / `Cmd+Z` | Undo Last Score |
 
 ---
 
-## 15. Technical Architecture
+## 8. Undo / Redo & Rack History (180s Focus Mode)
 
-| Aspect | Detail |
-|:---|:---|
-| Runtime | 100% client-side vanilla HTML + CSS + JavaScript |
-| Server | None required. Static file hosting only. |
-| Deployment | GitHub Actions → GitHub Pages (static upload, no Jekyll) |
-| Audio | Web Audio API oscillator synthesis (no audio files) |
-| Haptics | `navigator.vibrate()` API |
-| Persistence | `localStorage` (key: `21n2_pool_v2`) |
-| Browser Support | All modern browsers (Chrome, Safari, Firefox, Edge) |
-| Offline | Fully functional offline after first load (no server calls) |
+### 8.1 In-Memory Action Stack
+- Full undo and redo capabilities for point corrections without manual math.
+- Synchronized with rack history entries.
+
+### 8.2 Chronological Rack Ledger
+- Records every winning rack with timestamps: `R-21 · Johnny Archer · +1 · 19:48`.
+- **180s Focus Blur**: After 180 seconds of inactivity, the ledger applies a subtle blur (`filter: blur(4px); opacity: 0.25`) to keep player focus on the table.
+- Tapping anywhere or registering a new rack immediately wakes the ledger to razor-sharp clarity.
 
 ---
 
-## 16. File Structure
+## 9. Safety Hold-to-Reset & Quick Reset
 
-```
-pool-scoreboard/
-├── index.html          # App shell, player grid, modals, toolbar
-├── css/
-│   └── style.css       # All styles (dark/light themes, responsive, animations)
-├── js/
-│   └── script.js       # All logic (scoring, clock, audio, persistence, settlements)
-└── reference/
-    ├── DESIGN.md        # Monochrome Editorial design system specification
-    ├── code.html        # Reference implementation mockup
-    └── screen.png       # Visual reference screenshot
-```
+- **HOLD 2S RESET**: Requires a 2-second continuous hold with a red progress fill animation to prevent accidental match wipes.
+- **QUICK RESET**: Masthead button with confirmation dialog for rapid table turnover.
+
+---
+
+## 10. Design Architecture & Typography
+
+- **Reference Design Alignment:** Direct reproduction of `media_1790689465780.png`.
+- **Monochrome Editorial Palette:** Strict contrast, flat elevation, razor-sharp 0px borders.
+- **Typography:**
+  - `Newsreader`: Editorial headlines, player names, and massive score digits.
+  - `Inter`: UI labels, telemetry descriptions.
+  - `JetBrains Mono`: Masthead badges, clock hero, and financial metrics.

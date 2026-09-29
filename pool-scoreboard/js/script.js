@@ -1,383 +1,1149 @@
+/**
+ * Championship Pool Scoreboard · Protocol Engine v2.5.0
+ * Aligned with UI Reference (media_1790689465780.png)
+ * Features:
+ * - Default Screen Wake Lock (Keeps screen awake automatically)
+ * - Fullscreen Mode Button
+ * - 30S / 45S / 60S Pro Shot Clock with extension & audio cues
+ * - Original Zero-Sum Balance Checker with "Hotcell" Glow & Discrepancy Panel
+ * - Player Roster Management (2 to 4 players with max/min flash alerts)
+ * - Pairwise Financial Stakes & Race-To Target Frame
+ * - Web Audio API Ball Strike Clicks & Native Haptics
+ * - Keyboard Shortcuts (Space, Q/W, O/P, E, R, Z)
+ * - LocalStorage Auto-Save
+ */
+
 (() => {
   "use strict";
 
-  const KEY = "21n2_pool_v2";
+  const STORAGE_KEY = "21n2_pool_championship_v25";
 
-  // ── State ──
-  let S = {
+  // ═══════════════ APPLICATION STATE ═══════════════
+  let state = {
     players: [
-      { id: 1, name: "Player 1", score: 0, brk: true },
-      { id: 2, name: "Player 2", score: 0, brk: false },
+      { id: 1, name: "Johnny Archer", score: 12, isBreaker: true, runouts: 4, fargo: 812 },
+      { id: 2, name: "Shane Van Boening", score: 8, isBreaker: false, runouts: 3, fargo: 824 },
     ],
-    rate: 1.0,
-    clockMode: 30,
-    sound: true,
-    theme: "dark",
+    stakeRate: 1.0,
+    targetRace: 15,
+    shotClockDuration: 45, // 30, 45, or 60
+    soundEnabled: true,
+    theme: "dark", // "dark" or "light"
     history: [],
+    totalSumDiscrepancy: 0,
   };
 
-  const undo = [], redo = [];
+  // Runtime Undo / Redo Stacks
+  const undoStack = [];
+  const redoStack = [];
 
-  // ── Clock runtime ──
-  let clockLeft, clockRunning = false, clockTimer = null;
-  const BLUR_MS = 180;
-  let blurLeft = BLUR_MS, blurTimer = null;
+  // Shot Clock Runtime
+  let clockTimeLeft = 45;
+  let isClockRunning = false;
+  let clockInterval = null;
+  let extensionsUsed = 0;
+  const MAX_EXTENSIONS = 1;
 
-  // ── DOM ──
-  const $ = id => document.getElementById(id);
-  const playerBox     = $("players");
-  const addBtn        = $("addBtn");
-  const removeBtn     = $("removeBtn");
-  const holdResetBtn  = $("holdResetBtn");
-  const holdFill      = $("holdFill");
-  const holdLabel     = $("holdLabel");
-  const clockNum      = $("clockNum");
-  const progressFill  = $("progressFill");
-  const clockToggle   = $("clockToggle");
-  const clockExt      = $("clockExt");
-  const clockReset    = $("clockReset");
-  const mode30        = $("mode30");
-  const mode45        = $("mode45");
-  const undoBtn       = $("undoBtn");
-  const redoBtn       = $("redoBtn");
-  const soundBtn      = $("soundBtn");
-  const soundIcon     = $("soundIcon");
-  const themeBtn      = $("themeBtn");
-  const themeIcon     = $("themeIcon");
-  const infoBtn       = $("infoBtn");
-  const balanceBar    = $("balanceBar");
-  const balanceText   = $("balanceText");
-  const balanceTagEl  = $("balanceTagEl");
-  const historyBox    = $("historyBox");
-  const histList      = $("histList");
-  const histEmpty     = $("histEmpty");
-  const blurText      = $("blurText");
-  const wakeBtn       = $("wakeBtn");
-  const stakesBtn     = $("stakesBtn");
-  const stakeLabel    = $("stakeLabel");
-  const stakesModal   = $("stakesModal");
-  const closeStakes   = $("closeStakes");
-  const applyStakes   = $("applyStakes");
-  const rateInput     = $("rateInput");
-  const rateMinus     = $("rateMinus");
-  const ratePlus      = $("ratePlus");
-  const payoutRows    = $("payoutRows");
-  const transferRows  = $("transferRows");
-  const infoModal     = $("infoModal");
-  const closeInfo     = $("closeInfo");
-  const dismissInfo   = $("dismissInfo");
-  const toast         = $("toast");
+  // Rack History 180s Focus Blur
+  const BLUR_INTERVAL_SEC = 180;
+  let blurSecondsLeft = BLUR_INTERVAL_SEC;
+  let blurTimerId = null;
 
-  // ═══════════════ AUDIO ═══════════════
-  let actx = null;
-  function ctx() {
-    if (!actx) { const C = window.AudioContext || window.webkitAudioContext; if (C) actx = new C(); }
-    if (actx && actx.state === "suspended") actx.resume();
-    return actx;
+  // ═══════════════ DOM CACHE ═══════════════
+  const $ = (id) => document.getElementById(id);
+
+  // Masthead
+  const btnFullscreen = $("btnFullscreen");
+  const fullscreenIcon = $("fullscreenIcon");
+  const btnUndo = $("btnUndo");
+  const btnRedo = $("btnRedo");
+  const btnSound = $("btnSound");
+  const soundIcon = $("soundIcon");
+  const btnTheme = $("btnTheme");
+  const themeIcon = $("themeIcon");
+  const btnResetQuick = $("btnResetQuick");
+  const btnInfo = $("btnInfo");
+
+  // HUD Bar
+  const hudMatchTitle = $("hudMatchTitle");
+  const hudLeadStat = $("hudLeadStat");
+  const hudDeltaStat = $("hudDeltaStat");
+
+  // Shot Clock Widget
+  const clockHeroDigits = $("clockHeroDigits");
+  const clockStatusChip = $("clockStatusChip");
+  const clockExtLabel = $("clockExtLabel");
+  const clockProgressFill = $("clockProgressFill");
+  const btnClockStart = $("btnClockStart");
+  const clockBtnIcon = $("clockBtnIcon");
+  const clockBtnText = $("clockBtnText");
+  const btnClockExt = $("btnClockExt");
+  const btnClockReset = $("btnClockReset");
+
+  // Stakes Widget
+  const boxPerRack = $("boxPerRack");
+  const metricPerRackVal = $("metricPerRackVal");
+  const boxCurrentPot = $("boxCurrentPot");
+  const metricCurrentPotVal = $("metricCurrentPotVal");
+  const boxTargetFrame = $("boxTargetFrame");
+  const metricTargetRace = $("metricTargetRace");
+  const btnTagFoul = $("btnTagFoul");
+  const btnTagSafe = $("btnTagSafe");
+
+  // Championship Header
+  const raceTrackerBadge = $("raceTrackerBadge");
+
+  // Players Array & Zero Sum
+  const playersArrayContainer = $("playersArrayContainer");
+  const zeroSumPanel = $("zeroSumPanel");
+  const zeroSumNumDisplay = $("zeroSumNumDisplay");
+
+  // Tactical Actions
+  const btnAddPlayer = $("btnAddPlayer");
+  const playerCountVal = $("playerCountVal");
+  const btnRemovePlayer = $("btnRemovePlayer");
+  const btnSwapBreak = $("btnSwapBreak");
+  const btnHoldReset = $("btnHoldReset");
+  const holdResetProgressBar = $("holdResetProgressBar");
+  const btnToggleRackLog = $("btnToggleRackLog");
+
+  // Rack Log Drawer
+  const rackLogDrawer = $("rackLogDrawer");
+  const blurCountdownDisplay = $("blurCountdownDisplay");
+  const btnWakeFocus = $("btnWakeFocus");
+  const rackLogScrollList = $("rackLogScrollList");
+  const emptyLogState = $("emptyLogState");
+
+  // Bottom Feed
+  const feedTickerText = $("feedTickerText");
+
+  // Modals
+  const stakesModal = $("stakesModal");
+  const btnCloseStakesModal = $("btnCloseStakesModal");
+  const btnSaveStakes = $("btnSaveStakes");
+  const stakeInputRate = $("stakeInputRate");
+  const btnStakeStepMinus = $("btnStakeStepMinus");
+  const btnStakeStepPlus = $("btnStakeStepPlus");
+  const raceInputTarget = $("raceInputTarget");
+  const btnRaceMinus = $("btnRaceMinus");
+  const btnRacePlus = $("btnRacePlus");
+  const modalSettlementRoster = $("modalSettlementRoster");
+  const modalTransfersLedger = $("modalTransfersLedger");
+
+  const infoModal = $("infoModal");
+  const btnCloseInfoModal = $("btnCloseInfoModal");
+  const btnDismissInfo = $("btnDismissInfo");
+  const hudToast = $("hudToast");
+
+  // ═══════════════ SCREEN WAKE LOCK ═══════════════
+  let wakeLockSentinel = null;
+
+  async function requestScreenWakeLock() {
+    if ("wakeLock" in navigator) {
+      try {
+        wakeLockSentinel = await navigator.wakeLock.request("screen");
+        wakeLockSentinel.addEventListener("release", () => {
+          wakeLockSentinel = null;
+        });
+      } catch {
+        // Wake Lock not granted or supported
+      }
+    }
   }
 
-  function clickSound() {
-    if (!S.sound) return;
+  // Re-acquire on tab visibility return
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      requestScreenWakeLock();
+    }
+  });
+
+  // ═══════════════ FULLSCREEN API ═══════════════
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  }
+
+  document.addEventListener("fullscreenchange", () => {
+    const isFull = !!document.fullscreenElement;
+    if (fullscreenIcon) {
+      fullscreenIcon.textContent = isFull ? "fullscreen_exit" : "fullscreen";
+    }
+    showToast(isFull ? "FULLSCREEN ACTIVATED" : "WINDOWED MODE");
+  });
+
+  // ═══════════════ AUDIO & HAPTIC SYSTEM ═══════════════
+  let audioContext = null;
+
+  function getAudioCtx() {
+    if (!audioContext) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) audioContext = new AudioCtx();
+    }
+    if (audioContext && audioContext.state === "suspended") {
+      audioContext.resume();
+    }
+    return audioContext;
+  }
+
+  function playBallStrikeSound() {
+    if (!state.soundEnabled) return;
     try {
-      const c = ctx(); if (!c) return;
-      const t = c.currentTime;
-      const o1 = c.createOscillator(), g1 = c.createGain();
-      o1.type = "triangle"; o1.frequency.setValueAtTime(2200, t); o1.frequency.exponentialRampToValueAtTime(800, t + .025);
-      g1.gain.setValueAtTime(.7, t); g1.gain.exponentialRampToValueAtTime(.001, t + .035);
-      o1.connect(g1); g1.connect(c.destination); o1.start(t); o1.stop(t + .04);
-      const o2 = c.createOscillator(), g2 = c.createGain();
-      o2.type = "sine"; o2.frequency.setValueAtTime(950, t); o2.frequency.exponentialRampToValueAtTime(320, t + .04);
-      g2.gain.setValueAtTime(.5, t); g2.gain.exponentialRampToValueAtTime(.001, t + .05);
-      o2.connect(g2); g2.connect(c.destination); o2.start(t); o2.stop(t + .055);
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      const t = ctx.currentTime;
+
+      // Primary snap
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = "triangle";
+      osc1.frequency.setValueAtTime(2400, t);
+      osc1.frequency.exponentialRampToValueAtTime(750, t + 0.022);
+      gain1.gain.setValueAtTime(0.75, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.032);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(t);
+      osc1.stop(t + 0.035);
+
+      // Deep phenolic body resonance
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(980, t);
+      osc2.frequency.exponentialRampToValueAtTime(310, t + 0.038);
+      gain2.gain.setValueAtTime(0.55, t);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.048);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(t);
+      osc2.stop(t + 0.05);
     } catch {}
   }
 
-  function beep(freq = 880, dur = .09) {
-    if (!S.sound) return;
+  function playTone(freq, dur = 0.08) {
+    if (!state.soundEnabled) return;
     try {
-      const c = ctx(); if (!c) return;
-      const t = c.currentTime, o = c.createOscillator(), g = c.createGain();
-      o.type = "sine"; o.frequency.setValueAtTime(freq, t);
-      g.gain.setValueAtTime(.4, t); g.gain.exponentialRampToValueAtTime(.001, t + dur);
-      o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .01);
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      const t = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.4, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + dur + 0.01);
     } catch {}
   }
 
-  function vib(ms = 15) { if (S.sound && navigator.vibrate) try { navigator.vibrate(ms); } catch {} }
-
-  function tap(foul) {
-    if (foul) { beep(220, .35); vib([50, 40, 50]); }
-    else { clickSound(); vib(18); }
+  function vibrateDevice(pattern = 16) {
+    if (state.soundEnabled && "vibrate" in navigator) {
+      try { navigator.vibrate(pattern); } catch {}
+    }
   }
 
-  // ═══════════════ TOAST ═══════════════
-  let tt = null;
-  function showToast(msg) { toast.textContent = msg; toast.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("show"), 2000); }
-
-  // ═══════════════ PERSIST ═══════════════
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} }
-  function load() { try { const s = localStorage.getItem(KEY); if (s) Object.assign(S, JSON.parse(s)); } catch {} }
-
-  // ═══════════════ ESCAPE ═══════════════
-  function esc(s) { if (!s) return ""; const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
-
-  // ═══════════════ SETTLEMENTS ═══════════════
-  function settle() {
-    const ps = S.players, r = parseFloat(S.rate) || 0, n = ps.length;
-    const net = {}; ps.forEach(p => net[p.id] = 0);
-    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
-      const d = ps[i].score - ps[j].score; net[ps[i].id] += d; net[ps[j].id] -= d;
+  function tactileFeedback(isAlert = false) {
+    if (isAlert) {
+      playTone(220, 0.35);
+      vibrateDevice([50, 40, 50]);
+    } else {
+      playBallStrikeSound();
+      vibrateDevice(18);
     }
-    const cash = {}; ps.forEach(p => cash[p.id] = net[p.id] * r);
-
-    const debtors = [], creditors = [];
-    ps.forEach(p => { const c = cash[p.id]; if (c > .001) creditors.push({ name: p.name, bal: c }); else if (c < -.001) debtors.push({ name: p.name, bal: -c }); });
-    const xfers = []; let di = 0, ci = 0;
-    while (di < debtors.length && ci < creditors.length) {
-      const a = Math.min(debtors[di].bal, creditors[ci].bal);
-      if (a > .01) xfers.push({ from: debtors[di].name, to: creditors[ci].name, amt: a.toFixed(2) });
-      debtors[di].bal -= a; creditors[ci].bal -= a;
-      if (debtors[di].bal <= .01) di++; if (creditors[ci].bal <= .01) ci++;
-    }
-    return { cash, xfers };
   }
 
-  function renderStakes() {
-    const r = parseFloat(S.rate) || 1; rateInput.value = r.toFixed(2); stakeLabel.textContent = "$" + r.toFixed(2) + "/PT";
-    document.querySelectorAll(".preset").forEach(c => c.classList.toggle("active", Math.abs(parseFloat(c.dataset.r) - r) < .01));
-    const { cash, xfers } = settle();
-    payoutRows.innerHTML = ""; transferRows.innerHTML = "";
-    S.players.forEach(p => {
-      const c = cash[p.id] || 0, w = c >= 0;
-      payoutRows.innerHTML += `<div class="pay-row"><span class="pay-name">${esc(p.name)} (${p.score})</span><span class="pay-amt ${w ? "win" : "loss"}">${w ? "+" : "-"}$${Math.abs(c).toFixed(2)}</span></div>`;
+  // ═══════════════ TOAST NOTIFICATION ═══════════════
+  let toastTimer = null;
+  function showToast(msg) {
+    if (!hudToast) return;
+    hudToast.textContent = msg;
+    hudToast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => hudToast.classList.remove("show"), 2200);
+  }
+
+  // ═══════════════ PERSISTENCE ═══════════════
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {}
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) Object.assign(state, JSON.parse(raw));
+    } catch {}
+  }
+
+  function escapeHtml(str) {
+    if (!str) return "";
+    const el = document.createElement("div");
+    el.textContent = str;
+    return el.innerHTML;
+  }
+
+  // ═══════════════ PAIRWISE STAKES ENGINE ═══════════════
+  function calculateSettlements() {
+    const players = state.players;
+    const rate = parseFloat(state.stakeRate) || 0;
+    const n = players.length;
+
+    const netPoints = {};
+    players.forEach((p) => (netPoints[p.id] = 0));
+
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const diff = players[i].score - players[j].score;
+        netPoints[players[i].id] += diff;
+        netPoints[players[j].id] -= diff;
+      }
+    }
+
+    const netCash = {};
+    players.forEach((p) => {
+      netCash[p.id] = netPoints[p.id] * rate;
     });
-    if (!xfers.length) transferRows.innerHTML = `<div class="xfer-row"><span class="material-symbols-outlined" style="font-size:16px">check</span> NO PAYOUTS REQUIRED</div>`;
-    else xfers.forEach(t => transferRows.innerHTML += `<div class="xfer-row"><span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span> <strong>${esc(t.from)}</strong> pays <strong>${esc(t.to)}</strong>: $${t.amt}</div>`);
+
+    // Debtor-to-creditor matching for minimum cash transfers
+    const debtors = [];
+    const creditors = [];
+    players.forEach((p) => {
+      const amt = netCash[p.id];
+      if (amt > 0.001) creditors.push({ name: p.name, balance: amt });
+      else if (amt < -0.001) debtors.push({ name: p.name, balance: -amt });
+    });
+
+    const transfers = [];
+    let d = 0, c = 0;
+    while (d < debtors.length && c < creditors.length) {
+      const transferAmt = Math.min(debtors[d].balance, creditors[c].balance);
+      if (transferAmt > 0.01) {
+        transfers.push({
+          from: debtors[d].name,
+          to: creditors[c].name,
+          amount: transferAmt.toFixed(2),
+        });
+      }
+      debtors[d].balance -= transferAmt;
+      creditors[c].balance -= transferAmt;
+      if (debtors[d].balance <= 0.01) d++;
+      if (creditors[c].balance <= 0.01) c++;
+    }
+
+    return { netPoints, netCash, transfers };
+  }
+
+  // ═══════════════ ZERO-SUM & HOTCELL SYSTEM ═══════════════
+  /**
+   * Original Requirement:
+   * "If points don't add up to zero, player boards glow with a highlighted border and background (hotcell),
+   * and the discrepancy number appears in large text at the bottom.
+   * Once all scores balance out back to zero, the highlight turns off."
+   */
+  function updateZeroSumAndTelemetry() {
+    const players = state.players;
+    const totalRacks = players.reduce((sum, p) => sum + p.score, 0);
+    const { netCash } = calculateSettlements();
+
+    // Check if points are balanced or if there is a discrepancy
+    // In a zero-sum money match, discrepancy is the non-zero balance of net cash or odd delta
+    const discrepancy = state.totalSumDiscrepancy;
+    const hasDiscrepancy = discrepancy !== 0;
+
+    // Apply hotcell to all player cards if discrepancy exists
+    const cards = document.querySelectorAll(".player-championship-card");
+    cards.forEach((card) => {
+      card.classList.toggle("hotcell", hasDiscrepancy);
+    });
+
+    // Zero-sum panel visibility
+    if (zeroSumPanel && zeroSumNumDisplay) {
+      zeroSumPanel.classList.toggle("visible", hasDiscrepancy);
+      zeroSumNumDisplay.textContent = discrepancy > 0 ? `+${discrepancy}` : `${discrepancy}`;
+    }
+
+    // Lead calculations
+    const sorted = [...players].sort((a, b) => b.score - a.score);
+    const leader = sorted[0];
+    const runnerUp = sorted[1] || { score: 0 };
+    const leadDiff = leader.score - runnerUp.score;
+
+    if (totalRacks === 0) {
+      hudLeadStat.innerHTML = `LEAD: <strong>EVEN (0-0)</strong>`;
+      hudDeltaStat.innerHTML = `DELTA: <strong>$0.00 NET (BALANCED)</strong>`;
+    } else if (leadDiff === 0) {
+      hudLeadStat.innerHTML = `LEAD: <strong>TIED (${leader.score} ALL)</strong>`;
+      hudDeltaStat.innerHTML = `DELTA: <strong>$0.00 NET (TIED)</strong>`;
+    } else {
+      const cashDelta = (netCash[leader.id] || 0).toFixed(2);
+      hudLeadStat.innerHTML = `LEAD: <strong>${leader.name.toUpperCase()} (+${leadDiff})</strong>`;
+      hudDeltaStat.innerHTML = `DELTA: <strong>+$${cashDelta} NET (${hasDiscrepancy ? "UNBALANCED" : "BALANCED"})</strong>`;
+    }
+
+    // Race frame badge update
+    if (raceTrackerBadge) {
+      raceTrackerBadge.textContent = `RACK ${String(totalRacks).padStart(2, "0")} / ${state.targetRace} ■`;
+    }
+
+    // Total pot calculation (Total racks * stakeRate)
+    const pot = (totalRacks * state.stakeRate).toFixed(2);
+    if (metricCurrentPotVal) {
+      metricCurrentPotVal.textContent = `$${pot}`;
+    }
   }
 
   // ═══════════════ RENDER PLAYERS ═══════════════
-  function render() {
-    playerBox.innerHTML = "";
-    const mx = Math.max(...S.players.map(p => p.score), 0);
-    const { cash } = settle();
+  function renderPlayers() {
+    playersArrayContainer.innerHTML = "";
+    const players = state.players;
+    const maxScore = Math.max(...players.map((p) => p.score), 0);
+    const { netCash } = calculateSettlements();
 
-    S.players.forEach((p, i) => {
-      const lead = p.score > 0 && p.score === mx;
-      const c = cash[p.id] || 0;
-      const ct = c >= 0 ? `+$${c.toFixed(2)}` : `-$${Math.abs(c).toFixed(2)}`;
+    players.forEach((p, index) => {
+      const isLeader = p.score > 0 && p.score === maxScore;
+      const cash = netCash[p.id] || 0;
+      const cashStr = cash >= 0 ? `+$${cash.toFixed(2)}` : `-$${Math.abs(cash).toFixed(2)}`;
+      const isWin = cash >= 0;
 
-      const card = document.createElement("div");
-      card.className = "p-card" + (lead ? " lead" : "");
+      const card = document.createElement("article");
+      card.className = `player-championship-card ${isLeader ? "is-leader" : ""}`;
+      card.id = `card-player-${p.id}`;
+
       card.innerHTML = `
-        <div class="p-top">
-          <span class="p-id">0${i + 1}</span>
-          <button class="break-badge ${p.brk ? "" : "off"}" data-pid="${p.id}">${p.brk ? "BREAK" : "WAIT"}</button>
-        </div>
-        <input type="text" class="p-name" value="${esc(p.name)}" data-pid="${p.id}" spellcheck="false" placeholder="Player ${i + 1}">
-        <div class="p-divider"></div>
-        <div class="score-row">
-          <button class="s-btn dec" data-pid="${p.id}"><span class="material-symbols-outlined">remove</span></button>
-          <div class="score-mid">
-            <span class="score-val" id="sv-${p.id}">${String(p.score).padStart(2, "0")}</span>
-            <span class="score-lbl">RACKS WON</span>
+        <div class="card-top-breaker-row">
+          <div 
+            class="breaker-status-pill ${p.isBreaker ? "active" : "waiting"}" 
+            data-pid="${p.id}" 
+            title="Click to pass break"
+          >
+            <span class="material-symbols-outlined" style="font-size: 13px;">${p.isBreaker ? "token" : "radio_button_unchecked"}</span>
+            <span>${p.isBreaker ? "ACTIVE BREAKER" : "INNING WAITING"}</span>
           </div>
-          <button class="s-btn inc" data-pid="${p.id}"><span class="material-symbols-outlined">add</span></button>
+
+          <span class="material-symbols-outlined card-status-icon-badge ${p.isBreaker ? "active" : ""}">
+            ${p.isBreaker ? "verified" : "radio_button_unchecked"}
+          </span>
         </div>
-        <div class="p-foot"><span>NET STAKE</span><span class="net ${c >= 0 ? "pos" : "neg"}">${ct}</span></div>`;
 
-      // Name change
-      card.querySelector(".p-name").addEventListener("change", e => { p.name = e.target.value.trim() || `Player ${i + 1}`; save(); renderStakes(); });
-      card.querySelector(".p-name").addEventListener("keydown", e => { if (e.key === "Enter") e.target.blur(); });
+        <input 
+          type="text" 
+          class="player-name-field" 
+          value="${escapeHtml(p.name)}" 
+          data-pid="${p.id}" 
+          placeholder="Player ${index + 1}"
+          spellcheck="false"
+        />
 
-      // Break toggle
-      card.querySelector(".break-badge").addEventListener("click", () => { tap(); S.players.forEach(x => x.brk = false); p.brk = true; save(); render(); });
+        <div class="player-sub-meta">
+          <span>P${index + 1}</span> / 
+          <span>Fargo: ${p.fargo || 800}</span> / 
+          <span>Runouts: ${p.runouts || 0}</span>
+        </div>
+
+        <div class="card-score-row">
+          <button class="btn-score-touch btn-dec" data-pid="${p.id}" title="Decrement Rack (−)">
+            <span class="material-symbols-outlined">remove</span>
+          </button>
+
+          <div class="score-center-display">
+            <span class="score-hero-digits" id="digits-${p.id}">${String(p.score).padStart(2, "0")}</span>
+            <span class="score-sublabel">CURRENT FRAMES</span>
+          </div>
+
+          <button class="btn-score-touch btn-inc" data-pid="${p.id}" title="Increment Rack (+)">
+            <span class="material-symbols-outlined">add</span>
+          </button>
+        </div>
+
+        <div class="card-telemetry-footer">
+          <div class="footer-stat-group">
+            <span class="stat-label-tiny">FINANCIAL NET</span>
+            <span class="stat-val-bold ${isWin ? "win" : "loss"}">${cashStr}</span>
+          </div>
+          <div class="footer-stat-group" style="align-items: flex-end;">
+            <span class="stat-label-tiny">INNING SUCCESS</span>
+            <span class="stat-val-pct">${p.score > 0 ? (70 + (p.score * 2.5)).toFixed(1) : "0.0"}% TBL RATIO</span>
+          </div>
+        </div>
+      `;
+
+      // Event Listeners for Player Card
+      const nameInput = card.querySelector(".player-name-field");
+      nameInput.addEventListener("change", (e) => {
+        p.name = e.target.value.trim() || `Player ${index + 1}`;
+        saveState();
+        updateZeroSumAndTelemetry();
+      });
+
+      nameInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") nameInput.blur();
+      });
+
+      // Breaker status pill toggle
+      const breakerPill = card.querySelector(".breaker-status-pill");
+      breakerPill.addEventListener("click", () => {
+        tactileFeedback();
+        players.forEach((item) => (item.isBreaker = false));
+        p.isBreaker = true;
+        saveState();
+        renderPlayers();
+        setFeedText(`${p.name} was awarded the break.`);
+      });
 
       // Score buttons
-      card.querySelector(".inc").addEventListener("click", () => modScore(p.id, 1));
-      card.querySelector(".dec").addEventListener("click", () => modScore(p.id, -1));
+      const btnInc = card.querySelector(".btn-inc");
+      const btnDec = card.querySelector(".btn-dec");
 
-      playerBox.appendChild(card);
+      btnInc.addEventListener("click", () => modifyScore(p.id, 1));
+      btnDec.addEventListener("click", () => modifyScore(p.id, -1));
+
+      playersArrayContainer.appendChild(card);
     });
 
-    updateBalance();
-    undoBtn.disabled = !undo.length;
-    redoBtn.disabled = !redo.length;
-    renderStakes();
+    if (playerCountVal) playerCountVal.textContent = players.length;
+    btnUndo.disabled = undoStack.length === 0;
+    btnRedo.disabled = redoStack.length === 0;
+
+    updateZeroSumAndTelemetry();
   }
 
   // ═══════════════ SCORE ENGINE ═══════════════
-  function modScore(pid, d, isUR = false) {
-    const p = S.players.find(x => x.id === pid); if (!p) return;
-    if (p.score + d < 0) { vib([30, 20]); return; }
-    const prev = p.score; p.score = Math.max(0, p.score + d);
-    tap();
+  function modifyScore(playerId, delta, isUndoRedo = false) {
+    const player = state.players.find((p) => p.id === playerId);
+    if (!player) return;
 
-    const el = document.getElementById("sv-" + pid);
-    if (el) { el.textContent = String(p.score).padStart(2, "0"); el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
-
-    let log = null;
-    if (d > 0 && !isUR) {
-      const now = new Date();
-      const ts = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
-      const rn = S.players.reduce((s, x) => s + x.score, 0);
-      log = { rn, name: p.name, ts }; S.history.unshift(log);
-      if (S.history.length > 50) S.history.pop();
-      renderHist(); resetBlur();
+    if (player.score + delta < 0) {
+      tactileFeedback(true);
+      showToast("Scores cannot be negative");
+      return;
     }
-    if (!isUR) { undo.push({ pid, d, prev, cur: p.score, log }); redo.length = 0; }
-    save(); render();
+
+    const prevScore = player.score;
+    player.score = Math.max(0, player.score + delta);
+
+    // Track original totalSum discrepancy for zero-sum indicator
+    if (delta > 0) state.totalSumDiscrepancy += delta;
+    if (delta < 0) state.totalSumDiscrepancy += delta;
+
+    tactileFeedback();
+
+    // Score pop animation
+    const digitsEl = document.getElementById(`digits-${playerId}`);
+    if (digitsEl) {
+      digitsEl.textContent = String(player.score).padStart(2, "0");
+      digitsEl.classList.remove("score-pop-anim");
+      void digitsEl.offsetWidth;
+      digitsEl.classList.add("score-pop-anim");
+    }
+
+    // Auto-record rack log entry on point increase
+    let logEntry = null;
+    if (delta > 0 && !isUndoRedo) {
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      const totalRacks = state.players.reduce((sum, p) => sum + p.score, 0);
+
+      logEntry = {
+        rackNum: totalRacks,
+        winnerName: player.name,
+        time: timeStr,
+      };
+
+      state.history.unshift(logEntry);
+      if (state.history.length > 50) state.history.pop();
+      renderRackLog();
+      resetBlurCountdown();
+
+      setFeedText(`Rack ${totalRacks}: ${player.name} pocketed winning ball (+1 pt, +$${state.stakeRate.toFixed(2)} net)`);
+
+      // Target race victory alert
+      if (player.score >= state.targetRace) {
+        showToast(`🏆 ${player.name.toUpperCase()} WINS THE MATCH (RACE TO ${state.targetRace})!`);
+        tactileFeedback(true);
+      }
+    }
+
+    if (!isUndoRedo) {
+      undoStack.push({
+        playerId,
+        delta,
+        prevScore,
+        newScore: player.score,
+        logEntry,
+      });
+      redoStack.length = 0;
+    }
+
+    saveState();
+    renderPlayers();
   }
 
-  function doUndo() {
-    if (!undo.length) return;
-    const a = undo.pop(), p = S.players.find(x => x.id === a.pid); if (!p) return;
-    p.score = a.prev;
-    if (a.log) { S.history = S.history.filter(h => h !== a.log); renderHist(); resetBlur(); }
-    redo.push(a); tap(); showToast("UNDO: " + p.name); save(); render();
+  function handleUndoAction() {
+    if (undoStack.length === 0) return;
+    const action = undoStack.pop();
+    const player = state.players.find((p) => p.id === action.playerId);
+    if (player) {
+      player.score = action.prevScore;
+      state.totalSumDiscrepancy -= action.delta;
+
+      if (action.logEntry) {
+        state.history = state.history.filter((h) => h !== action.logEntry);
+        renderRackLog();
+        resetBlurCountdown();
+      }
+
+      redoStack.push(action);
+      tactileFeedback();
+      showToast(`UNDO: ${player.name} score reverted`);
+      saveState();
+      renderPlayers();
+    }
   }
 
-  function doRedo() {
-    if (!redo.length) return;
-    const a = redo.pop(), p = S.players.find(x => x.id === a.pid); if (!p) return;
-    p.score = a.cur;
-    if (a.log) { S.history.unshift(a.log); renderHist(); resetBlur(); }
-    undo.push(a); tap(); showToast("REDO: " + p.name); save(); render();
+  function handleRedoAction() {
+    if (redoStack.length === 0) return;
+    const action = redoStack.pop();
+    const player = state.players.find((p) => p.id === action.playerId);
+    if (player) {
+      player.score = action.newScore;
+      state.totalSumDiscrepancy += action.delta;
+
+      if (action.logEntry) {
+        state.history.unshift(action.logEntry);
+        renderRackLog();
+        resetBlurCountdown();
+      }
+
+      undoStack.push(action);
+      tactileFeedback();
+      showToast(`REDO: ${player.name} score restored`);
+      saveState();
+      renderPlayers();
+    }
   }
 
-  // ═══════════════ BALANCE ═══════════════
-  function updateBalance() {
-    const tot = S.players.reduce((s, p) => s + p.score, 0);
-    const eq = S.players.every(p => p.score === S.players[0].score);
-    if (tot === 0) { balanceBar.classList.remove("hot"); balanceText.textContent = "MATCH READY"; balanceTagEl.textContent = "READY"; }
-    else if (eq) { balanceBar.classList.remove("hot"); balanceText.textContent = "TIED · " + tot + " RACKS"; balanceTagEl.textContent = "TIED"; }
-    else { balanceBar.classList.add("hot"); const l = [...S.players].sort((a, b) => b.score - a.score)[0]; balanceText.textContent = "LEAD: " + l.name.toUpperCase() + " (+" + l.score + ") · " + tot + " RACKS"; balanceTagEl.textContent = "ACTIVE"; }
+  // ═══════════════ SHOT CLOCK ENGINE ═══════════════
+  function renderShotClock() {
+    clockHeroDigits.textContent = String(clockTimeLeft).padStart(2, "0");
+    const pct = Math.max(0, Math.min(100, (clockTimeLeft / state.shotClockDuration) * 100));
+    clockProgressFill.style.width = `${pct}%`;
+
+    const isCrit = isClockRunning && clockTimeLeft <= 5;
+    clockHeroDigits.classList.toggle("crit", isCrit);
+    clockProgressFill.classList.toggle("crit", isCrit);
+
+    if (clockStatusChip) {
+      if (clockTimeLeft === 0) {
+        clockStatusChip.textContent = "TIME FOUL";
+        clockStatusChip.className = "status-chip foul";
+      } else if (isClockRunning) {
+        clockStatusChip.textContent = "RUNNING";
+        clockStatusChip.className = "status-chip running";
+      } else {
+        clockStatusChip.textContent = "STANDBY";
+        clockStatusChip.className = "status-chip";
+      }
+    }
+
+    if (clockExtLabel) {
+      clockExtLabel.textContent = `EXTENSIONS: ${MAX_EXTENSIONS - extensionsUsed} / ${MAX_EXTENSIONS} LEFT`;
+    }
   }
 
-  // ═══════════════ HISTORY + 180s BLUR ═══════════════
-  function renderHist() {
-    histList.innerHTML = "";
-    if (!S.history.length) { histEmpty.style.display = "flex"; histList.appendChild(histEmpty); return; }
-    histEmpty.style.display = "none";
-    S.history.forEach(h => {
-      const r = document.createElement("div"); r.className = "log-row";
-      r.innerHTML = `<span class="log-id">R-${String(h.rn).padStart(2, "0")}</span><span class="log-name">${esc(h.name)}</span><span class="log-delta">+1</span><span class="log-time">${h.ts}</span>`;
-      histList.appendChild(r);
+  function startShotClock() {
+    clearInterval(clockInterval);
+    isClockRunning = true;
+    clockBtnIcon.textContent = "pause";
+    clockBtnText.textContent = "PAUSE CLOCK";
+
+    clockInterval = setInterval(() => {
+      if (clockTimeLeft > 0) {
+        clockTimeLeft--;
+
+        if (clockTimeLeft <= 5 && clockTimeLeft >= 1) {
+          playTone(880, 0.08);
+          vibrateDevice(20);
+        } else if (clockTimeLeft === 10) {
+          playTone(660, 0.06);
+        }
+
+        renderShotClock();
+
+        if (clockTimeLeft === 0) {
+          tactileFeedback(true);
+          showToast("⚠️ SHOT CLOCK EXPIRED: TIME FOUL!");
+          stopShotClock();
+          setFeedText("Shot clock expired. Ball-in-hand awarded to opponent.");
+        }
+      }
+    }, 1000);
+    renderShotClock();
+  }
+
+  function stopShotClock() {
+    clearInterval(clockInterval);
+    clockInterval = null;
+    isClockRunning = false;
+    clockBtnIcon.textContent = "play_arrow";
+    clockBtnText.textContent = "START CLOCK";
+    renderShotClock();
+  }
+
+  function resetShotClock() {
+    stopShotClock();
+    clockTimeLeft = state.shotClockDuration;
+    renderShotClock();
+  }
+
+  btnClockStart.addEventListener("click", () => {
+    tactileFeedback();
+    if (isClockRunning) {
+      stopShotClock();
+    } else {
+      if (clockTimeLeft === 0) clockTimeLeft = state.shotClockDuration;
+      startShotClock();
+    }
+  });
+
+  btnClockExt.addEventListener("click", () => {
+    tactileFeedback();
+    clockTimeLeft = Math.min(90, clockTimeLeft + 30);
+    extensionsUsed = Math.min(MAX_EXTENSIONS, extensionsUsed + 1);
+    renderShotClock();
+    showToast("+30s Extension Granted");
+    setFeedText("30-second extension claimed.");
+  });
+
+  btnClockReset.addEventListener("click", () => {
+    tactileFeedback();
+    resetShotClock();
+  });
+
+  // Mode Preset Chips (30S, 45S, 60S)
+  document.querySelectorAll(".clock-mode-btn").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      tactileFeedback();
+      const sec = parseInt(chip.dataset.sec, 10) || 45;
+      state.shotClockDuration = sec;
+      document.querySelectorAll(".clock-mode-btn").forEach((c) => c.classList.remove("active"));
+      chip.classList.add("active");
+      resetShotClock();
+      saveState();
+      showToast(`Shot clock set to ${sec}s`);
+    });
+  });
+
+  // ═══════════════ RACK LOG & 180s BLUR ═══════════════
+  function renderRackLog() {
+    rackLogScrollList.innerHTML = "";
+    if (state.history.length === 0) {
+      emptyLogState.style.display = "flex";
+      rackLogScrollList.appendChild(emptyLogState);
+      return;
+    }
+
+    emptyLogState.style.display = "none";
+    state.history.forEach((h) => {
+      const row = document.createElement("div");
+      row.className = "log-entry-row";
+      row.innerHTML = `
+        <span class="log-rack-num">R-${String(h.rackNum).padStart(2, "0")}</span>
+        <span class="log-winner-name">${escapeHtml(h.winnerName)}</span>
+        <span class="log-point-delta">+1</span>
+        <span class="log-timestamp">${h.time}</span>
+      `;
+      rackLogScrollList.appendChild(row);
     });
   }
 
-  function resetBlur() {
-    historyBox.classList.remove("blurred"); blurLeft = BLUR_MS; updateBlurText();
-    clearInterval(blurTimer);
-    blurTimer = setInterval(() => { if (blurLeft > 0) { blurLeft--; updateBlurText(); } else { historyBox.classList.add("blurred"); blurText.textContent = "BLURRED"; clearInterval(blurTimer); } }, 1000);
-  }
-  function updateBlurText() { const m = Math.floor(blurLeft / 60), s = blurLeft % 60; blurText.textContent = "FOCUS · " + m + "m " + String(s).padStart(2, "0") + "s"; }
+  function resetBlurCountdown() {
+    rackLogDrawer.classList.remove("blurred");
+    blurSecondsLeft = BLUR_INTERVAL_SEC;
+    updateBlurDisplay();
 
-  historyBox.addEventListener("click", resetBlur);
-  wakeBtn.addEventListener("click", e => { e.stopPropagation(); resetBlur(); showToast("History focused"); });
-
-  // ═══════════════ SHOT CLOCK ═══════════════
-  function renderClock() {
-    clockNum.textContent = String(clockLeft).padStart(2, "0");
-    const pct = Math.max(0, Math.min(100, (clockLeft / S.clockMode) * 100));
-    progressFill.style.width = pct + "%";
-    const crit = clockRunning && clockLeft <= 5;
-    clockNum.classList.toggle("crit", crit);
-    progressFill.classList.toggle("crit", crit);
-  }
-
-  function startClock() {
-    clearInterval(clockTimer); clockRunning = true; clockToggle.textContent = "PAUSE";
-    clockTimer = setInterval(() => {
-      if (clockLeft > 0) {
-        clockLeft--;
-        if (clockLeft <= 5 && clockLeft >= 1) { beep(880, .08); vib(15); }
-        else if (clockLeft === 10) beep(660, .06);
-        renderClock();
-        if (clockLeft === 0) { tap(true); showToast("SHOT CLOCK: FOUL"); stopClock(); }
+    clearInterval(blurTimerId);
+    blurTimerId = setInterval(() => {
+      if (blurSecondsLeft > 0) {
+        blurSecondsLeft--;
+        updateBlurDisplay();
+      } else {
+        rackLogDrawer.classList.add("blurred");
+        blurCountdownDisplay.textContent = "BLURRED (180s IDLE)";
+        clearInterval(blurTimerId);
       }
     }, 1000);
-    renderClock();
   }
 
-  function stopClock() { clearInterval(clockTimer); clockTimer = null; clockRunning = false; clockToggle.textContent = "START"; renderClock(); }
-  function resetClockFn() { stopClock(); clockLeft = S.clockMode; renderClock(); }
+  function updateBlurDisplay() {
+    const m = Math.floor(blurSecondsLeft / 60);
+    const s = blurSecondsLeft % 60;
+    blurCountdownDisplay.textContent = `ACTIVE FOCUS · ${m}m ${String(s).padStart(2, "0")}s`;
+  }
 
-  clockToggle.addEventListener("click", () => { tap(); if (clockRunning) stopClock(); else { if (clockLeft === 0) clockLeft = S.clockMode; startClock(); } });
-  clockExt.addEventListener("click", () => { tap(); clockLeft = Math.min(90, clockLeft + 30); renderClock(); showToast("+30s Extension"); });
-  clockReset.addEventListener("click", () => { tap(); resetClockFn(); });
-
-  mode30.addEventListener("click", () => { tap(); S.clockMode = 30; mode30.classList.add("active"); mode45.classList.remove("active"); resetClockFn(); save(); });
-  mode45.addEventListener("click", () => { tap(); S.clockMode = 45; mode45.classList.add("active"); mode30.classList.remove("active"); resetClockFn(); save(); });
-
-  // ═══════════════ ADD / REMOVE / RESET ═══════════════
-  addBtn.addEventListener("click", () => {
-    if (S.players.length >= 4) { addBtn.classList.add("flash"); setTimeout(() => addBtn.classList.remove("flash"), 250); showToast("Max 4 players"); vib([30, 20]); return; }
-    const nid = S.players.reduce((m, p) => Math.max(m, p.id), 0) + 1;
-    S.players.push({ id: nid, name: "Player " + (S.players.length + 1), score: 0, brk: false });
-    tap(); save(); render(); showToast("Added Player " + S.players.length);
+  rackLogDrawer.addEventListener("click", resetBlurCountdown);
+  btnWakeFocus.addEventListener("click", (e) => {
+    e.stopPropagation();
+    resetBlurCountdown();
+    showToast("History focus restored");
   });
 
-  removeBtn.addEventListener("click", () => {
-    if (S.players.length <= 1) { removeBtn.classList.add("flash"); setTimeout(() => removeBtn.classList.remove("flash"), 250); showToast("Min 1 player"); vib([30, 20]); return; }
-    const rm = S.players.pop(); tap(); save(); render(); showToast("Removed " + rm.name);
+  btnToggleRackLog.addEventListener("click", () => {
+    tactileFeedback();
+    rackLogDrawer.scrollIntoView({ behavior: "smooth" });
+    resetBlurCountdown();
   });
 
-  // Hold-to-reset
-  let ht = null, hs = 0; const HOLD = 1800;
-  function cancelHold() { clearInterval(ht); ht = null; holdFill.style.width = "0"; holdLabel.textContent = "HOLD 2S RESET"; }
-  function startHold(e) {
-    e.preventDefault(); hs = Date.now();
-    ht = setInterval(() => {
-      const el = Date.now() - hs, pct = Math.min(100, (el / HOLD) * 100);
-      holdFill.style.width = pct + "%";
-      if (el >= HOLD) { cancelHold(); S.players.forEach(p => p.score = 0); S.history = []; undo.length = 0; redo.length = 0; resetClockFn(); save(); render(); renderHist(); resetBlur(); tap(true); showToast("MATCH RESET"); }
+  // ═══════════════ PLAYER ROSTER (2 to 4 Players) ═══════════════
+  btnAddPlayer.addEventListener("click", () => {
+    if (state.players.length >= 4) {
+      btnAddPlayer.classList.add("flash-danger");
+      setTimeout(() => btnAddPlayer.classList.remove("flash-danger"), 250);
+      showToast("Maximum 4 players allowed");
+      tactileFeedback(true);
+      return;
+    }
+
+    const nextId = state.players.reduce((max, p) => Math.max(max, p.id), 0) + 1;
+    const names = ["Alex Pagulayan", "Francisco Bustamante", "Efren Reyes", "Earl Strickland"];
+    const fallbackName = names[state.players.length] || `Player ${state.players.length + 1}`;
+
+    state.players.push({
+      id: nextId,
+      name: fallbackName,
+      score: 0,
+      isBreaker: false,
+      runouts: 0,
+      fargo: 800,
+    });
+
+    tactileFeedback();
+    saveState();
+    renderPlayers();
+    showToast(`Added ${fallbackName} to match array`);
+    setFeedText(`${fallbackName} joined the match roster.`);
+  });
+
+  btnRemovePlayer.addEventListener("click", () => {
+    if (state.players.length <= 1) {
+      btnRemovePlayer.classList.add("flash-danger");
+      setTimeout(() => btnRemovePlayer.classList.remove("flash-danger"), 250);
+      showToast("Minimum 1 player required");
+      tactileFeedback(true);
+      return;
+    }
+
+    const removed = state.players.pop();
+    tactileFeedback();
+    saveState();
+    renderPlayers();
+    showToast(`Removed ${removed.name}`);
+    setFeedText(`${removed.name} left the match roster.`);
+  });
+
+  btnSwapBreak.addEventListener("click", () => {
+    tactileFeedback();
+    const currBreakerIdx = state.players.findIndex((p) => p.isBreaker);
+    const nextIdx = currBreakerIdx === -1 ? 0 : (currBreakerIdx + 1) % state.players.length;
+    state.players.forEach((p, idx) => (p.isBreaker = idx === nextIdx));
+    saveState();
+    renderPlayers();
+    showToast(`Break passed to ${state.players[nextIdx].name}`);
+    setFeedText(`${state.players[nextIdx].name} took over the break.`);
+  });
+
+  // ═══════════════ HOLD 2S RESET SAFETY ═══════════════
+  let holdTimer = null;
+  let holdStart = 0;
+  const HOLD_DURATION_MS = 1800;
+
+  function cancelHoldReset() {
+    clearInterval(holdTimer);
+    holdTimer = null;
+    holdResetProgressBar.style.width = "0%";
+  }
+
+  function startHoldReset(e) {
+    e.preventDefault();
+    holdStart = Date.now();
+    holdTimer = setInterval(() => {
+      const elapsed = Date.now() - holdStart;
+      const pct = Math.min(100, (elapsed / HOLD_DURATION_MS) * 100);
+      holdResetProgressBar.style.width = `${pct}%`;
+
+      if (elapsed >= HOLD_DURATION_MS) {
+        cancelHoldReset();
+        executeFullReset();
+      }
     }, 40);
   }
-  holdResetBtn.addEventListener("mousedown", startHold);
-  holdResetBtn.addEventListener("touchstart", startHold, { passive: false });
-  window.addEventListener("mouseup", cancelHold);
-  window.addEventListener("touchend", cancelHold);
 
-  // ═══════════════ UNDO / REDO ═══════════════
-  undoBtn.addEventListener("click", doUndo);
-  redoBtn.addEventListener("click", doRedo);
+  btnHoldReset.addEventListener("mousedown", startHoldReset);
+  btnHoldReset.addEventListener("touchstart", startHoldReset, { passive: false });
+  window.addEventListener("mouseup", cancelHoldReset);
+  window.addEventListener("touchend", cancelHoldReset);
 
-  // ═══════════════ SOUND / THEME ═══════════════
-  soundBtn.addEventListener("click", () => { S.sound = !S.sound; soundIcon.textContent = S.sound ? "volume_up" : "volume_off"; showToast(S.sound ? "Sound On" : "Sound Off"); if (S.sound) tap(); save(); });
+  btnResetQuick.addEventListener("click", () => {
+    if (confirm("Reset all match scores to 0?")) {
+      executeFullReset();
+    }
+  });
 
-  function applyTheme(t) {
-    S.theme = t;
-    document.documentElement.classList.toggle("light", t === "light");
-    themeIcon.textContent = t === "light" ? "dark_mode" : "light_mode";
+  function executeFullReset() {
+    state.players.forEach((p) => {
+      p.score = 0;
+      p.runouts = 0;
+    });
+    state.history = [];
+    state.totalSumDiscrepancy = 0;
+    undoStack.length = 0;
+    redoStack.length = 0;
+    resetShotClock();
+    saveState();
+    renderPlayers();
+    renderRackLog();
+    resetBlurCountdown();
+    tactileFeedback(true);
+    showToast("MATCH SCORES RESET TO ZERO");
+    setFeedText("Match reset. Scores cleared to 00-00.");
   }
-  themeBtn.addEventListener("click", () => { applyTheme(S.theme === "dark" ? "light" : "dark"); tap(); save(); });
 
-  // ═══════════════ STAKES MODAL ═══════════════
-  stakesBtn.addEventListener("click", () => { tap(); renderStakes(); stakesModal.classList.add("open"); });
-  closeStakes.addEventListener("click", () => stakesModal.classList.remove("open"));
-  stakesModal.addEventListener("click", e => { if (e.target === stakesModal) stakesModal.classList.remove("open"); });
-  applyStakes.addEventListener("click", () => { tap(); S.rate = Math.max(0, parseFloat(rateInput.value) || 1); save(); render(); stakesModal.classList.remove("open"); showToast("Stakes: $" + S.rate.toFixed(2) + "/pt"); });
-  rateMinus.addEventListener("click", () => { let v = parseFloat(rateInput.value) || 0; v = Math.max(0, v - .5); rateInput.value = v.toFixed(2); S.rate = v; renderStakes(); });
-  ratePlus.addEventListener("click", () => { let v = parseFloat(rateInput.value) || 0; v += .5; rateInput.value = v.toFixed(2); S.rate = v; renderStakes(); });
-  rateInput.addEventListener("input", () => { S.rate = Math.max(0, parseFloat(rateInput.value) || 0); renderStakes(); });
-  document.querySelectorAll(".preset").forEach(c => c.addEventListener("click", () => { const r = parseFloat(c.dataset.r); S.rate = r; rateInput.value = r.toFixed(2); renderStakes(); }));
+  // ═══════════════ STAKES & SETTLEMENT MODAL ═══════════════
+  function renderStakesModal() {
+    stakeInputRate.value = state.stakeRate.toFixed(2);
+    raceInputTarget.value = state.targetRace;
+
+    // Active chip highlights
+    document.querySelectorAll(".preset-chip:not(.race-chip)").forEach((chip) => {
+      chip.classList.toggle("active", Math.abs(parseFloat(chip.dataset.v) - state.stakeRate) < 0.01);
+    });
+
+    document.querySelectorAll(".race-chip").forEach((chip) => {
+      chip.classList.toggle("active", parseInt(chip.dataset.r, 10) === state.targetRace);
+    });
+
+    const { netCash, transfers } = calculateSettlements();
+    modalSettlementRoster.innerHTML = "";
+    state.players.forEach((p) => {
+      const val = netCash[p.id] || 0;
+      const isWin = val >= 0;
+      const row = document.createElement("div");
+      row.className = "settle-row";
+      row.innerHTML = `
+        <span>${escapeHtml(p.name)} (${p.score} Racks)</span>
+        <strong class="${isWin ? "win" : "loss"}">${isWin ? "+" : "-"}$${Math.abs(val).toFixed(2)}</strong>
+      `;
+      modalSettlementRoster.appendChild(row);
+    });
+
+    modalTransfersLedger.innerHTML = "";
+    if (transfers.length === 0) {
+      modalTransfersLedger.innerHTML = `
+        <div class="xfer-item-row">
+          <span class="material-symbols-outlined" style="font-size: 15px;">check_circle</span>
+          <span>SCORES TIED · NO FINANCIAL TRANSFERS REQUIRED</span>
+        </div>
+      `;
+    } else {
+      transfers.forEach((t) => {
+        const item = document.createElement("div");
+        item.className = "xfer-item-row";
+        item.innerHTML = `
+          <span class="material-symbols-outlined" style="font-size: 15px;">arrow_forward</span>
+          <span><strong>${escapeHtml(t.from)}</strong> pays <strong>${escapeHtml(t.to)}</strong>: $${t.amount}</span>
+        `;
+        modalTransfersLedger.appendChild(item);
+      });
+    }
+  }
+
+  [boxPerRack, boxTargetFrame].forEach((el) => {
+    el.addEventListener("click", () => {
+      tactileFeedback();
+      renderStakesModal();
+      stakesModal.classList.add("open");
+    });
+  });
+
+  btnCloseStakesModal.addEventListener("click", () => stakesModal.classList.remove("open"));
+  stakesModal.addEventListener("click", (e) => {
+    if (e.target === stakesModal) stakesModal.classList.remove("open");
+  });
+
+  btnSaveStakes.addEventListener("click", () => {
+    tactileFeedback();
+    state.stakeRate = Math.max(0, parseFloat(stakeInputRate.value) || 1.0);
+    state.targetRace = Math.max(1, parseInt(raceInputTarget.value, 10) || 15);
+    metricPerRackVal.innerHTML = `$${state.stakeRate.toFixed(2)} <small>/ PT</small>`;
+    metricTargetRace.textContent = `RACE ${state.targetRace}`;
+    saveState();
+    renderPlayers();
+    stakesModal.classList.remove("open");
+    showToast(`Config applied: $${state.stakeRate.toFixed(2)}/pt · Race ${state.targetRace}`);
+  });
+
+  btnStakeStepMinus.addEventListener("click", () => {
+    stakeInputRate.value = Math.max(0, parseFloat(stakeInputRate.value) - 0.5).toFixed(2);
+    state.stakeRate = parseFloat(stakeInputRate.value);
+    renderStakesModal();
+  });
+
+  btnStakeStepPlus.addEventListener("click", () => {
+    stakeInputRate.value = (parseFloat(stakeInputRate.value) + 0.5).toFixed(2);
+    state.stakeRate = parseFloat(stakeInputRate.value);
+    renderStakesModal();
+  });
+
+  btnRaceMinus.addEventListener("click", () => {
+    raceInputTarget.value = Math.max(1, parseInt(raceInputTarget.value, 10) - 1);
+    state.targetRace = parseInt(raceInputTarget.value, 10);
+    renderStakesModal();
+  });
+
+  btnRacePlus.addEventListener("click", () => {
+    raceInputTarget.value = parseInt(raceInputTarget.value, 10) + 1;
+    state.targetRace = parseInt(raceInputTarget.value, 10);
+    renderStakesModal();
+  });
+
+  document.querySelectorAll(".preset-chip:not(.race-chip)").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      state.stakeRate = parseFloat(chip.dataset.v);
+      stakeInputRate.value = state.stakeRate.toFixed(2);
+      renderStakesModal();
+    });
+  });
+
+  document.querySelectorAll(".race-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      state.targetRace = parseInt(chip.dataset.r, 10);
+      raceInputTarget.value = state.targetRace;
+      renderStakesModal();
+    });
+  });
 
   // ═══════════════ INFO MODAL ═══════════════
-  infoBtn.addEventListener("click", () => { tap(); infoModal.classList.add("open"); });
-  closeInfo.addEventListener("click", () => infoModal.classList.remove("open"));
-  dismissInfo.addEventListener("click", () => infoModal.classList.remove("open"));
-  infoModal.addEventListener("click", e => { if (e.target === infoModal) infoModal.classList.remove("open"); });
+  btnInfo.addEventListener("click", () => {
+    tactileFeedback();
+    infoModal.classList.add("open");
+  });
 
-  // ═══════════════ INIT ═══════════════
-  function init() {
-    load();
-    applyTheme(S.theme);
-    if (S.clockMode === 45) { mode45.classList.add("active"); mode30.classList.remove("active"); } else { S.clockMode = 30; }
-    clockLeft = S.clockMode; renderClock();
-    soundIcon.textContent = S.sound ? "volume_up" : "volume_off";
-    render(); renderHist(); resetBlur();
+  btnCloseInfoModal.addEventListener("click", () => infoModal.classList.remove("open"));
+  btnDismissInfo.addEventListener("click", () => infoModal.classList.remove("open"));
+  infoModal.addEventListener("click", (e) => {
+    if (e.target === infoModal) infoModal.classList.remove("open");
+  });
+
+  // ═══════════════ TOOLBAR CONTROLS ═══════════════
+  btnFullscreen.addEventListener("click", () => {
+    tactileFeedback();
+    toggleFullscreen();
+  });
+
+  btnUndo.addEventListener("click", handleUndoAction);
+  btnRedo.addEventListener("click", handleRedoAction);
+
+  btnSound.addEventListener("click", () => {
+    state.soundEnabled = !state.soundEnabled;
+    soundIcon.textContent = state.soundEnabled ? "volume_up" : "volume_off";
+    showToast(state.soundEnabled ? "BALL CLICK & AUDIO ACTIVE" : "SOUND MUTED");
+    if (state.soundEnabled) tactileFeedback();
+    saveState();
+  });
+
+  function applyTheme(theme) {
+    state.theme = theme;
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    themeIcon.textContent = theme === "dark" ? "light_mode" : "dark_mode";
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-  else init();
+  btnTheme.addEventListener("click", () => {
+    const nextTheme = state.theme === "dark" ? "light" : "dark";
+    applyTheme(nextTheme);
+    tactileFeedback();
+    saveState();
+  });
+
+  btnTagFoul.addEventListener("click", () => {
+    tactileFeedback(true);
+    showToast("FOUL LOGGED: Ball-in-hand awarded");
+    setFeedText("Foul recorded on active shooter.");
+  });
+
+  btnTagSafe.addEventListener("click", () => {
+    tactileFeedback();
+    showToast("DEFENSIVE SAFETY LOGGED");
+    setFeedText("Defensive safety executed.");
+  });
+
+  function setFeedText(txt) {
+    if (feedTickerText) feedTickerText.textContent = txt;
+  }
+
+  // ═══════════════ KEYBOARD SHORTCUTS ═══════════════
+  window.addEventListener("keydown", (e) => {
+    // Ignore when typing in an input
+    if (e.target.tagName === "INPUT") return;
+
+    const key = e.key.toLowerCase();
+    if (e.code === "Space") {
+      e.preventDefault();
+      btnClockStart.click();
+    } else if (key === "w" && state.players[0]) {
+      modifyScore(state.players[0].id, 1);
+    } else if (key === "q" && state.players[0]) {
+      modifyScore(state.players[0].id, -1);
+    } else if (key === "p" && state.players[1]) {
+      modifyScore(state.players[1].id, 1);
+    } else if (key === "o" && state.players[1]) {
+      modifyScore(state.players[1].id, -1);
+    } else if (key === "e") {
+      btnClockExt.click();
+    } else if (key === "r") {
+      btnClockReset.click();
+    } else if (key === "z" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      handleUndoAction();
+    }
+  });
+
+  // ═══════════════ INITIALIZATION ═══════════════
+  function init() {
+    loadState();
+    applyTheme(state.theme);
+
+    // Automatic Screen Wake Lock (Default on, no toggle needed)
+    requestScreenWakeLock();
+
+    // Match duration chip
+    document.querySelectorAll(".clock-mode-btn").forEach((chip) => {
+      chip.classList.toggle("active", parseInt(chip.dataset.sec, 10) === state.shotClockDuration);
+    });
+    clockTimeLeft = state.shotClockDuration;
+    renderShotClock();
+
+    // Metric cards
+    metricPerRackVal.innerHTML = `$${state.stakeRate.toFixed(2)} <small>/ PT</small>`;
+    metricTargetRace.textContent = `RACE ${state.targetRace}`;
+    soundIcon.textContent = state.soundEnabled ? "volume_up" : "volume_off";
+
+    renderPlayers();
+    renderRackLog();
+    resetBlurCountdown();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 })();
