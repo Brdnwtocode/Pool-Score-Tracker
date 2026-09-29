@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pool Scoreboard | 21N2 Billiards</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <header class="app-header">
+      <h1><i class="fas fa-circle-dot"></i> Pool Scoreboard</h1>
+    </header>
+
+    <main>
+      <div class="container">
+        <div class="player-container" id="playerContainer"></div>
+        <button id="addPlayerButton" class="add-btn" onclick="this.blur();" title="Add player (max 4)">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+
+      <aside class="sidebar">
+        <div class="feature-buttons">
+          <button class="feature-btn" id="resetAllBtn" title="Reset all scores">
+            <i class="fas fa-rotate-left"></i>
+          </button>
+          <button class="feature-btn" id="removeLastBtn" title="Remove last player">
+            <i class="fas fa-user-minus"></i>
+          </button>
+          <button class="feature-btn" id="toggleThemeBtn" title="Toggle theme">
+            <i class="fas fa-circle-half-stroke"></i>
+          </button>
+        </div>
+        <div class="total-display" id="totalSum"></div>
+      </aside>
+    </main>
+
+    <script src="js/script.js"></script>
+  </body>
+</html>
