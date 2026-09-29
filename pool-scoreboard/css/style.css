@@ -2,6 +2,7 @@
    CHAMPIONSHIP POOL SCOREBOARD · DUAL-MODE PROTOCOL
    Mode 1: Cash Ring Game (Zero-Sum Betting & Pairwise Settlements)
    Mode 2: Tournament Frame (WPA Broadcast Race-to-X & Shot Clock)
+   Includes 1s Hold & Drag Gesture Scrubber HUD (1 to 12 Points)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
@@ -842,7 +843,7 @@ html.mode-tournament .cash-only {
   color: var(--text-primary);
 }
 
-/* ── 6. Dynamic Player Roster Array ── */
+/* ── 6. Ultra-Clean Dynamic Player Roster Array ── */
 .players-array-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -861,14 +862,14 @@ html.mode-tournament .cash-only {
   }
 }
 
-/* Player Card Component */
+/* Player Card Component (Ultra-Clean Focus on Name & Score) */
 .player-championship-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
-  padding: 16px;
+  padding: 20px 18px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
@@ -894,64 +895,21 @@ html:not(.dark) .player-championship-card.hotcell {
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.05);
 }
 
-.card-top-breaker-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.breaker-status-pill {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 3px 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-.breaker-status-pill.active {
-  background: var(--text-primary);
-  color: var(--bg-surface);
-}
-
-.breaker-status-pill.waiting {
-  background: var(--bg-inset);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-hairline);
-}
-
-.player-seat-badge {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-}
-
 /* Player Name */
 .player-name-field {
   font-family: var(--font-serif);
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 500;
   color: var(--text-primary);
   letter-spacing: -0.015em;
   padding: 2px 0;
   border-bottom: 1px solid transparent;
   width: 100%;
+  text-align: center;
 }
 
 .player-name-field:focus {
   border-bottom-color: var(--text-primary);
-}
-
-.player-sub-meta {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
 }
 
 /* Score Row: Flex with safe min-width and auto-clamping digits */
@@ -959,16 +917,16 @@ html:not(.dark) .player-championship-card.hotcell {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
-  padding: 6px 0;
+  padding: 4px 0;
   box-sizing: border-box;
 }
 
 .btn-score-touch {
-  flex: 0 0 46px;
-  width: 46px;
-  height: 56px;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 58px;
   background: var(--bg-inset);
   border: 1px solid var(--border-hairline);
   color: var(--text-primary);
@@ -979,13 +937,15 @@ html:not(.dark) .player-championship-card.hotcell {
   align-items: center;
   justify-content: center;
   transition: all 80ms;
+  touch-action: none; /* Allows smooth hold-and-drag gesture */
 }
 
 .btn-score-touch:hover {
   background: var(--bg-elevated);
 }
 
-.btn-score-touch:active {
+.btn-score-touch:active,
+.btn-score-touch.scrubbing {
   background: var(--text-primary);
   color: var(--bg-surface);
   transform: scale(0.96);
@@ -1004,7 +964,7 @@ html:not(.dark) .player-championship-card.hotcell {
 
 .score-hero-digits {
   font-family: var(--font-serif);
-  font-size: clamp(38px, 4.2vw, 64px);
+  font-size: clamp(40px, 4.4vw, 68px);
   font-weight: 400;
   line-height: 1;
   letter-spacing: -0.03em;
@@ -1030,40 +990,6 @@ html:not(.dark) .player-championship-card.hotcell {
 
 @keyframes scorePopAnim {
   50% { transform: scale(1.12); }
-}
-
-/* Card Telemetry Footer */
-.card-telemetry-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 8px;
-  border-top: 1px solid var(--border-hairline);
-}
-
-.stat-label-tiny {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-}
-
-.stat-val-bold {
-  font-family: var(--font-serif);
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.stat-val-bold.win { color: var(--text-primary); }
-.stat-val-bold.loss { color: var(--text-secondary); }
-
-.stat-val-pct {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-primary);
 }
 
 /* ── 7. Tactical Control Actions Row ── */
@@ -1147,7 +1073,7 @@ html:not(.dark) .player-championship-card.hotcell {
   transition: width 40ms linear;
 }
 
-/* ── 8. Tournament Rack History Drawer ── */
+/* ── 8. Universal Chronological Rack History Drawer ── */
 .rack-log-drawer {
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
@@ -1183,10 +1109,41 @@ html:not(.dark) .player-championship-card.hotcell {
   letter-spacing: 0.08em;
 }
 
+.drawer-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-more-info {
+  height: 26px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 100ms;
+}
+
+.btn-more-info:hover {
+  background: var(--bg-elevated);
+}
+
+.btn-more-info.active {
+  background: var(--text-primary);
+  color: var(--bg-surface);
+}
+
 .drawer-status {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--text-secondary);
@@ -1215,7 +1172,7 @@ html:not(.dark) .player-championship-card.hotcell {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  max-height: 200px;
+  max-height: 220px;
   overflow-y: auto;
 }
 
@@ -1231,15 +1188,21 @@ html:not(.dark) .player-championship-card.hotcell {
 }
 
 .log-entry-row {
-  display: grid;
-  grid-template-columns: 50px 1fr auto auto;
-  align-items: center;
-  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   padding: 8px 10px;
   background: var(--bg-inset);
   border: 1px solid var(--border-hairline);
   font-family: var(--font-mono);
   font-size: 11px;
+}
+
+.log-entry-main {
+  display: grid;
+  grid-template-columns: 50px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
 }
 
 .log-rack-num {
@@ -1261,6 +1224,96 @@ html:not(.dark) .player-championship-card.hotcell {
 .log-timestamp {
   color: var(--text-muted);
   font-size: 10px;
+}
+
+/* Extended History Info */
+.log-extended-info {
+  display: none;
+  padding-top: 6px;
+  margin-top: 4px;
+  border-top: 1px dashed var(--border-hairline);
+  font-size: 10px;
+  color: var(--text-secondary);
+  justify-content: space-between;
+}
+
+.rack-log-drawer.show-extended .log-extended-info {
+  display: flex;
+}
+
+/* ══════════ FLOATING HOLD-AND-DRAG SCRUBBER HUD ══════════ */
+.scrubber-hud-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: none;
+}
+
+.scrubber-hud-overlay.active {
+  display: flex;
+}
+
+.scrubber-card {
+  background: var(--bg-surface);
+  border: 2px solid var(--border-bold);
+  padding: 24px 28px;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  animation: scrubPop 120ms ease-out;
+}
+
+@keyframes scrubPop {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.scrubber-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.scrubber-val {
+  font-family: var(--font-serif);
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+  letter-spacing: -0.04em;
+}
+
+.scrubber-scale {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 4px 2px 4px;
+  border-top: 1px solid var(--border-hairline);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.scrub-tick {
+  font-weight: 600;
+}
+
+.scrubber-hint {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  text-align: center;
 }
 
 /* ══════════ MODALS ══════════ */

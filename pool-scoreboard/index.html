@@ -178,7 +178,7 @@
           </button>
         </div>
 
-        <!-- Optional Compact Shot Clock in Cash Mode -->
+        <!-- Compact Shot Clock in Cash Mode -->
         <div class="cash-compact-clock">
           <span class="material-symbols-outlined" style="font-size: 16px;">timer</span>
           <span class="compact-clock-digits" id="compactClockDigits">45s</span>
@@ -211,9 +211,9 @@
         <span class="race-target-label" id="tourneyRaceBadge">TARGET: RACE TO 15</span>
       </section>
 
-      <!-- ── 6. Dynamic Player Roster Array (2 to 4 Players) ── -->
+      <!-- ── 6. Dynamic Player Roster Array (Ultra-Clean Cards) ── -->
       <section class="players-array-grid" id="playersArrayContainer">
-        <!-- Rendered dynamically by script.js with mode-specific card layout -->
+        <!-- Rendered dynamically by script.js with Name & Score Controls only -->
       </section>
 
       <!-- ── 7. Tactical Control Actions Row ── -->
@@ -227,10 +227,6 @@
             <span class="material-symbols-outlined">person_remove</span>
             <span>REMOVE</span>
           </button>
-          <button class="tactical-btn outline" id="btnSwapBreak" type="button">
-            <span class="material-symbols-outlined">swap_horiz</span>
-            <span>SWAP SEAT / BREAK</span>
-          </button>
         </div>
 
         <div class="tactical-right">
@@ -242,24 +238,32 @@
             <div class="hold-progress-bar" id="holdResetProgressBar"></div>
           </div>
 
-          <button class="tactical-btn inverted tournament-only" id="btnToggleRackLog" type="button">
+          <button class="tactical-btn inverted" id="btnToggleRackLog" type="button">
             <span class="material-symbols-outlined">menu_book</span>
             <span>RACK LOG</span>
           </button>
         </div>
       </section>
 
-      <!-- ── 8. TOURNAMENT-ONLY: Chronological Rack History Drawer ── -->
-      <section class="rack-log-drawer tournament-only" id="rackLogDrawer">
+      <!-- ── 8. Universal Chronological Rack History Drawer (With Extended Info Toggle) ── -->
+      <section class="rack-log-drawer" id="rackLogDrawer">
         <div class="drawer-header">
           <div class="drawer-title">
             <span class="material-symbols-outlined">history_edu</span>
-            <span>CHRONOLOGICAL RACK LEDGER &amp; AUDIT</span>
+            <span>CHRONOLOGICAL RACK LEDGER</span>
           </div>
-          <div class="drawer-status">
-            <span class="focus-pulse-dot"></span>
-            <span id="blurCountdownDisplay">ACTIVE FOCUS · 3m 00s</span>
-            <button class="btn-wake-focus" id="btnWakeFocus" type="button">WAKE FOCUS</button>
+
+          <div class="drawer-controls">
+            <button class="btn-more-info" id="btnToggleExtendedHistory" type="button">
+              <span class="material-symbols-outlined" style="font-size: 14px;">info</span>
+              <span id="moreInfoBtnText">MORE INFO</span>
+            </button>
+
+            <div class="drawer-status">
+              <span class="focus-pulse-dot"></span>
+              <span id="blurCountdownDisplay">3m 00s</span>
+              <button class="btn-wake-focus" id="btnWakeFocus" type="button">WAKE</button>
+            </div>
           </div>
         </div>
 
@@ -273,6 +277,22 @@
 
     </main>
 
+  </div>
+
+  <!-- ══════════ FLOATING HOLD-AND-DRAG SCRUBBER HUD ══════════ -->
+  <div class="scrubber-hud-overlay" id="scrubberHudOverlay">
+    <div class="scrubber-card" id="scrubberCard">
+      <div class="scrubber-label" id="scrubberLabel">HOLD &amp; DRAG TO ADJUST</div>
+      <div class="scrubber-val" id="scrubberVal">+1</div>
+      <div class="scrubber-scale" id="scrubberScale">
+        <span class="scrub-tick">1</span>
+        <span class="scrub-tick">3</span>
+        <span class="scrub-tick">6</span>
+        <span class="scrub-tick">9</span>
+        <span class="scrub-tick">12</span>
+      </div>
+      <div class="scrubber-hint">Drag up/down · Release to apply (max 12 pts)</div>
+    </div>
   </div>
 
   <!-- ══════════ CASH SETTLEMENTS & CONFIG MODAL ══════════ -->
@@ -403,7 +423,8 @@
           <span class="meta-tag">DUAL-MODE ARCHITECTURE</span>
           <ul>
             <li><strong>💰 Cash Ring Game Mode:</strong> Zero-sum betting logic where scores balance to 0, negative points permitted, live discrepancy tracker, subtle hotcell highlight.</li>
-            <li><strong>🏆 Tournament Mode:</strong> WPA official race-to-X frames (0 to Target Race), 30s/45s/60s shot clock, inning stats, and chronological audit log.</li>
+            <li><strong>🏆 Tournament Mode:</strong> WPA official race-to-X frames (0 to Target Race), 30s/45s/60s shot clock, and chronological audit log.</li>
+            <li><strong>Hold &amp; Drag Gesture:</strong> Hold + / − for 1s and drag up/down to adjust 1–12 points instantly.</li>
             <li><strong>Keep Screen Awake:</strong> Automatically active via Screen Wake Lock API.</li>
           </ul>
         </div>

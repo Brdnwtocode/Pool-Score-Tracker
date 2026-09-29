@@ -1,20 +1,25 @@
 /**
- * Championship Pool Scoreboard · Dual-Mode Protocol Engine v3.0.0
- * Mode 1: Cash Ring Game (Zero-Sum Betting & Pairwise Settlements)
- * Mode 2: Tournament Frame (WPA Broadcast Race-to-X & Shot Clock)
+ * Championship Pool Scoreboard · Dual-Mode Protocol Engine v3.1.0
+ * Features:
+ * - Ultra-Clean Player Cards (Name & Score Controls only, zero clutter)
+ * - 1s Hold & Drag Gesture Scrubber for +/- buttons (adjust 1 to 12 points)
+ * - Universal Chronological Rack History with Extended Info Toggle
+ * - Dual-Mode Engine: Cash Ring Game (zero-sum betting) vs Tournament Frame
+ * - Mathematically Bulletproof Zero-Sum Balance Audit
+ * - Screen Wake Lock, Fullscreen API, Web Audio Clicks, Native Haptics
  */
 
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "21n2_pool_dual_engine_v3";
+  const STORAGE_KEY = "21n2_pool_dual_engine_v31";
 
   // ═══════════════ APPLICATION STATE ═══════════════
   let state = {
     gameMode: "cash", // "cash" or "tournament"
     players: [
-      { id: 1, name: "Johnny Archer", score: 0, isBreaker: true, runouts: 0 },
-      { id: 2, name: "Shane Van Boening", score: 0, isBreaker: false, runouts: 0 },
+      { id: 1, name: "Johnny Archer", score: 0 },
+      { id: 2, name: "Shane Van Boening", score: 0 },
     ],
     stakeRate: 1.0,
     targetRace: 15,
@@ -22,13 +27,14 @@
     soundEnabled: true,
     theme: "dark", // "dark" or "light"
     history: [],
+    showExtendedHistory: false,
   };
 
   // Runtime Undo / Redo Stacks
   const undoStack = [];
   const redoStack = [];
 
-  // Shot Clock Runtime (Shared across both modes)
+  // Shot Clock Runtime
   let clockTimeLeft = 45;
   let isClockRunning = false;
   let clockInterval = null;
@@ -58,11 +64,10 @@
   const btnInfo = $("btnInfo");
 
   // Tournament HUD Strip
-  const hudMatchTitle = $("hudMatchTitle");
   const hudLeadStat = $("hudLeadStat");
   const hudDeltaStat = $("hudDeltaStat");
 
-  // Tournament Big Shot Clock Widget
+  // Tournament Shot Clock Widget
   const clockHeroDigits = $("clockHeroDigits");
   const clockStatusChip = $("clockStatusChip");
   const clockExtLabel = $("clockExtLabel");
@@ -105,17 +110,23 @@
   const btnAddPlayer = $("btnAddPlayer");
   const playerCountVal = $("playerCountVal");
   const btnRemovePlayer = $("btnRemovePlayer");
-  const btnSwapBreak = $("btnSwapBreak");
   const btnHoldReset = $("btnHoldReset");
   const holdResetProgressBar = $("holdResetProgressBar");
   const btnToggleRackLog = $("btnToggleRackLog");
 
-  // Rack Log Drawer
+  // Universal Rack Log Drawer & Extended Info Toggle
   const rackLogDrawer = $("rackLogDrawer");
+  const btnToggleExtendedHistory = $("btnToggleExtendedHistory");
+  const moreInfoBtnText = $("moreInfoBtnText");
   const blurCountdownDisplay = $("blurCountdownDisplay");
   const btnWakeFocus = $("btnWakeFocus");
   const rackLogScrollList = $("rackLogScrollList");
   const emptyLogState = $("emptyLogState");
+
+  // Hold & Drag Scrubber HUD
+  const scrubberHudOverlay = $("scrubberHudOverlay");
+  const scrubberLabel = $("scrubberLabel");
+  const scrubberVal = $("scrubberVal");
 
   // Modals
   const stakesModal = $("stakesModal");
@@ -234,7 +245,7 @@
       const gain = ctx.createGain();
       osc.type = "sine";
       osc.frequency.setValueAtTime(freq, t);
-      gain.gain.setValueAtTime(0.4, t);
+      gain.gain.setValueAtTime(0.35, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
       osc.connect(gain);
       gain.connect(ctx.destination);
@@ -290,7 +301,6 @@
     return el.innerHTML;
   }
 
-  // Score formatting: natural -3 on negative, 00, 08, 12 on positive
   function formatScore(score) {
     if (score < 0) {
       return `-${Math.abs(score)}`; // Clean: -1, -3 (never -03!)
@@ -354,12 +364,10 @@
     const netCash = {};
 
     if (state.gameMode === "cash") {
-      // In cash mode, each score directly equals net points won/lost
       players.forEach((p) => {
         netCash[p.id] = p.score * rate;
       });
     } else {
-      // In tournament mode, pairwise rack differential
       const n = players.length;
       const netPoints = {};
       players.forEach((p) => (netPoints[p.id] = 0));
@@ -376,7 +384,6 @@
       });
     }
 
-    // Debtor-to-creditor minimal transfers
     const debtors = [];
     const creditors = [];
     players.forEach((p) => {
@@ -405,127 +412,48 @@
     return { netCash, transfers };
   }
 
-  // ═══════════════ RENDER PLAYERS ═══════════════
+  // ═══════════════ ULTRA-CLEAN PLAYER CARD RENDERING ═══════════════
   function renderPlayers() {
     playersArrayContainer.innerHTML = "";
     const players = state.players;
     const isCashMode = state.gameMode === "cash";
     const maxScore = Math.max(...players.map((p) => p.score));
-    const { netCash } = calculateSettlements();
 
     players.forEach((p, index) => {
       const isLeader = p.score > 0 && p.score === maxScore;
-      const cash = netCash[p.id] || 0;
-      const cashStr = cash >= 0 ? `+$${cash.toFixed(2)}` : `-$${Math.abs(cash).toFixed(2)}`;
-      const isWin = cash >= 0;
 
       const card = document.createElement("article");
       card.className = `player-championship-card ${isLeader ? "is-leader" : ""}`;
       card.id = `card-player-${p.id}`;
 
-      // Mode-specific template structure
-      if (isCashMode) {
-        // ── CASH MODE CARD ──
-        card.innerHTML = `
-          <div class="card-top-breaker-row">
-            <button 
-              type="button"
-              class="breaker-status-pill ${p.isBreaker ? "active" : "waiting"}" 
-              data-pid="${p.id}" 
-              title="Click to pass break"
-            >
-              <span class="material-symbols-outlined" style="font-size: 13px;">${p.isBreaker ? "token" : "radio_button_unchecked"}</span>
-              <span>${p.isBreaker ? "BREAK" : "WAIT"}</span>
-            </button>
-            <span class="player-seat-badge">#0${index + 1}</span>
+      // Ultra-clean card: Only Name and Score Row (Zero clutter)
+      card.innerHTML = `
+        <input 
+          type="text" 
+          class="player-name-field" 
+          value="${escapeHtml(p.name)}" 
+          data-pid="${p.id}" 
+          placeholder="Player ${index + 1}"
+          spellcheck="false"
+        />
+
+        <div class="card-score-row">
+          <button class="btn-score-touch btn-dec" data-pid="${p.id}" title="Tap -1 · Hold & Drag to adjust up to -12">
+            <span class="material-symbols-outlined">remove</span>
+          </button>
+
+          <div class="score-center-display">
+            <span class="score-hero-digits" id="digits-${p.id}">${formatScore(p.score)}</span>
+            <span class="score-sublabel">${isCashMode ? "NET POINTS" : "FRAMES"}</span>
           </div>
 
-          <input 
-            type="text" 
-            class="player-name-field" 
-            value="${escapeHtml(p.name)}" 
-            data-pid="${p.id}" 
-            placeholder="Player ${index + 1}"
-            spellcheck="false"
-          />
+          <button class="btn-score-touch btn-inc" data-pid="${p.id}" title="Tap +1 · Hold & Drag to adjust up to +12">
+            <span class="material-symbols-outlined">add</span>
+          </button>
+        </div>
+      `;
 
-          <div class="card-score-row">
-            <button class="btn-score-touch btn-dec" data-pid="${p.id}" title="Decrement (−)">
-              <span class="material-symbols-outlined">remove</span>
-            </button>
-
-            <div class="score-center-display">
-              <span class="score-hero-digits" id="digits-${p.id}">${formatScore(p.score)}</span>
-              <span class="score-sublabel">NET POINTS</span>
-            </div>
-
-            <button class="btn-score-touch btn-inc" data-pid="${p.id}" title="Increment (+)">
-              <span class="material-symbols-outlined">add</span>
-            </button>
-          </div>
-
-          <div class="card-telemetry-footer">
-            <span class="stat-label-tiny">NET CASH</span>
-            <span class="stat-val-bold ${isWin ? "win" : "loss"}">${cashStr}</span>
-          </div>
-        `;
-      } else {
-        // ── TOURNAMENT MODE CARD ──
-        card.innerHTML = `
-          <div class="card-top-breaker-row">
-            <div 
-              class="breaker-status-pill ${p.isBreaker ? "active" : "waiting"}" 
-              data-pid="${p.id}" 
-              title="Click to pass break"
-            >
-              <span class="material-symbols-outlined" style="font-size: 13px;">${p.isBreaker ? "token" : "radio_button_unchecked"}</span>
-              <span>${p.isBreaker ? "ACTIVE BREAKER" : "INNING WAITING"}</span>
-            </div>
-            <span class="player-seat-badge">P${index + 1}</span>
-          </div>
-
-          <input 
-            type="text" 
-            class="player-name-field" 
-            value="${escapeHtml(p.name)}" 
-            data-pid="${p.id}" 
-            placeholder="Player ${index + 1}"
-            spellcheck="false"
-          />
-
-          <div class="player-sub-meta">
-            <span>P${index + 1}</span> / <span>Runouts: ${p.runouts || 0}</span>
-          </div>
-
-          <div class="card-score-row">
-            <button class="btn-score-touch btn-dec" data-pid="${p.id}" title="Decrement (−)">
-              <span class="material-symbols-outlined">remove</span>
-            </button>
-
-            <div class="score-center-display">
-              <span class="score-hero-digits" id="digits-${p.id}">${formatScore(p.score)}</span>
-              <span class="score-sublabel">CURRENT FRAMES</span>
-            </div>
-
-            <button class="btn-score-touch btn-inc" data-pid="${p.id}" title="Increment (+)">
-              <span class="material-symbols-outlined">add</span>
-            </button>
-          </div>
-
-          <div class="card-telemetry-footer">
-            <div style="display:flex; flex-direction:column;">
-              <span class="stat-label-tiny">FINANCIAL NET</span>
-              <span class="stat-val-bold ${isWin ? "win" : "loss"}">${cashStr}</span>
-            </div>
-            <div style="display:flex; flex-direction:column; align-items:flex-end;">
-              <span class="stat-label-tiny">INNING SUCCESS</span>
-              <span class="stat-val-pct">${p.score > 0 ? (70 + (p.score * 2.2)).toFixed(1) : "0.0"}% TBL RATIO</span>
-            </div>
-          </div>
-        `;
-      }
-
-      // Event Listeners for Player Card
+      // Name change listener
       const nameInput = card.querySelector(".player-name-field");
       nameInput.addEventListener("change", (e) => {
         p.name = e.target.value.trim() || `Player ${index + 1}`;
@@ -537,22 +465,12 @@
         if (e.key === "Enter") nameInput.blur();
       });
 
-      // Breaker status pill toggle
-      const breakerPill = card.querySelector(".breaker-status-pill");
-      breakerPill.addEventListener("click", () => {
-        tactileFeedback();
-        players.forEach((item) => (item.isBreaker = false));
-        p.isBreaker = true;
-        saveState();
-        renderPlayers();
-      });
-
-      // Score buttons
+      // Attach Hold & Drag Gesture Scrubber to + and - buttons
       const btnInc = card.querySelector(".btn-inc");
       const btnDec = card.querySelector(".btn-dec");
 
-      btnInc.addEventListener("click", () => modifyScore(p.id, 1));
-      btnDec.addEventListener("click", () => modifyScore(p.id, -1));
+      attachScrubberGesture(btnInc, p.id, 1);
+      attachScrubberGesture(btnDec, p.id, -1);
 
       playersArrayContainer.appendChild(card);
     });
@@ -561,7 +479,7 @@
     btnUndo.disabled = undoStack.length === 0;
     btnRedo.disabled = redoStack.length === 0;
 
-    // Update Telemetry Displays
+    // Telemetry Sync
     if (isCashMode) {
       if (cashStakeLabel) cashStakeLabel.textContent = `$${state.stakeRate.toFixed(2)} / PT`;
       updateZeroSumAudit();
@@ -603,6 +521,103 @@
     }
   }
 
+  // ═══════════════ 1-SECOND HOLD & DRAG GESTURE SCRUBBER (1 to 12 POINTS) ═══════════════
+  /**
+   * Normal tap (< 1s): Increments/decrements by 1 point.
+   * Hold for 1s: Activates the floating Scrubber HUD.
+   * Vertical drag: Changes magnitude between 1 and 12 points.
+   * Release: Commits the exact selected points in one score action.
+   */
+  function attachScrubberGesture(btn, playerId, baseDirection) {
+    let holdTimer = null;
+    let isScrubbing = false;
+    let startY = 0;
+    let currentDelta = baseDirection; // +1 or -1
+    const HOLD_THRESHOLD_MS = 1000;
+    const PIXELS_PER_POINT = 16;
+
+    function onPointerDown(e) {
+      const pointer = e.touches ? e.touches[0] : e;
+      startY = pointer.clientY;
+      isScrubbing = false;
+      currentDelta = baseDirection;
+
+      holdTimer = setTimeout(() => {
+        // 1s reached: activate scrubber HUD
+        isScrubbing = true;
+        btn.classList.add("scrubbing");
+        scrubberHudOverlay.classList.add("active");
+        scrubberLabel.textContent = `HOLD & DRAG TO ADJUST (${baseDirection > 0 ? "ADD" : "SUBTRACT"})`;
+        updateScrubberDisplay(currentDelta);
+
+        playTone(baseDirection > 0 ? 550 : 330, 0.12);
+        vibrateDevice([30, 20, 30]);
+      }, HOLD_THRESHOLD_MS);
+
+      window.addEventListener("mousemove", onPointerMove, { passive: false });
+      window.addEventListener("touchmove", onPointerMove, { passive: false });
+      window.addEventListener("mouseup", onPointerUp);
+      window.addEventListener("touchend", onPointerUp);
+    }
+
+    function onPointerMove(e) {
+      if (!isScrubbing) return;
+      e.preventDefault();
+
+      const pointer = e.touches ? e.touches[0] : e;
+      const diffY = startY - pointer.clientY; // Dragging UP is positive, DOWN is negative
+
+      let magnitude;
+      if (baseDirection > 0) {
+        // Increment button: dragging UP increases magnitude
+        magnitude = 1 + Math.floor(diffY / PIXELS_PER_POINT);
+      } else {
+        // Decrement button: dragging DOWN increases magnitude
+        magnitude = 1 + Math.floor(-diffY / PIXELS_PER_POINT);
+      }
+
+      // Clamp magnitude strictly between 1 and 12 points
+      magnitude = Math.max(1, Math.min(12, magnitude));
+      const nextDelta = magnitude * baseDirection;
+
+      if (nextDelta !== currentDelta) {
+        currentDelta = nextDelta;
+        updateScrubberDisplay(currentDelta);
+        playTone(440 + magnitude * 30, 0.03);
+        vibrateDevice(12);
+      }
+    }
+
+    function onPointerUp() {
+      clearTimeout(holdTimer);
+      window.removeEventListener("mousemove", onPointerMove);
+      window.removeEventListener("touchmove", onPointerMove);
+      window.removeEventListener("mouseup", onPointerUp);
+      window.removeEventListener("touchend", onPointerUp);
+
+      btn.classList.remove("scrubbing");
+
+      if (isScrubbing) {
+        isScrubbing = false;
+        scrubberHudOverlay.classList.remove("active");
+        // Apply the multi-point selection (1 to 12)
+        modifyScore(playerId, currentDelta);
+        showToast(`Adjusted: ${currentDelta > 0 ? "+" : ""}${currentDelta} points`);
+      } else {
+        // Released before 1s: standard 1-point tap
+        modifyScore(playerId, baseDirection);
+      }
+    }
+
+    btn.addEventListener("mousedown", onPointerDown);
+    btn.addEventListener("touchstart", onPointerDown, { passive: false });
+  }
+
+  function updateScrubberDisplay(delta) {
+    if (!scrubberVal) return;
+    scrubberVal.textContent = delta > 0 ? `+${delta}` : `${delta}`;
+  }
+
   // ═══════════════ SCORE ENGINE ═══════════════
   function modifyScore(playerId, delta, isUndoRedo = false) {
     const player = state.players.find((p) => p.id === playerId);
@@ -635,11 +650,16 @@
       const now = new Date();
       const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
       const totalRacks = state.players.reduce((sum, p) => sum + Math.max(0, p.score), 0);
+      const snapshot = state.players.map((p) => `${p.name}: ${p.score}`).join(" · ");
+      const curSum = state.players.reduce((sum, p) => sum + p.score, 0);
 
       logEntry = {
         rackNum: totalRacks,
         winnerName: player.name,
+        delta: delta,
         time: timeStr,
+        snapshot: snapshot,
+        balanceAtTime: curSum === 0 ? "Balanced (0)" : `${curSum > 0 ? "+" : ""}${curSum} Discrepancy`,
       };
 
       state.history.unshift(logEntry);
@@ -712,7 +732,7 @@
     }
   }
 
-  // ═══════════════ SHOT CLOCK ENGINE (SHARED ACROSS MODES) ═══════════════
+  // ═══════════════ SHOT CLOCK ENGINE ═══════════════
   function renderShotClock() {
     const formatted = String(clockTimeLeft).padStart(2, "0");
     if (clockHeroDigits) clockHeroDigits.textContent = formatted;
@@ -862,7 +882,7 @@
     });
   });
 
-  // ═══════════════ RACK LOG & 180s BLUR ═══════════════
+  // ═══════════════ RACK LOG & EXTENDED INFO TOGGLE ═══════════════
   function renderRackLog() {
     if (!rackLogScrollList) return;
     rackLogScrollList.innerHTML = "";
@@ -879,12 +899,32 @@
       const row = document.createElement("div");
       row.className = "log-entry-row";
       row.innerHTML = `
-        <span class="log-rack-num">R-${String(h.rackNum).padStart(2, "0")}</span>
-        <span class="log-winner-name">${escapeHtml(h.winnerName)}</span>
-        <span class="log-point-delta">+1</span>
-        <span class="log-timestamp">${h.time}</span>
+        <div class="log-entry-main">
+          <span class="log-rack-num">R-${String(h.rackNum).padStart(2, "0")}</span>
+          <span class="log-winner-name">${escapeHtml(h.winnerName)}</span>
+          <span class="log-point-delta">+${h.delta || 1}</span>
+          <span class="log-timestamp">${h.time}</span>
+        </div>
+        <div class="log-extended-info">
+          <span>Table Snapshot: ${escapeHtml(h.snapshot || "")}</span>
+          <span>${escapeHtml(h.balanceAtTime || "")}</span>
+        </div>
       `;
       rackLogScrollList.appendChild(row);
+    });
+  }
+
+  if (btnToggleExtendedHistory) {
+    btnToggleExtendedHistory.addEventListener("click", () => {
+      tactileFeedback();
+      state.showExtendedHistory = !state.showExtendedHistory;
+      rackLogDrawer.classList.toggle("show-extended", state.showExtendedHistory);
+      btnToggleExtendedHistory.classList.toggle("active", state.showExtendedHistory);
+      if (moreInfoBtnText) {
+        moreInfoBtnText.textContent = state.showExtendedHistory ? "LESS INFO" : "MORE INFO";
+      }
+      saveState();
+      showToast(state.showExtendedHistory ? "Extended History Details Visible" : "Compact History View");
     });
   }
 
@@ -901,7 +941,7 @@
         updateBlurDisplay();
       } else {
         rackLogDrawer.classList.add("blurred");
-        if (blurCountdownDisplay) blurCountdownDisplay.textContent = "BLURRED (180s IDLE)";
+        if (blurCountdownDisplay) blurCountdownDisplay.textContent = "BLURRED";
         clearInterval(blurTimerId);
       }
     }, 1000);
@@ -911,7 +951,7 @@
     if (!blurCountdownDisplay) return;
     const m = Math.floor(blurSecondsLeft / 60);
     const s = blurSecondsLeft % 60;
-    blurCountdownDisplay.textContent = `ACTIVE FOCUS · ${m}m ${String(s).padStart(2, "0")}s`;
+    blurCountdownDisplay.textContent = `${m}m ${String(s).padStart(2, "0")}s`;
   }
 
   if (rackLogDrawer) rackLogDrawer.addEventListener("click", resetBlurCountdown);
@@ -949,8 +989,6 @@
       id: nextId,
       name: fallbackName,
       score: 0,
-      isBreaker: false,
-      runouts: 0,
     });
 
     tactileFeedback();
@@ -975,32 +1013,22 @@
     showToast(`Removed ${removed.name}`);
   });
 
-  btnSwapBreak.addEventListener("click", () => {
-    tactileFeedback();
-    const currBreakerIdx = state.players.findIndex((p) => p.isBreaker);
-    const nextIdx = currBreakerIdx === -1 ? 0 : (currBreakerIdx + 1) % state.players.length;
-    state.players.forEach((p, idx) => (p.isBreaker = idx === nextIdx));
-    saveState();
-    renderPlayers();
-    showToast(`Break passed to ${state.players[nextIdx].name}`);
-  });
-
   // ═══════════════ HOLD 2S RESET SAFETY ═══════════════
-  let holdTimer = null;
-  let holdStart = 0;
+  let holdResetTimer = null;
+  let holdResetStart = 0;
   const HOLD_DURATION_MS = 1800;
 
   function cancelHoldReset() {
-    clearInterval(holdTimer);
-    holdTimer = null;
+    clearInterval(holdResetTimer);
+    holdResetTimer = null;
     holdResetProgressBar.style.width = "0%";
   }
 
   function startHoldReset(e) {
     e.preventDefault();
-    holdStart = Date.now();
-    holdTimer = setInterval(() => {
-      const elapsed = Date.now() - holdStart;
+    holdResetStart = Date.now();
+    holdResetTimer = setInterval(() => {
+      const elapsed = Date.now() - holdResetStart;
       const pct = Math.min(100, (elapsed / HOLD_DURATION_MS) * 100);
       holdResetProgressBar.style.width = `${pct}%`;
 
@@ -1025,7 +1053,6 @@
   function executeFullReset() {
     state.players.forEach((p) => {
       p.score = 0;
-      p.runouts = 0;
     });
     state.history = [];
     undoStack.length = 0;
@@ -1259,6 +1286,17 @@
     if (racePillTag) racePillTag.textContent = `RACE ${state.targetRace}`;
     if (cashStakeLabel) cashStakeLabel.textContent = `$${state.stakeRate.toFixed(2)} / PT`;
     soundIcon.textContent = state.soundEnabled ? "volume_up" : "volume_off";
+
+    // Restore extended history preference
+    if (rackLogDrawer) {
+      rackLogDrawer.classList.toggle("show-extended", !!state.showExtendedHistory);
+    }
+    if (btnToggleExtendedHistory) {
+      btnToggleExtendedHistory.classList.toggle("active", !!state.showExtendedHistory);
+    }
+    if (moreInfoBtnText) {
+      moreInfoBtnText.textContent = state.showExtendedHistory ? "LESS INFO" : "MORE INFO";
+    }
 
     renderPlayers();
     renderRackLog();
