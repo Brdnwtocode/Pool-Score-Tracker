@@ -356,7 +356,6 @@
   const metricTargetRace = $("metricTargetRace");
   const racePillTag = $("racePillTag");
   const tourneyRaceBadge = $("tourneyRaceBadge");
-  const lblShortcuts = $("lblShortcuts");
   const lblShortcutHint = $("lblShortcutHint");
 
   // Cash Mode Telemetry Bar
@@ -620,7 +619,6 @@
     if (lblPerRackVal) lblPerRackVal.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">sell</span> ${t("per_rack_val")}`;
     if (lblCurrentPot) lblCurrentPot.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">savings</span> ${t("current_pot")}`;
     if (lblTargetFrame) lblTargetFrame.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">flag</span> ${t("target_frame")}`;
-    if (lblShortcuts) lblShortcuts.textContent = t("shortcuts");
     if (lblShortcutHint) lblShortcutHint.innerHTML = `<span class="material-symbols-outlined" style="font-size: 12px; vertical-align: middle;">touch_app</span> ${t("shortcut_hint")}`;
     if (lblWhoPaysWhom) lblWhoPaysWhom.textContent = t("who_pays_whom");
     if (lblTourneyArrayTitle) lblTourneyArrayTitle.textContent = t("tourney_array_title");
