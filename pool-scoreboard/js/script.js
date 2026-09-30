@@ -88,33 +88,44 @@
       lang_switched: "Language: English",
       snapshot: "Table",
       lead: "Lead",
-      // Tutorial / Guide
-      guide_title: "USER GUIDE",
+      // Tutorial / Quick Reference Guide
+      guide_title: "QUICK REFERENCE GUIDE",
       guide_open: "HOW TO USE THIS APP",
-      guide_got_it: "GOT IT",
-      guide_mode_title: "TWO GAME MODES",
-      guide_cash_label: "CASH",
-      guide_cash_desc: "Zero-sum betting. Scores can go negative. Live balance tracker shows who owes whom.",
-      guide_tourney_label: "TOURNEY",
-      guide_tourney_desc: "WPA race-to-X frames. Shot clock with 30s/45s/60s presets. Official match protocol.",
-      guide_mode_tip: "Each mode has completely separate memory — switching back and forth preserves both trackers independently.",
-      guide_score_title: "SCORING",
-      guide_tap: "<strong>Tap</strong> the + or − button for ±1 point",
-      guide_drag: "<strong>Hold 0.7s + drag</strong> up/down for 1–12 points instantly — no popup, direct update",
-      guide_undo: "<strong>Undo / Redo</strong> via toolbar or Ctrl+Z / Ctrl+Y",
-      guide_settle_title: "CASH SETTLEMENTS",
-      guide_rate: "Set your <strong>rate per point</strong> (e.g. $1.00/pt)",
-      guide_who: "App calculates <strong>who pays whom</strong> with minimum cash transfers",
-      guide_zero: "<strong>Zero-sum tracker</strong> highlights discrepancy if scores don't balance",
-      guide_clock_title: "SHOT CLOCK",
-      guide_presets: "<strong>30s / 45s / 60s</strong> presets — tap to switch",
-      guide_ext: "<strong>+30s extension</strong> (1 per turn) for tactical shots",
-      guide_foul: "Visual + audio <strong>time foul alert</strong> when clock expires",
-      guide_extras_title: "LOG & EXTRAS",
-      guide_log: "<strong>Rack log</strong> records every score change with timestamp & table snapshot",
-      guide_wake: "<strong>Screen wake lock</strong> keeps display on during matches",
-      guide_lang: "<strong>EN / VI</strong> language toggle in toolbar",
-      guide_theme: "<strong>Dark / Light</strong> theme + fullscreen mode",
+      guide_got_it: "GOT IT · START PLAYING",
+      guide_modes_header: "CHOOSE YOUR GAME MODE",
+      guide_cash_title: "CASH RING",
+      guide_cash_tag: "Zero-Sum Betting",
+      guide_cash_b1: "Negative scores allowed (-3)",
+      guide_cash_b2: "Table balance sums to 0",
+      guide_cash_b3: "Auto-calculates who owes whom",
+      guide_tourney_title: "TOURNAMENT",
+      guide_tourney_tag: "Race-to-X & Clock",
+      guide_tourney_b1: "Race to target frames (e.g. 15)",
+      guide_tourney_b2: "30s / 45s / 60s shot clock",
+      guide_tourney_b3: "Live TV broadcast match HUD",
+      guide_modes_note: "100% separate memory: switching modes never wipes your scores or history.",
+      guide_controls_header: "CONTROLS CHEAT SHEET",
+      guide_key_tap: "TAP + / −",
+      guide_action_tap_title: "±1 Point",
+      guide_action_tap_desc: "Quick single-point tap",
+      guide_key_drag: "HOLD 0.7S",
+      guide_action_drag_title: "Slide 1–12 Pts",
+      guide_action_drag_desc: "Drag up/down, release to commit",
+      guide_key_undo: "CTRL + Z",
+      guide_action_undo_title: "Undo / Redo",
+      guide_action_undo_desc: "Revert scoring mistakes anytime",
+      guide_key_settle: "SETTLE",
+      guide_action_settle_title: "Who Pays Whom",
+      guide_action_settle_desc: "Exact pairwise cash payouts",
+      guide_key_clock: "SPACE",
+      guide_action_clock_title: "Shot Clock",
+      guide_action_clock_desc: "Start/pause timer · +30s extension",
+      guide_key_log: "LOG",
+      guide_action_log_title: "Rack Ledger",
+      guide_action_log_desc: "Full history & score snapshots",
+      guide_badge_wake: "SCREEN AWAKE",
+      guide_badge_offline: "OFFLINE READY",
+      guide_badge_lang: "EN / VI TOGGLE",
     },
     vi: {
       cash_mode: "ĐÁNH ĐIỂM",
@@ -187,33 +198,44 @@
       lang_switched: "Ngôn ngữ: Tiếng Việt",
       snapshot: "Bàn đấu",
       lead: "Dẫn đầu",
-      // Tutorial / Guide
-      guide_title: "HƯỚNG DẪN SỬ DỤNG",
-      guide_open: "CÁCH SỬ DỤNG ỨNG DỤNG",
-      guide_got_it: "ĐÃ HIỂU",
-      guide_mode_title: "HAI CHẾ ĐỘ CHƠI",
-      guide_cash_label: "ĐÁNH ĐIỂM",
-      guide_cash_desc: "Tính tiền theo điểm. Điểm có thể âm. Theo dõi cân bằng trực tiếp, ai nợ ai.",
-      guide_tourney_label: "THI ĐẤU",
-      guide_tourney_desc: "Thi đấu chạm X ván theo WPA. Shot clock 30s/45s/60s. Thể thức chính thức.",
-      guide_mode_tip: "Mỗi chế độ có bộ nhớ riêng hoàn toàn — chuyển qua lại giữa hai chế độ sẽ giữ nguyên dữ liệu của từng bên.",
-      guide_score_title: "GHI ĐIỂM",
-      guide_tap: "<strong>Bấm</strong> nút + hoặc − để cộng/trừ 1 điểm",
-      guide_drag: "<strong>Giữ 0.7s + kéo</strong> lên/xuống để điều chỉnh 1–12 điểm trực tiếp — không popup",
-      guide_undo: "<strong>Hoàn tác / Làm lại</strong> qua thanh công cụ hoặc Ctrl+Z / Ctrl+Y",
-      guide_settle_title: "THANH TOÁN TIỀN",
-      guide_rate: "Đặt <strong>mức cược mỗi điểm</strong> (VD: $1.00/điểm)",
-      guide_who: "Ứng dụng tính toán <strong>ai trả tiền ai</strong> với số lần chuyển ít nhất",
-      guide_zero: "<strong>Bộ theo dõi tổng điểm</strong> cảnh báo khi điểm không cân bằng",
-      guide_clock_title: "ĐỒNG HỒ SHOT",
-      guide_presets: "Cài sẵn <strong>30s / 45s / 60s</strong> — bấm để chuyển",
-      guide_ext: "<strong>Gia hạn +30s</strong> (1 lần/lượt) cho những cú đánh chiến thuật",
-      guide_foul: "Cảnh báo hình ảnh + âm thanh <strong>khi hết giờ phạm quy</strong>",
-      guide_extras_title: "NHẬT KÝ & TIỆN ÍCH",
-      guide_log: "<strong>Nhật ký</strong> ghi lại mọi thay đổi điểm kèm thời gian & trạng thái bàn",
-      guide_wake: "<strong>Giữ màn hình sáng</strong> trong suốt trận đấu",
-      guide_lang: "<strong>EN / VI</strong> chuyển ngôn ngữ trên thanh công cụ",
-      guide_theme: "Giao diện <strong>Tối / Sáng</strong> + chế độ toàn màn hình",
+      // Tutorial / Quick Reference Guide
+      guide_title: "HƯỚNG DẪN NHANH",
+      guide_open: "HƯỚNG DẪN SỬ DỤNG",
+      guide_got_it: "ĐÃ HIỂU · BẮT ĐẦU",
+      guide_modes_header: "CHỌN CHẾ ĐỘ CHƠI",
+      guide_cash_title: "ĐÁNH ĐIỂM",
+      guide_cash_tag: "Ăn tiền theo điểm",
+      guide_cash_b1: "Cho phép điểm âm (-3)",
+      guide_cash_b2: "Tổng điểm bàn luôn cân bằng (0)",
+      guide_cash_b3: "Tự động tính ai trả tiền ai",
+      guide_tourney_title: "THI ĐẤU",
+      guide_tourney_tag: "Đấu chạm & Shot clock",
+      guide_tourney_b1: "Đấu chạm điểm đích (VD: chạm 15)",
+      guide_tourney_b2: "Đồng hồ shot 30s / 45s / 60s",
+      guide_tourney_b3: "Bảng dẫn điểm truyền hình",
+      guide_modes_note: "Lưu bộ nhớ riêng 100%: chuyển chế độ không bao giờ mất điểm hay lịch sử.",
+      guide_controls_header: "BẢNG THAO TÁC NHANH",
+      guide_key_tap: "BẤM + / −",
+      guide_action_tap_title: "±1 Điểm",
+      guide_action_tap_desc: "Chạm nút để chỉnh 1 điểm",
+      guide_key_drag: "GIỮ 0.7S",
+      guide_action_drag_title: "Trượt 1–12 Điểm",
+      guide_action_drag_desc: "Kéo lên/xuống rồi thả — không popup!",
+      guide_key_undo: "CTRL + Z",
+      guide_action_undo_title: "Hoàn tác / Làm lại",
+      guide_action_undo_desc: "Khắc phục sai sót điểm tức thì",
+      guide_key_settle: "QUỸ TIỀN",
+      guide_action_settle_title: "Ai Trả Tiền Ai",
+      guide_action_settle_desc: "Danh sách chuyển tiền tối ưu",
+      guide_key_clock: "PHÍM CÁCH",
+      guide_action_clock_title: "Đồng Hồ Shot",
+      guide_action_clock_desc: "Bắt đầu/dừng · Bấm +30s gia hạn",
+      guide_key_log: "LỊCH SỬ",
+      guide_action_log_title: "Nhật Ký Ván",
+      guide_action_log_desc: "Lịch sử kèm mốc giờ & trạng thái bàn",
+      guide_badge_wake: "MÀN HÌNH LUÔN SÁNG",
+      guide_badge_offline: "LƯU NGOẠI TUYẾN",
+      guide_badge_lang: "CHUYỂN ĐỔI EN / VI",
     }
   };
 
@@ -1655,45 +1677,53 @@
     s("lblTutorialTitle", "guide_title");
     s("lblOpenGuide", "guide_open");
     s("lblGotIt", "guide_got_it");
-    s("lblGuideMode", "guide_mode_title");
-    s("lblGuideCash", "guide_cash_label");
-    s("lblGuideCashDesc", "guide_cash_desc");
-    s("lblGuideTourney", "guide_tourney_label");
-    s("lblGuideTourneyDesc", "guide_tourney_desc");
-    s("lblGuideScore", "guide_score_title");
-    s("lblGuideSettle", "guide_settle_title");
-    s("lblGuideClock", "guide_clock_title");
-    s("lblGuideExtras", "guide_extras_title");
 
-    // Elements with inline icons — use innerHTML
-    const tipEl = el("lblGuideModeTip");
-    if (tipEl) tipEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px;">info</span> ${t("guide_mode_tip")}`;
+    // Modes comparison
+    s("lblGuideModesHeader", "guide_modes_header");
+    s("lblGuideCashTitle", "guide_cash_title");
+    s("lblGuideCashTag", "guide_cash_tag");
+    s("lblGuideCashB1", "guide_cash_b1");
+    s("lblGuideCashB2", "guide_cash_b2");
+    s("lblGuideCashB3", "guide_cash_b3");
 
-    const guideListItems = [
-      ["lblGuideTap", "guide_tap", "add"],
-      ["lblGuideDrag", "guide_drag", "swipe_up"],
-      ["lblGuideUndo", "guide_undo", "undo"],
-      ["lblGuideRate", "guide_rate", "sell"],
-      ["lblGuideWho", "guide_who", "payments"],
-      ["lblGuideZero", "guide_zero", "balance"],
-      ["lblGuidePresets", "guide_presets", "speed"],
-      ["lblGuideExt", "guide_ext", "more_time"],
-      ["lblGuideFoul", "guide_foul", "warning"],
-      ["lblGuideLog", "guide_log", "history"],
-      ["lblGuideWake", "guide_wake", "visibility"],
-      ["lblGuideLang", "guide_lang", "language"],
-      ["lblGuideTheme", "guide_theme", "contrast"],
-    ];
+    s("lblGuideTourneyTitle", "guide_tourney_title");
+    s("lblGuideTourneyTag", "guide_tourney_tag");
+    s("lblGuideTourneyB1", "guide_tourney_b1");
+    s("lblGuideTourneyB2", "guide_tourney_b2");
+    s("lblGuideTourneyB3", "guide_tourney_b3");
+    s("lblGuideModesNote", "guide_modes_note");
 
-    guideListItems.forEach(([id, key, icon]) => {
-      const li = el(id);
-      if (li) {
-        // Parse the translated text for bold segments marked with ** **
-        const raw = t(key);
-        // Split translated text on the first space to separate the bold keyword
-        li.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">${icon}</span> ${raw}`;
-      }
-    });
+    // Controls Cheat Sheet
+    s("lblGuideControlsHeader", "guide_controls_header");
+
+    s("lblGuideKeyTap", "guide_key_tap");
+    s("lblGuideActionTapTitle", "guide_action_tap_title");
+    s("lblGuideActionTapDesc", "guide_action_tap_desc");
+
+    s("lblGuideKeyDrag", "guide_key_drag");
+    s("lblGuideActionDragTitle", "guide_action_drag_title");
+    s("lblGuideActionDragDesc", "guide_action_drag_desc");
+
+    s("lblGuideKeyUndo", "guide_key_undo");
+    s("lblGuideActionUndoTitle", "guide_action_undo_title");
+    s("lblGuideActionUndoDesc", "guide_action_undo_desc");
+
+    s("lblGuideKeySettle", "guide_key_settle");
+    s("lblGuideActionSettleTitle", "guide_action_settle_title");
+    s("lblGuideActionSettleDesc", "guide_action_settle_desc");
+
+    s("lblGuideKeyClock", "guide_key_clock");
+    s("lblGuideActionClockTitle", "guide_action_clock_title");
+    s("lblGuideActionClockDesc", "guide_action_clock_desc");
+
+    s("lblGuideKeyLog", "guide_key_log");
+    s("lblGuideActionLogTitle", "guide_action_log_title");
+    s("lblGuideActionLogDesc", "guide_action_log_desc");
+
+    // System badges
+    s("lblGuideBadgeWake", "guide_badge_wake");
+    s("lblGuideBadgeOffline", "guide_badge_offline");
+    s("lblGuideBadgeLang", "guide_badge_lang");
   }
 
   function openTutorial() {

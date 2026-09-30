@@ -1689,32 +1689,37 @@ html:not(.dark) .player-championship-card.hotcell {
 
 /* ══════════ TUTORIAL / ONBOARDING MODAL ══════════ */
 .tutorial-window {
-  max-width: 480px;
+  max-width: 520px;
 }
 
 .tutorial-body {
-  padding: 14px 16px !important;
+  padding: 16px !important;
   display: flex;
   flex-direction: column;
   gap: 16px;
   overflow-y: auto;
 }
 
-.guide-section {
+.guide-block {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
-.guide-section-head {
+.guide-block-head {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
   border-bottom: 1px solid var(--border-hairline);
 }
 
-.guide-section-head h3 {
+.guide-block-head .guide-icon {
+  font-size: 17px;
+  color: var(--text-primary);
+}
+
+.guide-block-title {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
@@ -1722,92 +1727,207 @@ html:not(.dark) .player-championship-card.hotcell {
   color: var(--text-primary);
 }
 
-.guide-icon {
-  font-size: 18px;
-  color: var(--text-secondary);
-}
-
-.guide-cards-row {
+/* Modes 2-Column Comparison */
+.guide-modes-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
-.guide-card {
+@media (max-width: 440px) {
+  .guide-modes-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.guide-mode-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 12px 8px;
+  gap: 8px;
+  padding: 10px 12px;
   background: var(--bg-inset);
   border: 1px solid var(--border-hairline);
-  text-align: center;
 }
 
-.guide-card .material-symbols-outlined {
-  font-size: 24px;
-  color: var(--text-secondary);
+.guide-mode-card.cash {
+  border-left: 2px solid var(--text-primary);
 }
 
-.guide-card strong {
+.guide-mode-card.tourney {
+  border-left: 2px solid var(--accent-amber);
+}
+
+.mode-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mode-card-header .material-symbols-outlined {
+  font-size: 22px;
+  color: var(--text-primary);
+}
+
+.mode-card-name {
+  display: block;
   font-family: var(--font-mono);
   font-size: 11px;
+  font-weight: 700;
   letter-spacing: 0.06em;
 }
 
-.guide-card-desc {
+.mode-card-subtitle {
+  display: block;
   font-family: var(--font-sans);
-  font-size: 11px;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.guide-hint {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  padding: 8px 10px;
-  background: var(--bg-inset);
-  border: 1px solid var(--border-hairline);
-  font-family: var(--font-sans);
-  font-size: 11px;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.guide-hint .material-symbols-outlined {
-  flex-shrink: 0;
-  margin-top: 1px;
+  font-size: 10px;
   color: var(--text-muted);
 }
 
-.guide-list {
+.mode-card-bullets {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
-.guide-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
+.mode-card-bullets li {
   font-family: var(--font-sans);
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--text-primary);
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  padding-left: 2px;
 }
 
-.guide-list li .material-symbols-outlined {
+.guide-memory-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--bg-canvas);
+  border: 1px dashed var(--border-medium);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.guide-memory-note .material-symbols-outlined {
+  color: var(--accent-amber);
   flex-shrink: 0;
-  margin-top: 1px;
+}
+
+/* Controls Cheat Sheet Grid */
+.guide-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .guide-actions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.guide-action-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
+  min-height: 52px;
+}
+
+.guide-action-card.highlight {
+  border-color: var(--border-bold);
+  background: var(--bg-elevated);
+}
+
+.guide-keycap {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  min-width: 62px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-bold);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.guide-keycap.keycap-accent {
+  background: var(--text-primary);
+  color: var(--bg-surface);
+}
+
+.guide-action-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+}
+
+.guide-action-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.guide-action-desc {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+/* System Mini-Badges Strip */
+.guide-system-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+@media (max-width: 440px) {
+  .guide-system-strip {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.system-mini-chip {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   color: var(--text-secondary);
 }
 
-.guide-list li strong {
-  font-weight: 600;
+.system-mini-chip .material-symbols-outlined {
+  color: var(--text-muted);
 }
 
 /* "How to Use" button inside info modal */

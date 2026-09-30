@@ -456,7 +456,7 @@
       <div class="modal-head">
         <div class="modal-title-row">
           <span class="material-symbols-outlined">menu_book</span>
-          <h2 id="lblTutorialTitle">USER GUIDE</h2>
+          <h2 id="lblTutorialTitle">QUICK REFERENCE GUIDE</h2>
         </div>
         <button class="btn-modal-close" id="btnCloseTutorial" type="button">
           <span class="material-symbols-outlined">close</span>
@@ -465,81 +465,131 @@
 
       <div class="modal-body tutorial-body" id="tutorialBody">
 
-        <!-- Feature 1: Dual Modes -->
-        <div class="guide-section">
-          <div class="guide-section-head">
+        <!-- ── Part 1: Game Modes Comparison ── -->
+        <section class="guide-block">
+          <div class="guide-block-head">
             <span class="material-symbols-outlined guide-icon">swap_horiz</span>
-            <h3 id="lblGuideMode">TWO GAME MODES</h3>
+            <span class="guide-block-title" id="lblGuideModesHeader">CHOOSE YOUR GAME MODE</span>
           </div>
-          <div class="guide-cards-row">
-            <div class="guide-card">
-              <span class="material-symbols-outlined">payments</span>
-              <strong id="lblGuideCash">CASH</strong>
-              <span class="guide-card-desc" id="lblGuideCashDesc">Zero-sum betting. Scores can go negative. Live balance tracker shows who owes whom.</span>
-            </div>
-            <div class="guide-card">
-              <span class="material-symbols-outlined">emoji_events</span>
-              <strong id="lblGuideTourney">TOURNEY</strong>
-              <span class="guide-card-desc" id="lblGuideTourneyDesc">WPA race-to-X frames. Shot clock with 30s/45s/60s presets. Official match protocol.</span>
-            </div>
-          </div>
-          <p class="guide-hint" id="lblGuideModeTip">
-            <span class="material-symbols-outlined" style="font-size: 13px;">info</span>
-            Each mode has completely separate memory — switching back and forth preserves both trackers independently.
-          </p>
-        </div>
 
-        <!-- Feature 2: Scoring -->
-        <div class="guide-section">
-          <div class="guide-section-head">
+          <div class="guide-modes-grid">
+            <!-- Mode A: Cash -->
+            <div class="guide-mode-card cash">
+              <div class="mode-card-header">
+                <span class="material-symbols-outlined">payments</span>
+                <div>
+                  <strong class="mode-card-name" id="lblGuideCashTitle">CASH RING</strong>
+                  <span class="mode-card-subtitle" id="lblGuideCashTag">Zero-Sum Betting</span>
+                </div>
+              </div>
+              <ul class="mode-card-bullets">
+                <li id="lblGuideCashB1">Negative scores allowed (-3)</li>
+                <li id="lblGuideCashB2">Table balance sums to 0</li>
+                <li id="lblGuideCashB3">Auto-calculates who owes whom</li>
+              </ul>
+            </div>
+
+            <!-- Mode B: Tournament -->
+            <div class="guide-mode-card tourney">
+              <div class="mode-card-header">
+                <span class="material-symbols-outlined">emoji_events</span>
+                <div>
+                  <strong class="mode-card-name" id="lblGuideTourneyTitle">TOURNAMENT</strong>
+                  <span class="mode-card-subtitle" id="lblGuideTourneyTag">Race-to-X &amp; Clock</span>
+                </div>
+              </div>
+              <ul class="mode-card-bullets">
+                <li id="lblGuideTourneyB1">Race to target frames (e.g. 15)</li>
+                <li id="lblGuideTourneyB2">30s / 45s / 60s shot clock</li>
+                <li id="lblGuideTourneyB3">Live TV broadcast match HUD</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="guide-memory-note">
+            <span class="material-symbols-outlined" style="font-size: 14px;">bolt</span>
+            <span id="lblGuideModesNote">100% separate memory: switching modes never wipes your scores or history.</span>
+          </div>
+        </section>
+
+        <!-- ── Part 2: Quick Controls Cheat Sheet ── -->
+        <section class="guide-block">
+          <div class="guide-block-head">
             <span class="material-symbols-outlined guide-icon">touch_app</span>
-            <h3 id="lblGuideScore">SCORING</h3>
+            <span class="guide-block-title" id="lblGuideControlsHeader">CONTROLS CHEAT SHEET</span>
           </div>
-          <ul class="guide-list">
-            <li id="lblGuideTap"><span class="material-symbols-outlined" style="font-size: 14px;">add</span> <strong>Tap</strong> the + or − button for ±1 point</li>
-            <li id="lblGuideDrag"><span class="material-symbols-outlined" style="font-size: 14px;">swipe_up</span> <strong>Hold 0.7s + drag</strong> up/down for 1–12 points instantly — no popup, direct update</li>
-            <li id="lblGuideUndo"><span class="material-symbols-outlined" style="font-size: 14px;">undo</span> <strong>Undo / Redo</strong> via toolbar or Ctrl+Z / Ctrl+Y</li>
-          </ul>
-        </div>
 
-        <!-- Feature 3: Cash Settlements -->
-        <div class="guide-section">
-          <div class="guide-section-head">
-            <span class="material-symbols-outlined guide-icon">sync_alt</span>
-            <h3 id="lblGuideSettle">CASH SETTLEMENTS</h3>
-          </div>
-          <ul class="guide-list">
-            <li id="lblGuideRate"><span class="material-symbols-outlined" style="font-size: 14px;">sell</span> Set your <strong>rate per point</strong> (e.g. $1.00/pt)</li>
-            <li id="lblGuideWho"><span class="material-symbols-outlined" style="font-size: 14px;">payments</span> App calculates <strong>who pays whom</strong> with minimum cash transfers</li>
-            <li id="lblGuideZero"><span class="material-symbols-outlined" style="font-size: 14px;">balance</span> <strong>Zero-sum tracker</strong> highlights discrepancy if scores don't balance</li>
-          </ul>
-        </div>
+          <div class="guide-actions-grid">
+            <!-- Action 1: Tap Score -->
+            <div class="guide-action-card">
+              <span class="guide-keycap" id="lblGuideKeyTap">TAP + / −</span>
+              <div class="guide-action-text">
+                <strong class="guide-action-title" id="lblGuideActionTapTitle">±1 Point</strong>
+                <span class="guide-action-desc" id="lblGuideActionTapDesc">Quick single-point tap</span>
+              </div>
+            </div>
 
-        <!-- Feature 4: Shot Clock -->
-        <div class="guide-section">
-          <div class="guide-section-head">
-            <span class="material-symbols-outlined guide-icon">timer</span>
-            <h3 id="lblGuideClock">SHOT CLOCK</h3>
-          </div>
-          <ul class="guide-list">
-            <li id="lblGuidePresets"><span class="material-symbols-outlined" style="font-size: 14px;">speed</span> <strong>30s / 45s / 60s</strong> presets — tap to switch</li>
-            <li id="lblGuideExt"><span class="material-symbols-outlined" style="font-size: 14px;">more_time</span> <strong>+30s extension</strong> (1 per turn) for tactical shots</li>
-            <li id="lblGuideFoul"><span class="material-symbols-outlined" style="font-size: 14px;">warning</span> Visual + audio <strong>time foul alert</strong> when clock expires</li>
-          </ul>
-        </div>
+            <!-- Action 2: Slide Score -->
+            <div class="guide-action-card highlight">
+              <span class="guide-keycap keycap-accent" id="lblGuideKeyDrag">HOLD 0.7S</span>
+              <div class="guide-action-text">
+                <strong class="guide-action-title" id="lblGuideActionDragTitle">Slide 1–12 Pts</strong>
+                <span class="guide-action-desc" id="lblGuideActionDragDesc">Drag up/down, release to commit</span>
+              </div>
+            </div>
 
-        <!-- Feature 5: History & Extras -->
-        <div class="guide-section">
-          <div class="guide-section-head">
-            <span class="material-symbols-outlined guide-icon">history</span>
-            <h3 id="lblGuideExtras">LOG & EXTRAS</h3>
+            <!-- Action 3: Undo / Redo -->
+            <div class="guide-action-card">
+              <span class="guide-keycap" id="lblGuideKeyUndo">CTRL + Z</span>
+              <div class="guide-action-text">
+                <strong class="guide-action-title" id="lblGuideActionUndoTitle">Undo / Redo</strong>
+                <span class="guide-action-desc" id="lblGuideActionUndoDesc">Revert scoring mistakes anytime</span>
+              </div>
+            </div>
+
+            <!-- Action 4: Settlements -->
+            <div class="guide-action-card">
+              <span class="guide-keycap" id="lblGuideKeySettle">SETTLE</span>
+              <div class="guide-action-text">
+                <strong class="guide-action-title" id="lblGuideActionSettleTitle">Who Pays Whom</strong>
+                <span class="guide-action-desc" id="lblGuideActionSettleDesc">Exact pairwise cash payouts</span>
+              </div>
+            </div>
+
+            <!-- Action 5: Shot Clock -->
+            <div class="guide-action-card">
+              <span class="guide-keycap" id="lblGuideKeyClock">SPACE</span>
+              <div class="guide-action-text">
+                <strong class="guide-action-title" id="lblGuideActionClockTitle">Shot Clock</strong>
+                <span class="guide-action-desc" id="lblGuideActionClockDesc">Start/pause timer · +30s extension</span>
+              </div>
+            </div>
+
+            <!-- Action 6: Rack Log -->
+            <div class="guide-action-card">
+              <span class="guide-keycap" id="lblGuideKeyLog">LOG</span>
+              <div class="guide-action-text">
+                <strong class="guide-action-title" id="lblGuideActionLogTitle">Rack Ledger</strong>
+                <span class="guide-action-desc" id="lblGuideActionLogDesc">Full history &amp; score snapshots</span>
+              </div>
+            </div>
           </div>
-          <ul class="guide-list">
-            <li id="lblGuideLog"><span class="material-symbols-outlined" style="font-size: 14px;">history</span> <strong>Rack log</strong> records every score change with timestamp & table snapshot</li>
-            <li id="lblGuideWake"><span class="material-symbols-outlined" style="font-size: 14px;">visibility</span> <strong>Screen wake lock</strong> keeps display on during matches</li>
-            <li id="lblGuideLang"><span class="material-symbols-outlined" style="font-size: 14px;">language</span> <strong>EN / VI</strong> language toggle in toolbar</li>
-            <li id="lblGuideTheme"><span class="material-symbols-outlined" style="font-size: 14px;">contrast</span> <strong>Dark / Light</strong> theme + fullscreen mode</li>
-          </ul>
+        </section>
+
+        <!-- ── Part 3: System Badges Strip ── -->
+        <div class="guide-system-strip">
+          <div class="system-mini-chip">
+            <span class="material-symbols-outlined" style="font-size: 13px;">visibility</span>
+            <span id="lblGuideBadgeWake">SCREEN AWAKE</span>
+          </div>
+          <div class="system-mini-chip">
+            <span class="material-symbols-outlined" style="font-size: 13px;">save</span>
+            <span id="lblGuideBadgeOffline">OFFLINE READY</span>
+          </div>
+          <div class="system-mini-chip">
+            <span class="material-symbols-outlined" style="font-size: 13px;">language</span>
+            <span id="lblGuideBadgeLang">EN / VI TOGGLE</span>
+          </div>
         </div>
 
       </div>
@@ -547,7 +597,7 @@
       <div class="modal-foot">
         <button class="btn-modal-action" id="btnDismissTutorial" type="button">
           <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">check</span>
-          <span id="lblGotIt">GOT IT</span>
+          <span id="lblGotIt">GOT IT · START PLAYING</span>
         </button>
       </div>
     </div>
