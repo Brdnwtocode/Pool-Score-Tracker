@@ -757,7 +757,7 @@ html.mode-tournament .cash-only {
 
 .compact-clock-btn {
   height: 24px;
-  padding: 0 8px;
+  padding: 0 6px;
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
   color: var(--text-primary);
@@ -765,6 +765,10 @@ html.mode-tournament .cash-only {
   font-size: 10px;
   font-weight: 700;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
 }
 
 .compact-clock-btn:hover {
@@ -1073,6 +1077,15 @@ html:not(.dark) .player-championship-card.hotcell {
   color: var(--text-secondary);
 }
 
+.tactical-btn.icon-only {
+  width: 38px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .tactical-btn.inverted {
   background: var(--text-primary);
   color: var(--bg-surface);
@@ -1191,14 +1204,21 @@ html:not(.dark) .player-championship-card.hotcell {
 }
 
 .btn-wake-focus {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--text-primary);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
   cursor: pointer;
-  letter-spacing: 0.05em;
+  transition: all 100ms;
+}
+
+.btn-wake-focus:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
 }
 
 .rack-log-scroll {
@@ -1388,7 +1408,7 @@ html:not(.dark) .player-championship-card.hotcell {
 
 .btn-step {
   height: 42px;
-  padding: 0 14px;
+  padding: 0 12px;
   background: var(--bg-inset);
   border: 1px solid var(--border-hairline);
   color: var(--text-primary);
@@ -1396,6 +1416,10 @@ html:not(.dark) .player-championship-card.hotcell {
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .btn-step:hover {
@@ -1517,6 +1541,10 @@ html:not(.dark) .player-championship-card.hotcell {
   font-weight: 700;
   letter-spacing: 0.08em;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .btn-modal-action:hover {

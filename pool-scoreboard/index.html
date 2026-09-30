@@ -21,17 +21,17 @@
     <!-- ── 1. Top Masthead Navigation ── -->
     <header class="masthead">
       <div class="masthead-left">
-        <span class="table-badge"><span id="lblTablePrefix">TABLE</span> <strong id="tableIdText">#01</strong></span>
+        <span class="table-badge"><span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">table_restaurant</span> <strong id="tableIdText">#01</strong></span>
         
         <!-- DUAL-MODE TOGGLE SWITCH -->
         <div class="mode-toggle-group">
-          <button class="mode-switch-btn active" id="btnModeCash" type="button" title="Switch to Cash Ring Game (Zero-Sum Betting)">
+          <button class="mode-switch-btn active" id="btnModeCash" type="button" title="Cash Ring Game (Zero-Sum Betting)">
             <span class="material-symbols-outlined">payments</span>
-            <span id="lblModeCash">CASH RING</span>
+            <span id="lblModeCash">CASH</span>
           </button>
-          <button class="mode-switch-btn" id="btnModeTournament" type="button" title="Switch to WPA Tournament Frame (Race-to-X & Shot Clock)">
+          <button class="mode-switch-btn" id="btnModeTournament" type="button" title="WPA Tournament Frame (Race-to-X &amp; Shot Clock)">
             <span class="material-symbols-outlined">emoji_events</span>
-            <span id="lblModeTourney">TOURNAMENT</span>
+            <span id="lblModeTourney">TOURNEY</span>
           </button>
         </div>
       </div>
@@ -51,17 +51,16 @@
         <button class="icon-tool" id="btnRedo" type="button" title="Redo Score" disabled>
           <span class="material-symbols-outlined">redo</span>
         </button>
-        <button class="icon-tool" id="btnSound" type="button" title="Toggle Ball Strike Sound & Haptics">
+        <button class="icon-tool" id="btnSound" type="button" title="Toggle Ball Strike Sound &amp; Haptics">
           <span class="material-symbols-outlined" id="soundIcon">volume_up</span>
         </button>
         <button class="icon-tool" id="btnTheme" type="button" title="Toggle Dark / Light Theme">
           <span class="material-symbols-outlined" id="themeIcon">contrast</span>
         </button>
-        <button class="text-tool-btn" id="btnResetQuick" type="button" title="Quick Reset">
+        <button class="icon-tool" id="btnResetQuick" type="button" title="Quick Reset (Clear Scores) / Đặt lại">
           <span class="material-symbols-outlined">restart_alt</span>
-          <span id="lblResetQuick">RESET</span>
         </button>
-        <button class="user-avatar-btn" id="btnInfo" type="button" title="Author & System Specifications">
+        <button class="user-avatar-btn" id="btnInfo" type="button" title="About &amp; System Specifications">
           <span class="material-symbols-outlined">person</span>
         </button>
       </div>
@@ -71,13 +70,13 @@
     <aside class="hud-ticker-band tournament-only" id="hudTickerBand">
       <div class="hud-ticker-inner">
         <div class="hud-ticker-left">
-          <span class="hud-pill"><span class="hud-dot"></span> HUD ACTIVE</span>
-          <span class="hud-title" id="hudMatchTitle">TABLE #01 · 9-BALL CHAMPIONSHIP FRAME</span>
+          <span class="hud-pill"><span class="hud-dot"></span> LIVE</span>
+          <span class="hud-title" id="hudMatchTitle">TABLE #01 · 9-BALL CHAMPIONSHIP</span>
         </div>
         <div class="hud-ticker-right">
-          <span class="hud-stat" id="hudLeadStat">LEAD: <strong>EVEN</strong></span>
+          <span class="hud-stat" id="hudLeadStat"><span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>EVEN</strong></span>
           <span class="hud-divider">|</span>
-          <span class="hud-stat" id="hudDeltaStat">DELTA: <strong>$0.00 NET (BALANCED)</strong></span>
+          <span class="hud-stat" id="hudDeltaStat"><span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">monetization_on</span> <strong>$0.00</strong></span>
         </div>
       </div>
     </aside>
@@ -93,7 +92,7 @@
           <div class="card-head">
             <div class="card-title">
               <span class="material-symbols-outlined icon-accent">timer</span>
-              <span class="card-title-text" id="lblShotClockTitle">SHOT CLOCK PRECISION READOUT</span>
+              <span class="card-title-text" id="lblShotClockTitle">SHOT CLOCK</span>
             </div>
             <div class="mode-chips">
               <button class="clock-mode-btn" data-sec="30" type="button">30S</button>
@@ -105,11 +104,11 @@
           <div class="clock-hero-row">
             <div class="clock-digits-wrap">
               <span class="clock-digits-hero" id="clockHeroDigits">45</span>
-              <span class="clock-digits-sub" id="lblClockSecRem">SEC REMAINING</span>
+              <span class="clock-digits-sub" id="lblClockSecRem">SEC</span>
             </div>
             <div class="clock-status-meta">
               <span class="status-chip" id="clockStatusChip">STANDBY</span>
-              <span class="extension-label" id="clockExtLabel">EXTENSIONS: 1 / 1 LEFT</span>
+              <span class="extension-label" id="clockExtLabel"><span class="material-symbols-outlined" style="font-size: 12px; vertical-align: middle;">history</span> <span id="clockExtText">1/1 EXT</span></span>
             </div>
           </div>
 
@@ -120,11 +119,11 @@
           <div class="clock-controls-bar">
             <button class="btn-clock-main" id="btnClockStart" type="button">
               <span class="material-symbols-outlined" id="clockBtnIcon">play_arrow</span>
-              <span id="clockBtnText">START CLOCK</span>
+              <span id="clockBtnText">START</span>
             </button>
             <button class="btn-clock-sec" id="btnClockExt" type="button">
-              <span class="material-symbols-outlined">history</span>
-              <span id="lblClockExtBtn">+30S EXT</span>
+              <span class="material-symbols-outlined">more_time</span>
+              <span id="lblClockExtBtn">+30S</span>
             </button>
             <button class="btn-clock-icon" id="btnClockReset" type="button" title="Reset Shot Clock">
               <span class="material-symbols-outlined">refresh</span>
@@ -137,34 +136,34 @@
           <div class="card-head">
             <div class="card-title">
               <span class="material-symbols-outlined icon-accent">payments</span>
-              <span class="card-title-text" id="lblStakesProtocolTitle">STAKES LEDGER &amp; PROTOCOL</span>
+              <span class="card-title-text" id="lblStakesProtocolTitle">STAKES &amp; RACE</span>
             </div>
             <span class="header-badge" id="racePillTag">RACE 15</span>
           </div>
 
           <div class="stakes-metrics-triad">
             <div class="stake-metric-box" id="boxPerRack" title="Click to adjust stake rate">
-              <span class="metric-label" id="lblPerRackVal">PER RACK VALUE</span>
+              <span class="metric-label" id="lblPerRackVal"><span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">sell</span> PER RACK</span>
               <span class="metric-val" id="metricPerRackVal">$1.00 <small>/ PT</small></span>
             </div>
             <div class="stake-metric-box" id="boxCurrentPot">
-              <span class="metric-label" id="lblCurrentPot">CURRENT POT</span>
+              <span class="metric-label" id="lblCurrentPot"><span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">savings</span> POT</span>
               <span class="metric-val" id="metricCurrentPotVal">$0.00</span>
             </div>
             <div class="stake-metric-box" id="boxTargetFrame" title="Click to change target race">
-              <span class="metric-label" id="lblTargetFrame">TARGET FRAME</span>
+              <span class="metric-label" id="lblTargetFrame"><span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">flag</span> RACE</span>
               <span class="metric-val" id="metricTargetRace">RACE 15</span>
             </div>
           </div>
 
           <div class="stakes-shortcuts-row">
             <div class="shortcuts-legend">
-              <span class="label-dim" id="lblShortcuts">SHORTCUTS:</span>
-              <code>Space: Clock</code>
-              <code>Q/W: P1 ±</code>
-              <code>O/P: P2 ±</code>
+              <span class="material-symbols-outlined" style="font-size: 13px; color: var(--text-muted);">keyboard</span>
+              <code>Space</code>
+              <code>Q/W: P1</code>
+              <code>O/P: P2</code>
             </div>
-            <span class="shortcut-hint" id="lblShortcutHint">Tap box to edit</span>
+            <span class="shortcut-hint" id="lblShortcutHint"><span class="material-symbols-outlined" style="font-size: 12px; vertical-align: middle;">touch_app</span> Tap to edit</span>
           </div>
         </article>
 
@@ -175,11 +174,11 @@
         <div class="cash-telemetry-left">
           <button class="cash-rate-chip" id="btnCashRateChip" type="button" title="Configure stake rate">
             <span class="material-symbols-outlined" style="font-size: 15px;">payments</span>
-            <span><span id="lblStakePrefix">STAKE:</span> <strong id="cashStakeLabel">$1.00 / PT</strong></span>
+            <strong id="cashStakeLabel">$1.00 / PT</strong>
           </button>
           <button class="cash-payout-btn" id="btnOpenSettlements" type="button" title="Open Cash Settlement Transfers">
             <span class="material-symbols-outlined" style="font-size: 15px;">receipt_long</span>
-            <span id="lblWhoPaysWhom">WHO PAYS WHOM</span>
+            <span id="lblWhoPaysWhom">SETTLEMENTS</span>
           </button>
         </div>
 
@@ -187,20 +186,25 @@
         <div class="cash-balance-inline" id="balanceStatusBar">
           <div class="balance-left">
             <span class="balance-dot" id="balanceDot"></span>
-            <span class="balance-title" id="balanceStatusText">ZERO-SUM BALANCED (0)</span>
+            <span class="material-symbols-outlined" style="font-size: 14px; color: var(--text-secondary);">balance</span>
+            <span class="balance-title" id="balanceStatusText">ZERO-SUM (0)</span>
           </div>
           <div class="balance-right">
-            <span class="balance-tag" id="lblDiscrepancyTag">DISCREPANCY:</span>
-            <span class="balance-number" id="totalSum">BALANCED</span>
+            <span class="balance-number" id="totalSum">0</span>
           </div>
         </div>
 
         <!-- Compact Shot Clock in Cash Mode -->
         <div class="cash-compact-clock">
-          <span class="material-symbols-outlined" style="font-size: 16px;">timer</span>
+          <span class="material-symbols-outlined" style="font-size: 15px;">timer</span>
           <span class="compact-clock-digits" id="compactClockDigits">45s</span>
-          <button class="compact-clock-btn" id="btnCompactClockToggle" type="button">START</button>
-          <button class="compact-clock-btn" id="btnCompactClockExt" type="button">+30s</button>
+          <button class="compact-clock-btn icon-only" id="btnCompactClockToggle" type="button" title="Start / Pause Clock">
+            <span class="material-symbols-outlined" id="compactClockIcon" style="font-size: 14px;">play_arrow</span>
+          </button>
+          <button class="compact-clock-btn" id="btnCompactClockExt" type="button" title="+30s Extension">
+            <span class="material-symbols-outlined" style="font-size: 12px;">more_time</span>
+            <span>+30s</span>
+          </button>
           <button class="compact-clock-btn icon-only" id="btnCompactClockReset" type="button" title="Reset Clock">
             <span class="material-symbols-outlined" style="font-size: 14px;">refresh</span>
           </button>
@@ -210,10 +214,10 @@
       <!-- ── 5. TOURNAMENT-ONLY: Race Header ── -->
       <section class="tournament-race-header tournament-only">
         <div class="race-header-title">
-          <span class="material-symbols-outlined">sports_score</span>
-          <span id="lblTourneyArrayTitle">CHAMPIONSHIP SCORE ARRAY</span>
+          <span class="material-symbols-outlined">emoji_events</span>
+          <span id="lblTourneyArrayTitle">FRAME SCORE</span>
         </div>
-        <span class="race-target-label" id="tourneyRaceBadge">TARGET: RACE TO 15</span>
+        <span class="race-target-label" id="tourneyRaceBadge"><span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">flag</span> RACE 15</span>
       </section>
 
       <!-- ── 6. Dynamic Player Roster Array (Ultra-Clean Cards) ── -->
@@ -226,26 +230,25 @@
         <div class="tactical-left">
           <button class="tactical-btn" id="btnAddPlayer" type="button">
             <span class="material-symbols-outlined">person_add</span>
-            <span id="lblAddPlayerBtn">ADD PLAYER (<span id="playerCountVal">2</span>/4)</span>
+            <span id="lblAddPlayerBtn">PLAYER (<span id="playerCountVal">2</span>/4)</span>
           </button>
-          <button class="tactical-btn outline" id="btnRemovePlayer" type="button">
+          <button class="tactical-btn outline icon-only" id="btnRemovePlayer" type="button" title="Remove Player / Xóa cơ thủ">
             <span class="material-symbols-outlined">person_remove</span>
-            <span id="lblRemovePlayerBtn">REMOVE</span>
           </button>
         </div>
 
         <div class="tactical-right">
           <div class="hold-reset-container">
-            <button class="tactical-btn danger" id="btnHoldReset" type="button">
+            <button class="tactical-btn danger" id="btnHoldReset" type="button" title="Hold 2 seconds to reset match scores">
               <span class="material-symbols-outlined">restart_alt</span>
-              <span id="holdResetLabel">HOLD 2S RESET</span>
+              <span id="holdResetLabel">HOLD 2S</span>
             </button>
             <div class="hold-progress-bar" id="holdResetProgressBar"></div>
           </div>
 
           <button class="tactical-btn inverted" id="btnToggleRackLog" type="button">
-            <span class="material-symbols-outlined">menu_book</span>
-            <span id="lblRackLogBtn">RACK LOG</span>
+            <span class="material-symbols-outlined">history</span>
+            <span id="lblRackLogBtn">LOG</span>
           </button>
         </div>
       </section>
@@ -254,20 +257,22 @@
       <section class="rack-log-drawer" id="rackLogDrawer">
         <div class="drawer-header">
           <div class="drawer-title">
-            <span class="material-symbols-outlined">history_edu</span>
-            <span id="lblChronDrawerTitle">CHRONOLOGICAL RACK LEDGER</span>
+            <span class="material-symbols-outlined">history</span>
+            <span id="lblChronDrawerTitle">RACK LOG</span>
           </div>
 
           <div class="drawer-controls">
             <button class="btn-more-info" id="btnToggleExtendedHistory" type="button">
-              <span class="material-symbols-outlined" style="font-size: 14px;">info</span>
-              <span id="moreInfoBtnText">MORE INFO</span>
+              <span class="material-symbols-outlined" id="moreInfoIcon" style="font-size: 14px;">unfold_more</span>
+              <span id="moreInfoBtnText">DETAILS</span>
             </button>
 
             <div class="drawer-status">
               <span class="focus-pulse-dot"></span>
               <span id="blurCountdownDisplay">3m 00s</span>
-              <button class="btn-wake-focus" id="btnWakeFocus" type="button">WAKE</button>
+              <button class="btn-wake-focus" id="btnWakeFocus" type="button" title="Wake View / Mở khóa">
+                <span class="material-symbols-outlined" style="font-size: 13px;">visibility</span>
+              </button>
             </div>
           </div>
         </div>
@@ -275,7 +280,7 @@
         <div class="rack-log-scroll" id="rackLogScrollList">
           <div class="empty-log-state" id="emptyLogState">
             <span class="material-symbols-outlined">sports_score</span>
-            <p id="lblEmptyLog">NO RACKS RECORDED YET · TAP + ON ANY PLAYER CARD TO LOG A FRAME</p>
+            <p id="lblEmptyLog">NO RACKS RECORDED · TAP + TO LOG</p>
           </div>
         </div>
       </section>
@@ -290,7 +295,7 @@
       <div class="modal-head">
         <div class="modal-title-row">
           <span class="material-symbols-outlined">payments</span>
-          <h2 id="modalTitleText">STAKES &amp; CASH SETTLEMENTS</h2>
+          <h2 id="modalTitleText">STAKES &amp; SETTLEMENTS</h2>
         </div>
         <button class="btn-modal-close" id="btnCloseStakesModal" type="button">
           <span class="material-symbols-outlined">close</span>
@@ -299,14 +304,18 @@
 
       <div class="modal-body">
         <div class="config-section">
-          <label class="config-label" for="stakeInputRate" id="lblRatePerPoint">RATE PER POINT / RACK ($)</label>
+          <label class="config-label" for="stakeInputRate" id="lblRatePerPoint"><span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">payments</span> RATE PER POINT</label>
           <div class="stepper-row">
-            <button class="btn-step" id="btnStakeStepMinus" type="button">−$0.50</button>
+            <button class="btn-step" id="btnStakeStepMinus" type="button">
+              <span class="material-symbols-outlined" style="font-size: 15px;">remove</span> 0.50
+            </button>
             <div class="input-rate-box">
               <span class="curr-symbol">$</span>
               <input type="number" id="stakeInputRate" step="0.25" min="0" value="1.00">
             </div>
-            <button class="btn-step" id="btnStakeStepPlus" type="button">+$0.50</button>
+            <button class="btn-step" id="btnStakeStepPlus" type="button">
+              <span class="material-symbols-outlined" style="font-size: 15px;">add</span> 0.50
+            </button>
           </div>
 
           <div class="chip-preset-row">
@@ -319,14 +328,18 @@
         </div>
 
         <div class="config-section tournament-only">
-          <label class="config-label" for="raceInputTarget" id="lblTargetMatchRace">TARGET MATCH RACE (FIRST TO X)</label>
+          <label class="config-label" for="raceInputTarget" id="lblTargetMatchRace"><span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">flag</span> TARGET RACE</label>
           <div class="stepper-row">
-            <button class="btn-step" id="btnRaceMinus" type="button">−1</button>
+            <button class="btn-step" id="btnRaceMinus" type="button">
+              <span class="material-symbols-outlined" style="font-size: 15px;">remove</span> 1
+            </button>
             <div class="input-rate-box">
               <span class="curr-symbol">RACE</span>
               <input type="number" id="raceInputTarget" step="1" min="1" max="99" value="15">
             </div>
-            <button class="btn-step" id="btnRacePlus" type="button">+1</button>
+            <button class="btn-step" id="btnRacePlus" type="button">
+              <span class="material-symbols-outlined" style="font-size: 15px;">add</span> 1
+            </button>
           </div>
           <div class="chip-preset-row">
             <button class="preset-chip race-chip" data-r="7" type="button">RACE 7</button>
@@ -338,14 +351,17 @@
         </div>
 
         <div class="settlement-breakdown-box">
-          <div class="breakdown-header" id="lblBreakdownHeader">WHO PAYS WHOM (DIRECT CASH TRANSFERS)</div>
+          <div class="breakdown-header" id="lblBreakdownHeader"><span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">sync_alt</span> <span>DIRECT TRANSFERS</span></div>
           <div class="settlement-roster-list" id="modalSettlementRoster"></div>
           <div class="transfers-ledger-list" id="modalTransfersLedger"></div>
         </div>
       </div>
 
       <div class="modal-foot">
-        <button class="btn-modal-action" id="btnSaveStakes" type="button">APPLY &amp; SAVE</button>
+        <button class="btn-modal-action" id="btnSaveStakes" type="button">
+          <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">check</span>
+          <span id="lblSaveBtnText">APPLY</span>
+        </button>
       </div>
     </div>
   </div>
@@ -356,7 +372,7 @@
       <div class="modal-head">
         <div class="modal-title-row">
           <span class="material-symbols-outlined">info</span>
-          <h2 id="lblInfoModalTitle">SYSTEM SPECIFICATIONS &amp; AUTHOR</h2>
+          <h2 id="lblInfoModalTitle">ABOUT &amp; SYSTEM</h2>
         </div>
         <button class="btn-modal-close" id="btnCloseInfoModal" type="button">
           <span class="material-symbols-outlined">close</span>
@@ -420,7 +436,10 @@
       </div>
 
       <div class="modal-foot">
-        <button class="btn-modal-action" id="btnDismissInfo" type="button">CLOSE</button>
+        <button class="btn-modal-action" id="btnDismissInfo" type="button">
+          <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">close</span>
+          <span id="lblDismissBtnText">CLOSE</span>
+        </button>
       </div>
     </div>
   </div>

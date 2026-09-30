@@ -1,6 +1,7 @@
 /**
- * Championship Pool Scoreboard · Dual-Mode Protocol Engine v3.2.0
+ * Championship Pool Scoreboard · Dual-Mode Protocol Engine v3.3.0
  * Features:
+ * - Clean Icon-Driven UI (Unnecessary word content stripped & replaced with Google Material Symbols)
  * - 100% Isolated Dual-Mode Memory (Cash Ring Game vs WPA Tournament Frame)
  * - Upper Card Integrated Zero-Sum Balance Telemetry
  * - Full History Ledger (Logs increments, decrements, adjustments, undo/redo)
@@ -17,163 +18,147 @@
   // ═══════════════ LOCALIZATION DICTIONARY (VI / EN) ═══════════════
   const I18N = {
     en: {
-      table: "TABLE",
-      cash_mode: "CASH RING",
-      tourney_mode: "TOURNAMENT",
+      cash_mode: "CASH",
+      tourney_mode: "TOURNEY",
       reset: "RESET",
-      hold_reset: "HOLD 2S RESET",
+      hold_reset: "HOLD 2S",
       reset_confirm: "Reset all match scores to 0?",
-      reset_done: "MATCH SCORES RESET TO ZERO",
-      shot_clock_title: "SHOT CLOCK PRECISION READOUT",
-      sec_remaining: "SEC REMAINING",
+      reset_done: "SCORES RESET TO ZERO",
+      shot_clock_title: "SHOT CLOCK",
+      sec_remaining: "SEC",
       standby: "STANDBY",
       running: "RUNNING",
       time_foul: "TIME FOUL",
-      extensions_left: "EXTENSIONS: {0} / {1} LEFT",
-      start_clock: "START CLOCK",
-      pause_clock: "PAUSE CLOCK",
-      ext_btn: "+30S EXT",
+      extensions_left: "{0}/{1} EXT",
+      start_clock: "START",
+      pause_clock: "PAUSE",
+      ext_btn: "+30S",
       ext_granted: "+30s Extension Granted",
       clock_expired: "SHOT CLOCK EXPIRED: FOUL",
       clock_set: "Shot clock set to {0}s",
-      stakes_protocol_title: "STAKES LEDGER & PROTOCOL",
-      per_rack_val: "PER RACK VALUE",
-      current_pot: "CURRENT POT",
-      target_frame: "TARGET FRAME",
+      stakes_protocol_title: "STAKES & RACE",
+      per_rack_val: "PER RACK",
+      current_pot: "POT",
+      target_frame: "RACE",
       shortcuts: "SHORTCUTS:",
-      shortcut_hint: "Tap box to edit",
-      stake_prefix: "STAKE:",
-      who_pays_whom: "WHO PAYS WHOM",
-      discrepancy_tag: "DISCREPANCY:",
-      balanced_zero: "ZERO-SUM BALANCED (0)",
-      table_unbalanced: "TABLE UNBALANCED ({0})",
-      balanced: "BALANCED",
-      tourney_array_title: "CHAMPIONSHIP SCORE ARRAY",
-      target_race_badge: "TARGET: RACE TO {0}",
-      net_points: "NET POINTS",
+      shortcut_hint: "Tap to edit",
+      who_pays_whom: "SETTLEMENTS",
+      balanced_zero: "ZERO-SUM (0)",
+      table_unbalanced: "UNBALANCED ({0})",
+      tourney_array_title: "FRAME SCORE",
+      target_race_badge: "RACE {0}",
+      net_points: "PTS",
       frames: "FRAMES",
       player_placeholder: "Player {0}",
-      add_player: "ADD PLAYER ({0}/4)",
-      remove_player: "REMOVE",
+      add_player: "PLAYER ({0}/4)",
+      remove_player: "Remove Player",
       max_players: "Maximum 4 players allowed",
       min_players: "Minimum 1 player required",
       player_added: "Added {0}",
       player_removed: "Removed {0}",
-      rack_log: "RACK LOG",
-      chron_drawer_title: "CHRONOLOGICAL RACK LEDGER",
-      more_info: "MORE INFO",
-      less_info: "LESS INFO",
+      rack_log: "LOG",
+      chron_drawer_title: "RACK LOG",
+      more_info: "DETAILS",
+      less_info: "COMPACT",
       wake: "WAKE",
       blurred: "BLURRED",
-      empty_log: "NO RACKS RECORDED YET · TAP + ON ANY PLAYER CARD TO LOG A FRAME",
+      empty_log: "NO RACKS RECORDED · TAP + TO LOG",
       focus_restored: "History focus restored",
-      extended_info_on: "Extended History Details Visible",
-      extended_info_off: "Compact History View",
-      modal_title_cash: "STAKES & CASH SETTLEMENTS",
-      modal_title_tourney: "TOURNAMENT STAKES & PROTOCOL",
-      rate_per_point: "RATE PER POINT / RACK ($)",
-      target_race_label: "TARGET MATCH RACE (FIRST TO X)",
-      who_pays_whom_header: "WHO PAYS WHOM (DIRECT CASH TRANSFERS)",
-      no_transfers: "SCORES BALANCED · NO CASH TRANSFERS REQUIRED",
+      extended_info_on: "Extended Details Visible",
+      extended_info_off: "Compact View",
+      modal_title_cash: "STAKES & SETTLEMENTS",
+      modal_title_tourney: "MATCH PROTOCOL",
+      rate_per_point: "RATE PER POINT",
+      target_race_label: "TARGET RACE",
+      who_pays_whom_header: "DIRECT TRANSFERS",
+      no_transfers: "SCORES BALANCED · NO CASH TRANSFERS",
       transfer_item: "<strong>{0}</strong> pays <strong>{1}</strong>: ${2}",
-      apply_save: "APPLY & SAVE",
+      apply_save: "APPLY",
       close: "CLOSE",
-      info_modal_title: "SYSTEM SPECIFICATIONS & AUTHOR",
+      info_modal_title: "ABOUT & SYSTEM",
       architect_tag: "ARCHITECT & LEAD DEVELOPER",
       dual_mode_tag: "DUAL-MODE ARCHITECTURE",
-      lead_even: "LEAD: <strong>EVEN (0-0)</strong>",
-      lead_tied: "LEAD: <strong>TIED ({0} ALL)</strong>",
-      lead_ahead: "LEAD: <strong>{0} (+{1})</strong>",
-      delta_stat: "DELTA: <strong>+${0} NET</strong>",
       tourney_negative_err: "Tournament frames cannot be negative",
-      match_win_alert: "🏆 {0} WINS MATCH (RACE TO {1})!",
+      match_win_alert: "🏆 {0} WINS MATCH (RACE {1})!",
       undo_toast: "UNDO: {0} reverted",
       redo_toast: "REDO: {0} restored",
       pts_adjusted: "pts adjusted",
-      sound_active: "BALL CLICK & AUDIO ACTIVE",
-      sound_muted: "SOUND MUTED",
-      lang_switched: "Language switched to English",
-      snapshot: "Table Snapshot",
+      sound_active: "AUDIO ACTIVE",
+      sound_muted: "MUTED",
+      lang_switched: "Language: English",
+      snapshot: "Table",
       lead: "Lead",
     },
     vi: {
-      table: "BÀN",
-      cash_mode: "ĐÁNH ĐIỂM (CASH)",
-      tourney_mode: "THI ĐẤU (WPA)",
+      cash_mode: "ĐÁNH ĐIỂM",
+      tourney_mode: "THI ĐẤU",
       reset: "ĐẶT LẠI",
-      hold_reset: "GIỮ 2S ĐẶT LẠI",
+      hold_reset: "GIỮ 2S",
       reset_confirm: "Đặt lại toàn bộ điểm số trận đấu về 0?",
-      reset_done: "ĐÃ ĐẶT LẠI ĐIỂM SỐ VỀ 0",
-      shot_clock_title: "ĐỒNG HỒ ĐẾM GIÂY (SHOT CLOCK)",
-      sec_remaining: "GIÂY CÒN LẠI",
+      reset_done: "ĐÃ ĐẶT LẠI ĐIỂM VỀ 0",
+      shot_clock_title: "SHOT CLOCK",
+      sec_remaining: "GIÂY",
       standby: "CHỜ",
-      running: "ĐANG CHẠY",
-      time_foul: "PHẠM QUY HẾT GIỜ",
-      extensions_left: "GIA HẠN: CÒN {0} / {1} LẦN",
+      running: "CHẠY",
+      time_foul: "HẾT GIỜ",
+      extensions_left: "{0}/{1} GIA HẠN",
       start_clock: "BẮT ĐẦU",
       pause_clock: "TẠM DỪNG",
-      ext_btn: "+30S GIA HẠN",
+      ext_btn: "+30S",
       ext_granted: "Đã cộng thêm 30s gia hạn",
       clock_expired: "HẾT GIỜ ĐÁNH: PHẠM QUY",
-      clock_set: "Đã đặt đồng hồ {0}s",
+      clock_set: "Đồng hồ đặt {0}s",
       stakes_protocol_title: "MỨC CƯỢC & THỂ THỨC",
-      per_rack_val: "GIÁ TRỊ VÁN",
+      per_rack_val: "MỖI VÁN",
       current_pot: "TỔNG QUỸ",
-      target_frame: "MỤC TIÊU VÁN",
+      target_frame: "CHẠM",
       shortcuts: "PHÍM TẮT:",
-      shortcut_hint: "Chạm ô để chỉnh",
-      stake_prefix: "MỨC CƯỢC:",
-      who_pays_whom: "AI TRẢ TIỀN AI",
-      discrepancy_tag: "CHÊNH LỆCH:",
-      balanced_zero: "CÂN BẰNG TỔNG 0 (0)",
-      table_unbalanced: "BÀN CHƯA CÂN BẰNG (LỆCH {0})",
-      balanced: "CÂN BẰNG",
-      tourney_array_title: "BẢNG ĐIỂM THI ĐẤU",
-      target_race_badge: "MỤC TIÊU: CHẠM {0}",
-      net_points: "ĐIỂM TỔNG",
-      frames: "VÁN THẮNG",
+      shortcut_hint: "Chạm để chỉnh",
+      who_pays_whom: "THANH TOÁN",
+      balanced_zero: "CÂN BẰNG (0)",
+      table_unbalanced: "LỆCH ({0})",
+      tourney_array_title: "ĐIỂM TRẬN ĐẤU",
+      target_race_badge: "CHẠM {0}",
+      net_points: "ĐIỂM",
+      frames: "VÁN",
       player_placeholder: "Cơ thủ {0}",
-      add_player: "THÊM CƠ THỦ ({0}/4)",
-      remove_player: "XÓA",
+      add_player: "CƠ THỦ ({0}/4)",
+      remove_player: "Xóa cơ thủ",
       max_players: "Tối đa 4 cơ thủ",
       min_players: "Tối thiểu 1 cơ thủ",
       player_added: "Đã thêm {0}",
       player_removed: "Đã xóa {0}",
-      rack_log: "LỊCH SỬ VÁN",
-      chron_drawer_title: "NHẬT KÝ ĐẤU THEO THỜI GIAN",
+      rack_log: "LỊCH SỬ",
+      chron_drawer_title: "NHẬT KÝ VÁN",
       more_info: "CHI TIẾT",
-      less_info: "THU GỌN",
-      wake: "ĐÁNH THỨC",
+      less_info: "GỌN",
+      wake: "MỞ KHÓA",
       blurred: "ĐÃ MỜ",
-      empty_log: "CHƯA CÓ VÁN ĐẤU NÀO · BẤM + ĐỂ GHI NHẬN VÁN",
+      empty_log: "CHƯA CÓ VÁN ĐẤU · BẤM + ĐỂ GHI NHẬN",
       focus_restored: "Đã mở khóa hiển thị lịch sử",
-      extended_info_on: "Hiển thị thông tin chi tiết lịch sử",
-      extended_info_off: "Chế độ xem gọn",
-      modal_title_cash: "MỨC CƯỢC & THANH TOÁN TIỀN",
-      modal_title_tourney: "THỂ THỨC & MỨC THƯỞNG",
-      rate_per_point: "MỨC TIỀN MỖI ĐIỂM / VÁN ($)",
-      target_race_label: "CHẠM MỤC TIÊU (VÁN ĐẦU TIÊN TỚI X)",
-      who_pays_whom_header: "AI TRẢ TIỀN AI (CHUYỂN KHOẢN TRỰC TIẾP)",
-      no_transfers: "ĐIỂM ĐÃ CÂN BẰNG · KHÔNG CẦN CHUYỂN TIỀN",
+      extended_info_on: "Hiển thị chi tiết lịch sử",
+      extended_info_off: "Xem gọn",
+      modal_title_cash: "MỨC CƯỢC & THANH TOÁN",
+      modal_title_tourney: "THỂ THỨC & THƯỞNG",
+      rate_per_point: "MỖI ĐIỂM",
+      target_race_label: "CHẠM MỤC TIÊU",
+      who_pays_whom_header: "CHUYỂN TIỀN TRỰC TIẾP",
+      no_transfers: "ĐIỂM CÂN BẰNG · KHÔNG CẦN CHUYỂN TIỀN",
       transfer_item: "<strong>{0}</strong> trả cho <strong>{1}</strong>: ${2}",
-      apply_save: "ÁP DỤNG & LƯU",
+      apply_save: "ÁP DỤNG",
       close: "ĐÓNG",
-      info_modal_title: "THÔNG SỐ HỆ THỐNG & TÁC GIẢ",
+      info_modal_title: "THÔNG TIN HỆ THỐNG",
       architect_tag: "KIẾN TRÚC SƯ & PHÁT TRIỂN CHÍNH",
-      dual_mode_tag: "KIẾN TRÚC 2 CHẾ ĐỘ RIÊNG BIỆT",
-      lead_even: "DẪN ĐẦU: <strong>HÒA (0-0)</strong>",
-      lead_tied: "DẪN ĐẦU: <strong>BẰNG ĐIỂM ({0} ĐỀU)</strong>",
-      lead_ahead: "DẪN ĐẦU: <strong>{0} (+{1})</strong>",
-      delta_stat: "CHÊNH LỆCH: <strong>+${0} NET</strong>",
+      dual_mode_tag: "KIẾN TRÚC 2 CHẾ ĐỘ",
       tourney_negative_err: "Điểm thi đấu không thể âm",
       match_win_alert: "🏆 {0} CHIẾN THẮNG TRẬN ĐẤU (CHẠM {1})!",
-      undo_toast: "HOÀN TÁC: Đã phục hồi điểm {0}",
-      redo_toast: "LÀM LẠI: Đã phục hồi điểm {0}",
-      pts_adjusted: "điểm đã điều chỉnh",
-      sound_active: "ÂM THANH & RUNG ĐÃ BẬT",
+      undo_toast: "HOÀN TÁC: Đã phục hồi {0}",
+      redo_toast: "LÀM LẠI: Đã phục hồi {0}",
+      pts_adjusted: "điểm điều chỉnh",
+      sound_active: "ÂM THANH ĐÃ BẬT",
       sound_muted: "ĐÃ TẮT TIẾNG",
-      lang_switched: "Đã chuyển sang Tiếng Việt",
-      snapshot: "Trạng thái bàn",
+      lang_switched: "Ngôn ngữ: Tiếng Việt",
+      snapshot: "Bàn đấu",
       lead: "Dẫn đầu",
     }
   };
@@ -260,10 +245,8 @@
   const btnInfo = $("btnInfo");
 
   // Masthead localized spans
-  const lblTablePrefix = $("lblTablePrefix");
   const lblModeCash = $("lblModeCash");
   const lblModeTourney = $("lblModeTourney");
-  const lblResetQuick = $("lblResetQuick");
 
   // Tournament HUD Strip
   const hudLeadStat = $("hudLeadStat");
@@ -301,7 +284,6 @@
 
   // Cash Mode Telemetry Bar
   const btnCashRateChip = $("btnCashRateChip");
-  const lblStakePrefix = $("lblStakePrefix");
   const cashStakeLabel = $("cashStakeLabel");
   const btnOpenSettlements = $("btnOpenSettlements");
   const lblWhoPaysWhom = $("lblWhoPaysWhom");
@@ -314,7 +296,6 @@
   const balanceStatusBar = $("balanceStatusBar");
   const balanceDot = $("balanceDot");
   const balanceStatusText = $("balanceStatusText");
-  const lblDiscrepancyTag = $("lblDiscrepancyTag");
   const totalSumEl = $("totalSum");
 
   // Tournament Header
@@ -328,7 +309,6 @@
   const lblAddPlayerBtn = $("lblAddPlayerBtn");
   const playerCountVal = $("playerCountVal");
   const btnRemovePlayer = $("btnRemovePlayer");
-  const lblRemovePlayerBtn = $("lblRemovePlayerBtn");
   const btnHoldReset = $("btnHoldReset");
   const holdResetLabel = $("holdResetLabel");
   const holdResetProgressBar = $("holdResetProgressBar");
@@ -548,37 +528,36 @@
     }
 
     // Static text updates
-    if (lblTablePrefix) lblTablePrefix.textContent = t("table");
     if (lblModeCash) lblModeCash.textContent = t("cash_mode");
     if (lblModeTourney) lblModeTourney.textContent = t("tourney_mode");
-    if (lblResetQuick) lblResetQuick.textContent = t("reset");
     if (lblShotClockTitle) lblShotClockTitle.textContent = t("shot_clock_title");
     if (lblClockSecRem) lblClockSecRem.textContent = t("sec_remaining");
     if (lblClockExtBtn) lblClockExtBtn.textContent = t("ext_btn");
     if (lblStakesProtocolTitle) lblStakesProtocolTitle.textContent = t("stakes_protocol_title");
-    if (lblPerRackVal) lblPerRackVal.textContent = t("per_rack_val");
-    if (lblCurrentPot) lblCurrentPot.textContent = t("current_pot");
-    if (lblTargetFrame) lblTargetFrame.textContent = t("target_frame");
+    if (lblPerRackVal) lblPerRackVal.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">sell</span> ${t("per_rack_val")}`;
+    if (lblCurrentPot) lblCurrentPot.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">savings</span> ${t("current_pot")}`;
+    if (lblTargetFrame) lblTargetFrame.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">flag</span> ${t("target_frame")}`;
     if (lblShortcuts) lblShortcuts.textContent = t("shortcuts");
-    if (lblShortcutHint) lblShortcutHint.textContent = t("shortcut_hint");
-    if (lblStakePrefix) lblStakePrefix.textContent = t("stake_prefix");
+    if (lblShortcutHint) lblShortcutHint.innerHTML = `<span class="material-symbols-outlined" style="font-size: 12px; vertical-align: middle;">touch_app</span> ${t("shortcut_hint")}`;
     if (lblWhoPaysWhom) lblWhoPaysWhom.textContent = t("who_pays_whom");
-    if (lblDiscrepancyTag) lblDiscrepancyTag.textContent = t("discrepancy_tag");
     if (lblTourneyArrayTitle) lblTourneyArrayTitle.textContent = t("tourney_array_title");
-    if (lblRemovePlayerBtn) lblRemovePlayerBtn.textContent = t("remove_player");
+    if (btnRemovePlayer) btnRemovePlayer.title = t("remove_player");
     if (holdResetLabel) holdResetLabel.textContent = t("hold_reset");
     if (lblRackLogBtn) lblRackLogBtn.textContent = t("rack_log");
     if (lblChronDrawerTitle) lblChronDrawerTitle.textContent = t("chron_drawer_title");
-    if (btnWakeFocus) btnWakeFocus.textContent = t("wake");
     if (lblEmptyLog) lblEmptyLog.textContent = t("empty_log");
-    if (lblRatePerPoint) lblRatePerPoint.textContent = t("rate_per_point");
-    if (lblTargetMatchRace) lblTargetMatchRace.textContent = t("target_race_label");
-    if (lblBreakdownHeader) lblBreakdownHeader.textContent = t("who_pays_whom_header");
-    if (btnSaveStakes) btnSaveStakes.textContent = t("apply_save");
+    if (lblRatePerPoint) lblRatePerPoint.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">payments</span> ${t("rate_per_point")}`;
+    if (lblTargetMatchRace) lblTargetMatchRace.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">flag</span> ${t("target_race_label")}`;
+    if (lblBreakdownHeader) lblBreakdownHeader.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">sync_alt</span> <span>${t("who_pays_whom_header")}</span>`;
+    
+    const lblSaveBtnText = $("lblSaveBtnText");
+    if (lblSaveBtnText) lblSaveBtnText.textContent = t("apply_save");
     if (lblInfoModalTitle) lblInfoModalTitle.textContent = t("info_modal_title");
     if (lblArchitectTag) lblArchitectTag.textContent = t("architect_tag");
     if (lblSpecsSummaryTag) lblSpecsSummaryTag.textContent = t("dual_mode_tag");
-    if (btnDismissInfo) btnDismissInfo.textContent = t("close");
+    
+    const lblDismissBtnText = $("lblDismissBtnText");
+    if (lblDismissBtnText) lblDismissBtnText.textContent = t("close");
 
     if (moreInfoBtnText) {
       moreInfoBtnText.textContent = state.showExtendedHistory ? t("less_info") : t("more_info");
@@ -626,7 +605,7 @@
     if (mode === "tournament") {
       if (metricTargetRace) metricTargetRace.textContent = `RACE ${mState.targetRace}`;
       if (racePillTag) racePillTag.textContent = `RACE ${mState.targetRace}`;
-      if (tourneyRaceBadge) tourneyRaceBadge.textContent = t("target_race_badge", mState.targetRace);
+      if (tourneyRaceBadge) tourneyRaceBadge.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">flag</span> ${t("target_race_badge", mState.targetRace)}`;
     }
 
     // Update active clock chip for current mode
@@ -672,7 +651,7 @@
         : t("table_unbalanced", `${currentSum > 0 ? "+" : ""}${currentSum}`);
     }
     if (totalSumEl) {
-      totalSumEl.textContent = isBalanced ? t("balanced") : `${currentSum > 0 ? "+" : ""}${currentSum}`;
+      totalSumEl.textContent = `${currentSum > 0 ? "+" : ""}${currentSum}`;
     }
   }
 
@@ -764,7 +743,7 @@
 
           <div class="score-center-display">
             <span class="score-hero-digits" id="digits-${p.id}">${formatScore(p.score)}</span>
-            <span class="score-sublabel">${isCashMode ? t("net_points") : t("frames")}</span>
+            <span class="score-sublabel">${isCashMode ? '<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">monetization_on</span> ' + t("net_points") : '<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">emoji_events</span> ' + t("frames")}</span>
           </div>
 
           <button class="btn-score-touch btn-inc" data-pid="${p.id}" title="Tap +1 · Hold 0.7s to drag">
@@ -817,7 +796,7 @@
     const leadDiff = leader.score - runnerUp.score;
 
     if (leader.score === 0) return "EVEN (0-0)";
-    if (leadDiff === 0) return `TIED (${leader.score} ALL)`;
+    if (leadDiff === 0) return `TIED (${leader.score})`;
     return `${leader.name.toUpperCase()} (+${leadDiff})`;
   }
 
@@ -832,17 +811,17 @@
 
     if (hudLeadStat) {
       if (leader.score === 0) {
-        hudLeadStat.innerHTML = t("lead_even");
+        hudLeadStat.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>EVEN</strong>`;
       } else if (leadDiff === 0) {
-        hudLeadStat.innerHTML = t("lead_tied", leader.score);
+        hudLeadStat.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>TIED (${leader.score})</strong>`;
       } else {
-        hudLeadStat.innerHTML = t("lead_ahead", leader.name.toUpperCase(), leadDiff);
+        hudLeadStat.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>${leader.name.toUpperCase()} (+${leadDiff})</strong>`;
       }
     }
 
     if (hudDeltaStat) {
       const cashDelta = (netCash[leader.id] || 0).toFixed(2);
-      hudDeltaStat.innerHTML = t("delta_stat", cashDelta);
+      hudDeltaStat.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">monetization_on</span> <strong>+$${cashDelta}</strong>`;
     }
 
     const totalPositive = players.reduce((sum, p) => sum + Math.max(0, p.score), 0);
@@ -851,7 +830,7 @@
       metricCurrentPotVal.textContent = `$${pot}`;
     }
     if (tourneyRaceBadge) {
-      tourneyRaceBadge.textContent = t("target_race_badge", mState.targetRace);
+      tourneyRaceBadge.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">flag</span> ${t("target_race_badge", mState.targetRace)}`;
     }
   }
 
@@ -1113,16 +1092,20 @@
       }
     }
 
-    if (clockExtLabel) {
-      clockExtLabel.textContent = t("extensions_left", MAX_EXTENSIONS - extensionsUsed, MAX_EXTENSIONS);
+    const clockExtText = $("clockExtText");
+    if (clockExtText) {
+      clockExtText.textContent = t("extensions_left", MAX_EXTENSIONS - extensionsUsed, MAX_EXTENSIONS);
+    } else if (clockExtLabel) {
+      clockExtLabel.innerHTML = `<span class="material-symbols-outlined" style="font-size: 12px; vertical-align: middle;">history</span> ${t("extensions_left", MAX_EXTENSIONS - extensionsUsed, MAX_EXTENSIONS)}`;
     }
 
     if (clockBtnText) {
       clockBtnText.textContent = isClockRunning ? t("pause_clock") : t("start_clock");
     }
 
-    if (btnCompactClockToggle) {
-      btnCompactClockToggle.textContent = isClockRunning ? t("pause_clock").split(" ")[0] : t("start_clock").split(" ")[0];
+    const compactClockIcon = $("compactClockIcon");
+    if (compactClockIcon) {
+      compactClockIcon.textContent = isClockRunning ? "pause" : "play_arrow";
     }
   }
 
@@ -1131,6 +1114,8 @@
     isClockRunning = true;
     if (clockBtnIcon) clockBtnIcon.textContent = "pause";
     if (clockBtnText) clockBtnText.textContent = t("pause_clock");
+    const compactClockIcon = $("compactClockIcon");
+    if (compactClockIcon) compactClockIcon.textContent = "pause";
 
     clockInterval = setInterval(() => {
       if (clockTimeLeft > 0) {
@@ -1161,6 +1146,8 @@
     isClockRunning = false;
     if (clockBtnIcon) clockBtnIcon.textContent = "play_arrow";
     if (clockBtnText) clockBtnText.textContent = t("start_clock");
+    const compactClockIcon = $("compactClockIcon");
+    if (compactClockIcon) compactClockIcon.textContent = "play_arrow";
     renderShotClock();
   }
 
@@ -1290,6 +1277,11 @@
       state.showExtendedHistory = !state.showExtendedHistory;
       rackLogDrawer.classList.toggle("show-extended", state.showExtendedHistory);
       btnToggleExtendedHistory.classList.toggle("active", state.showExtendedHistory);
+      
+      const moreInfoIcon = $("moreInfoIcon");
+      if (moreInfoIcon) {
+        moreInfoIcon.textContent = state.showExtendedHistory ? "unfold_less" : "unfold_more";
+      }
       if (moreInfoBtnText) {
         moreInfoBtnText.textContent = state.showExtendedHistory ? t("less_info") : t("more_info");
       }
@@ -1521,7 +1513,7 @@
     if (metricPerRackVal) metricPerRackVal.innerHTML = `$${mState.stakeRate.toFixed(2)} <small>/ PT</small>`;
     if (metricTargetRace) metricTargetRace.textContent = `RACE ${mState.targetRace}`;
     if (racePillTag) racePillTag.textContent = `RACE ${mState.targetRace}`;
-    if (tourneyRaceBadge) tourneyRaceBadge.textContent = t("target_race_badge", mState.targetRace);
+    if (tourneyRaceBadge) tourneyRaceBadge.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">flag</span> ${t("target_race_badge", mState.targetRace)}`;
     if (cashStakeLabel) cashStakeLabel.textContent = `$${mState.stakeRate.toFixed(2)} / PT`;
     saveState();
     renderPlayers();
