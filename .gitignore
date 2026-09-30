@@ -1,0 +1,12 @@
+# Local Python environment for tools/*.py - never commit it
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

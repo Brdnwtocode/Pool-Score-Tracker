@@ -1,0 +1,51 @@
+{
+  "name": "21N2 Championship Pool Scoreboard",
+  "short_name": "21N2 Scoreboard",
+  "description": "Dual-mode billiards scoreboard: zero-sum cash ring-game tracking with automatic settlements, plus WPA tournament race-to-X scoring with shot clock and rack log.",
+  "start_url": "./?mode=cash",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#0d0e0f",
+  "theme_color": "#0d0e0f",
+  "lang": "vi",
+  "dir": "ltr",
+  "categories": ["sports", "utilities", "productivity"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Cash Ring Game",
+      "short_name": "Cash",
+      "description": "Zero-sum money game scoring",
+      "url": "./?mode=cash",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Tournament Frame",
+      "short_name": "Tourney",
+      "description": "WPA race-to-X with shot clock",
+      "url": "./?mode=tournament",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

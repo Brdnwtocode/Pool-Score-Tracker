@@ -1,19 +1,32 @@
 /**
- * Championship Pool Scoreboard · Dual-Mode Protocol Engine v3.3.0
+ * Championship Pool Scoreboard · Dual-Mode Protocol Engine v3.4.0
  * Features:
  * - Clean Icon-Driven UI (Unnecessary word content stripped & replaced with Google Material Symbols)
  * - 100% Isolated Dual-Mode Memory (Cash Ring Game vs WPA Tournament Frame)
  * - Upper Card Integrated Zero-Sum Balance Telemetry
- * - Full History Ledger (Logs increments, decrements, adjustments, undo/redo)
- * - 0.7s Fast Direct Score Drag Gesture (Zero modal, direct card digits update)
+ * - Full History Ledger (Monotonic ledger ids, increments, decrements, undo/redo)
+ * - 0.7s Fast Direct Score Drag Gesture (Single Pointer Events stream, no double-count)
  * - Vietnamese (VI) & English (EN) Localization Switcher
  * - Screen Wake Lock, Fullscreen API, Web Audio Clicks, Native Haptics
+ *
+ * v3.4.0 hardening:
+ * - One Pointer Events stream per score button (a tap used to score ±2 on touch)
+ * - Attribute-safe escaping (player names can no longer inject markup)
+ * - Modal edits are drafted and only committed by APPLY
+ * - Global shortcuts/Escape respect open dialogs; redo shortcut added
+ * - Shot-clock extensions enforced, reset per shot, and stored per mode
+ * - In-place score refresh instead of a full card rebuild on every point
+ *
+ * v3.4.x offline: vendored fonts (no CDN), service worker precache, web manifest
+ * + install prompt and home-screen shortcuts (?mode=cash / ?mode=tournament).
+ * See README.md - bump VERSION in sw.js when css/js/fonts change.
  */
 
 (() => {
   "use strict";
 
   const STORAGE_KEY = "21n2_pool_dual_engine_v32";
+  const OFFLINE_FLAG_KEY = "21n2_offline_announced";
 
   // ═══════════════ LOCALIZATION DICTIONARY (VI / EN) ═══════════════
   const I18N = {
@@ -34,6 +47,7 @@
       pause_clock: "PAUSE",
       ext_btn: "+30S",
       ext_granted: "+30s Extension Granted",
+      ext_exhausted: "Extension already used for this shot",
       clock_expired: "SHOT CLOCK EXPIRED: FOUL",
       clock_set: "Shot clock set to {0}s",
       stakes_protocol_title: "STAKES & RACE",
@@ -88,6 +102,22 @@
       lang_switched: "Language: English",
       snapshot: "Table",
       lead: "Lead",
+      hud_even: "EVEN",
+      hud_tied: "TIED ({0})",
+      hud_lead: "{0} (+{1})",
+      lead_even: "EVEN (0-0)",
+      lead_tied: "TIED ({0})",
+      lead_named: "{0} (+{1})",
+      stake_saved: "Applied: ${0} / PT",
+      pts_suffix: "{0} PTS",
+      aria_inc: "Add 1 point for {0}",
+      aria_dec: "Remove 1 point for {0}",
+      offline_cached: "Saved for offline use · works without internet",
+      offline_ready: "OFFLINE READY",
+      offline_pending: "GO ONLINE ONCE TO ENABLE OFFLINE MODE",
+      update_ready: "New version ready · reopen the app to update",
+      install_app: "INSTALL ON THIS DEVICE",
+      install_done: "App installed · launch it from your home screen",
       // Tutorial / Quick Reference Guide
       guide_title: "QUICK REFERENCE GUIDE",
       guide_open: "HOW TO USE THIS APP",
@@ -144,6 +174,7 @@
       pause_clock: "TẠM DỪNG",
       ext_btn: "+30S",
       ext_granted: "Đã cộng thêm 30s gia hạn",
+      ext_exhausted: "Đã dùng hết lượt gia hạn cho lượt đánh này",
       clock_expired: "HẾT GIỜ ĐÁNH: PHẠM QUY",
       clock_set: "Đồng hồ đặt {0}s",
       stakes_protocol_title: "MỨC CƯỢC & THỂ THỨC",
@@ -198,6 +229,22 @@
       lang_switched: "Ngôn ngữ: Tiếng Việt",
       snapshot: "Bàn đấu",
       lead: "Dẫn đầu",
+      hud_even: "CĂN BẰNG",
+      hud_tied: "HÒA ({0})",
+      hud_lead: "{0} (+{1})",
+      lead_even: "CĂN BẰNG (0-0)",
+      lead_tied: "HÒA ({0})",
+      lead_named: "{0} (+{1})",
+      stake_saved: "Đã áp dụng: ${0}/điểm",
+      pts_suffix: "{0} ĐIỂM",
+      aria_inc: "Cộng 1 điểm cho {0}",
+      aria_dec: "Trừ 1 điểm cho {0}",
+      offline_cached: "Đã lưu để dùng ngoại tuyến · không cần mạng",
+      offline_ready: "SẴN SÀNG NGOẠI TUYẾN",
+      offline_pending: "CẦN MẠNG 1 LẦN ĐỂ BẬT CHẾ ĐỘ NGOẠI TUYẾN",
+      update_ready: "Có bản mới · mở lại ứng dụng để cập nhật",
+      install_app: "CÀI ĐẶT LÊN THIẾT BỊ NÀY",
+      install_done: "Đã cài ứng dụng · mở từ màn hình chính",
       // Tutorial / Quick Reference Guide
       guide_title: "HƯỚNG DẪN NHANH",
       guide_open: "HƯỚNG DẪN SỬ DỤNG",
@@ -243,7 +290,10 @@
     const lang = state.lang || "vi";
     let str = (I18N[lang] && I18N[lang][key]) || (I18N.en && I18N.en[key]) || key;
     args.forEach((val, idx) => {
-      str = str.replace(new RegExp(`\\{${idx}\\}`, "g"), val);
+      // "$" must be doubled, otherwise a value like "$1.00" is treated as a
+      // $1 / $& replacement pattern and silently corrupts the output.
+      const safeVal = String(val).replace(/\$/g, "$$$$");
+      str = str.replace(new RegExp(`\\{${idx}\\}`, "g"), safeVal);
     });
     return str;
   }
@@ -265,6 +315,8 @@
       ],
       stakeRate: 1.0,
       shotClockDuration: 45,
+      extensionsUsed: 0,
+      rackSeq: 0,
       history: [],
       undoStack: [],
       redoStack: [],
@@ -279,6 +331,8 @@
       stakeRate: 1.0,
       targetRace: 15,
       shotClockDuration: 45,
+      extensionsUsed: 0,
+      rackSeq: 0,
       history: [],
       undoStack: [],
       redoStack: [],
@@ -290,12 +344,20 @@
     return state.activeMode === "tournament" ? state.tournament : state.cash;
   }
 
-  // Shot Clock Runtime
+  // Shot Clock Runtime (extension usage is stored per mode for true isolation)
   let clockTimeLeft = 45;
   let isClockRunning = false;
   let clockInterval = null;
-  let extensionsUsed = 0;
   const MAX_EXTENSIONS = 1;
+
+  function getExtensionsUsed() {
+    const used = Number(getModeState().extensionsUsed);
+    return Number.isFinite(used) ? used : 0;
+  }
+
+  function setExtensionsUsed(value) {
+    getModeState().extensionsUsed = value;
+  }
 
   // Rack History 180s Focus Blur
   const BLUR_INTERVAL_SEC = 180;
@@ -586,11 +648,70 @@
     } catch {}
   }
 
+  // Escapes for BOTH text and attribute contexts.
+  // NOTE: element.innerHTML serialization escapes &, < and > only - it does NOT
+  // escape quotes, so a name containing '"' used to break out of value="...".
+  const ESCAPE_MAP = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+
   function escapeHtml(str) {
-    if (!str) return "";
-    const el = document.createElement("div");
-    el.textContent = str;
-    return el.innerHTML;
+    if (str === null || str === undefined) return "";
+    return String(str).replace(/[&<>"']/g, (ch) => ESCAPE_MAP[ch]);
+  }
+
+  /**
+   * Hydration guard. loadState() used to Object.assign() any payload straight
+   * into state, so an empty/corrupt players array crashed the first render.
+   */
+  function normalizeState() {
+    const DEFAULTS = {
+      cash: ["Johnny Archer", "Shane Van Boening", "Alex Pagulayan", "Francisco Bustamante"],
+      tournament: ["Efren Reyes", "Earl Strickland", "Thorsten Hohmann", "Niels Feijen"],
+    };
+
+    ["cash", "tournament"].forEach((modeKey) => {
+      const m = state[modeKey];
+      if (!m || typeof m !== "object") return;
+
+      if (!Array.isArray(m.players) || m.players.length === 0) {
+        m.players = DEFAULTS[modeKey].slice(0, 2).map((name, i) => ({ id: i + 1, name, score: 0 }));
+      }
+
+      m.players = m.players.map((p, i) => {
+        const safe = p && typeof p === "object" ? p : {};
+        return {
+          id: Number.isFinite(safe.id) ? safe.id : i + 1,
+          name: typeof safe.name === "string" && safe.name.trim()
+            ? safe.name
+            : (DEFAULTS[modeKey][i] || `Player ${i + 1}`),
+          score: Number.isFinite(safe.score) ? safe.score : 0,
+        };
+      });
+
+      if (!Array.isArray(m.history)) m.history = [];
+      if (!Array.isArray(m.undoStack)) m.undoStack = [];
+      if (!Array.isArray(m.redoStack)) m.redoStack = [];
+      if (!Number.isFinite(m.stakeRate) || m.stakeRate < 0) m.stakeRate = 1;
+      if (!Number.isFinite(m.shotClockDuration) || m.shotClockDuration <= 0) m.shotClockDuration = 45;
+      if (!Number.isFinite(m.extensionsUsed) || m.extensionsUsed < 0) m.extensionsUsed = 0;
+      if (!Number.isFinite(m.rackSeq) || m.rackSeq < m.history.length) m.rackSeq = m.history.length;
+
+      // Backfill ledger ids on entries saved before rackSeq existed.
+      m.history.forEach((h, idx) => {
+        if (h && !Number.isFinite(h.seq)) h.seq = Math.max(1, m.rackSeq - idx);
+      });
+    });
+
+    if (!Number.isFinite(state.tournament.targetRace) || state.tournament.targetRace < 1) {
+      state.tournament.targetRace = 15;
+    }
+    if (state.lang !== "vi" && state.lang !== "en") state.lang = "vi";
+    if (state.activeMode !== "cash" && state.activeMode !== "tournament") state.activeMode = "cash";
   }
 
   function formatScore(score) {
@@ -640,6 +761,9 @@
     const lblDismissBtnText = $("lblDismissBtnText");
     if (lblDismissBtnText) lblDismissBtnText.textContent = t("close");
 
+    const lblInstallApp = $("lblInstallApp");
+    if (lblInstallApp) lblInstallApp.textContent = t("install_app");
+
     if (moreInfoBtnText) {
       moreInfoBtnText.textContent = state.showExtendedHistory ? t("less_info") : t("more_info");
     }
@@ -683,14 +807,7 @@
     clockTimeLeft = mState.shotClockDuration;
     renderShotClock();
 
-    if (metricPerRackVal) metricPerRackVal.innerHTML = `$${mState.stakeRate.toFixed(2)} <small>/ PT</small>`;
-    if (cashStakeLabel) cashStakeLabel.textContent = `$${mState.stakeRate.toFixed(2)} / PT`;
-
-    if (mode === "tournament") {
-      if (metricTargetRace) metricTargetRace.textContent = `RACE ${mState.targetRace}`;
-      if (racePillTag) racePillTag.textContent = `RACE ${mState.targetRace}`;
-      if (tourneyRaceBadge) tourneyRaceBadge.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">flag</span> ${t("target_race_badge", mState.targetRace)}`;
-    }
+    refreshStakeDisplays();
 
     // Update active clock chip for current mode
     document.querySelectorAll(".clock-mode-btn").forEach((chip) => {
@@ -740,10 +857,11 @@
   }
 
   // ═══════════════ PAIRWISE SETTLEMENT & CASH TRANSFERS ═══════════════
-  function calculateSettlements() {
+  function calculateSettlements(rateOverride) {
     const mState = getModeState();
     const players = mState.players;
-    const rate = parseFloat(mState.stakeRate) || 0;
+    // rateOverride lets the modal preview a draft rate without committing it.
+    const rate = parseFloat(rateOverride !== undefined ? rateOverride : mState.stakeRate) || 0;
     const netCash = {};
 
     if (state.activeMode === "cash") {
@@ -821,8 +939,8 @@
         />
 
         <div class="card-score-row">
-          <button class="btn-score-touch btn-dec" data-pid="${p.id}" title="Tap -1 · Hold 0.7s to drag">
-            <span class="material-symbols-outlined">remove</span>
+          <button class="btn-score-touch btn-dec" data-pid="${p.id}" aria-label="${escapeHtml(t("aria_dec", p.name))}" title="Tap -1 · Hold 0.7s to drag">
+            <span class="material-symbols-outlined" aria-hidden="true">remove</span>
           </button>
 
           <div class="score-center-display">
@@ -830,8 +948,8 @@
             <span class="score-sublabel">${isCashMode ? '<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">monetization_on</span> ' + t("net_points") : '<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">emoji_events</span> ' + t("frames")}</span>
           </div>
 
-          <button class="btn-score-touch btn-inc" data-pid="${p.id}" title="Tap +1 · Hold 0.7s to drag">
-            <span class="material-symbols-outlined">add</span>
+          <button class="btn-score-touch btn-inc" data-pid="${p.id}" aria-label="${escapeHtml(t("aria_inc", p.name))}" title="Tap +1 · Hold 0.7s to drag">
+            <span class="material-symbols-outlined" aria-hidden="true">add</span>
           </button>
         </div>
       `;
@@ -872,6 +990,42 @@
     }
   }
 
+  /**
+   * In-place refresh of the existing player cards (scores, leader outline,
+   * telemetry, undo/redo). Used for score deltas so the card DOM is not rebuilt
+   * mid-interaction: rebuilding used to kill the pop animation, drop focus and
+   * re-create every gesture listener on each point.
+   */
+  function syncPlayersUI() {
+    const mState = getModeState();
+    const players = mState.players;
+    const maxScore = players.length ? Math.max(...players.map((p) => p.score)) : 0;
+
+    players.forEach((p) => {
+      const digitsEl = document.getElementById(`digits-${p.id}`);
+      const nextScore = formatScore(p.score);
+      if (digitsEl && digitsEl.textContent !== nextScore) {
+        digitsEl.textContent = nextScore;
+      }
+      const card = document.getElementById(`card-player-${p.id}`);
+      if (card) {
+        card.classList.toggle("is-leader", p.score > 0 && p.score === maxScore);
+      }
+    });
+
+    if (lblAddPlayerBtn) lblAddPlayerBtn.textContent = t("add_player", players.length);
+    if (playerCountVal) playerCountVal.textContent = players.length;
+
+    if (state.activeMode === "cash") {
+      if (cashStakeLabel) cashStakeLabel.textContent = `$${mState.stakeRate.toFixed(2)} / PT`;
+      updateZeroSumAudit();
+    } else {
+      updateTournamentHUD();
+    }
+
+    updateUndoRedoUI();
+  }
+
   function getTournamentLeadSummary() {
     const players = state.tournament.players;
     const sorted = [...players].sort((a, b) => b.score - a.score);
@@ -879,9 +1033,9 @@
     const runnerUp = sorted[1] || { score: 0 };
     const leadDiff = leader.score - runnerUp.score;
 
-    if (leader.score === 0) return "EVEN (0-0)";
-    if (leadDiff === 0) return `TIED (${leader.score})`;
-    return `${leader.name.toUpperCase()} (+${leadDiff})`;
+    if (leader.score === 0) return t("lead_even");
+    if (leadDiff === 0) return t("lead_tied", leader.score);
+    return t("lead_named", leader.name.toUpperCase(), leadDiff);
   }
 
   function updateTournamentHUD() {
@@ -895,17 +1049,18 @@
 
     if (hudLeadStat) {
       if (leader.score === 0) {
-        hudLeadStat.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>EVEN</strong>`;
+        hudLeadStat.innerHTML = `<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>${escapeHtml(t("hud_even"))}</strong>`;
       } else if (leadDiff === 0) {
-        hudLeadStat.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>TIED (${leader.score})</strong>`;
+        hudLeadStat.innerHTML = `<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>${escapeHtml(t("hud_tied", leader.score))}</strong>`;
       } else {
-        hudLeadStat.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>${leader.name.toUpperCase()} (+${leadDiff})</strong>`;
+        // Player names are user input and must be escaped before hitting innerHTML.
+        hudLeadStat.innerHTML = `<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>${escapeHtml(t("hud_lead", leader.name.toUpperCase(), leadDiff))}</strong>`;
       }
     }
 
     if (hudDeltaStat) {
       const cashDelta = (netCash[leader.id] || 0).toFixed(2);
-      hudDeltaStat.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">monetization_on</span> <strong>+$${cashDelta}</strong>`;
+      hudDeltaStat.innerHTML = `<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 13px; vertical-align: middle;">monetization_on</span> <strong>+$${cashDelta}</strong>`;
     }
 
     const totalPositive = players.reduce((sum, p) => sum + Math.max(0, p.score), 0);
@@ -930,6 +1085,8 @@
     let isScrubbing = false;
     let startY = 0;
     let currentDelta = baseDirection;
+    let initialScore = 0;
+    let activePointerId = null;
     const HOLD_THRESHOLD_MS = 700;
     const PIXELS_PER_POINT = 14;
 
@@ -937,89 +1094,118 @@
       return document.getElementById(`digits-${playerId}`);
     }
 
+    function setPreview(nextDelta) {
+      currentDelta = nextDelta;
+      const digitsEl = getDigitsEl();
+      if (digitsEl) digitsEl.textContent = formatScore(initialScore + currentDelta);
+    }
+
+    function clearListeners() {
+      btn.removeEventListener("pointermove", onPointerMove);
+      btn.removeEventListener("pointerup", onPointerUp);
+      btn.removeEventListener("pointercancel", onPointerUp);
+    }
+
+    /**
+     * A single Pointer Events stream replaces the old mouse+touch pair.
+     * Previously both `mousedown` and `touchstart` were bound, so a tap fired
+     * the handler twice (touch, then the compatibility mouse event) and scored
+     * +/-2 per tap on every touch device.
+     */
     function onPointerDown(e) {
-      const pointer = e.touches ? e.touches[0] : e;
-      startY = pointer.clientY;
+      if (activePointerId !== null) return; // ignore extra fingers / secondary streams
+      activePointerId = e.pointerId;
+
+      startY = e.clientY;
       isScrubbing = false;
       currentDelta = baseDirection;
 
       const mState = getModeState();
       const player = mState.players.find((p) => p.id === playerId);
-      const initialScore = player ? player.score : 0;
-      const digitsEl = getDigitsEl();
+      initialScore = player ? player.score : 0;
+
+      try { btn.setPointerCapture(e.pointerId); } catch {}
 
       holdTimer = setTimeout(() => {
         // 0.7s reached: activate direct in-place scrubbing
         isScrubbing = true;
         btn.classList.add("scrubbing");
+        const digitsEl = getDigitsEl();
         if (digitsEl) digitsEl.classList.add("scrubbing-live");
 
         // Immediately preview the score directly on the card
-        const previewScore = initialScore + currentDelta;
-        if (digitsEl) digitsEl.textContent = formatScore(previewScore);
+        setPreview(baseDirection);
 
         playTone(baseDirection > 0 ? 560 : 330, 0.1);
         vibrateDevice([25, 20]);
       }, HOLD_THRESHOLD_MS);
 
-      function onPointerMove(eMove) {
-        if (!isScrubbing) return;
-        if (eMove.cancelable) eMove.preventDefault();
-
-        const pMove = eMove.touches ? eMove.touches[0] : eMove;
-        const diffY = startY - pMove.clientY;
-
-        let magnitude;
-        if (baseDirection > 0) {
-          magnitude = 1 + Math.floor(diffY / PIXELS_PER_POINT);
-        } else {
-          magnitude = 1 + Math.floor(-diffY / PIXELS_PER_POINT);
-        }
-
-        magnitude = Math.max(1, Math.min(12, magnitude));
-        const nextDelta = magnitude * baseDirection;
-
-        // In tournament mode, score cannot drop below 0
-        if (state.activeMode === "tournament" && initialScore + nextDelta < 0) {
-          return;
-        }
-
-        if (nextDelta !== currentDelta) {
-          currentDelta = nextDelta;
-          if (digitsEl) digitsEl.textContent = formatScore(initialScore + currentDelta);
-          playTone(430 + magnitude * 32, 0.025);
-          vibrateDevice(10);
-        }
-      }
-
-      function onPointerUp() {
-        clearTimeout(holdTimer);
-        window.removeEventListener("mousemove", onPointerMove);
-        window.removeEventListener("touchmove", onPointerMove);
-        window.removeEventListener("mouseup", onPointerUp);
-        window.removeEventListener("touchend", onPointerUp);
-
-        btn.classList.remove("scrubbing");
-        if (digitsEl) digitsEl.classList.remove("scrubbing-live");
-
-        if (isScrubbing) {
-          isScrubbing = false;
-          modifyScore(playerId, currentDelta);
-          showToast(`${currentDelta > 0 ? "+" : ""}${currentDelta} ${t("pts_adjusted")}`);
-        } else {
-          // Quick tap under 0.7s: standard +/- 1
-          modifyScore(playerId, baseDirection);
-        }
-      }
-
-      window.addEventListener("mousemove", onPointerMove, { passive: false });
-      window.addEventListener("touchmove", onPointerMove, { passive: false });
-      window.addEventListener("mouseup", onPointerUp, { once: true });
-      window.addEventListener("touchend", onPointerUp, { once: true });
+      btn.addEventListener("pointermove", onPointerMove, { passive: false });
+      btn.addEventListener("pointerup", onPointerUp);
+      btn.addEventListener("pointercancel", onPointerUp);
     }
 
-    btn.addEventListener("mousedown", onPointerDown);
-    btn.addEventListener("touchstart", onPointerDown, { passive: false });
+    function onPointerMove(eMove) {
+      if (!isScrubbing || eMove.pointerId !== activePointerId) return;
+      if (eMove.cancelable) eMove.preventDefault();
+
+      const diffY = startY - eMove.clientY;
+
+      let magnitude;
+      if (baseDirection > 0) {
+        magnitude = 1 + Math.floor(diffY / PIXELS_PER_POINT);
+      } else {
+        magnitude = 1 + Math.floor(-diffY / PIXELS_PER_POINT);
+      }
+
+      magnitude = Math.max(1, Math.min(12, magnitude));
+      const nextDelta = magnitude * baseDirection;
+
+      // In tournament mode, score cannot drop below 0
+      if (state.activeMode === "tournament" && initialScore + nextDelta < 0) {
+        return;
+      }
+
+      if (nextDelta !== currentDelta) {
+        setPreview(nextDelta);
+        playTone(430 + magnitude * 32, 0.025);
+        vibrateDevice(10);
+      }
+    }
+
+    function onPointerUp(e) {
+      if (activePointerId === null) return;
+      if (e && e.pointerId !== undefined && e.pointerId !== activePointerId) return;
+
+      try { btn.releasePointerCapture(activePointerId); } catch {}
+      activePointerId = null;
+
+      clearTimeout(holdTimer);
+      holdTimer = null;
+      clearListeners();
+
+      btn.classList.remove("scrubbing");
+      const digitsEl = getDigitsEl();
+      if (digitsEl) digitsEl.classList.remove("scrubbing-live");
+
+      if (isScrubbing) {
+        isScrubbing = false;
+        modifyScore(playerId, currentDelta);
+        showToast(`${currentDelta > 0 ? "+" : ""}${currentDelta} ${t("pts_adjusted")}`);
+      } else {
+        // Quick tap under 0.7s: standard +/- 1
+        modifyScore(playerId, baseDirection);
+      }
+    }
+
+    btn.addEventListener("pointerdown", onPointerDown);
+
+    if (!window.PointerEvent) {
+      // Last-resort path for pre-2019 engines without Pointer Events: a plain
+      // click commits the standard ±1 tap (hold-and-scrub unavailable). Only one
+      // input stream is ever bound, so a tap can never be counted twice.
+      btn.addEventListener("click", () => modifyScore(playerId, baseDirection));
+    }
   }
 
   // ═══════════════ SCORE ENGINE & FULL HISTORY LOGGING ═══════════════
@@ -1053,12 +1239,15 @@
     if (delta !== 0 && !isUndoRedo) {
       const now = new Date();
       const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-      const totalRacks = mState.players.reduce((sum, p) => sum + Math.max(0, p.score), 0);
       const snapshot = mState.players.map((p) => `${p.name}: ${p.score}`).join(" · ");
       const curSum = mState.players.reduce((sum, p) => sum + p.score, 0);
 
+      // Monotonic ledger id. The old rack number was derived from live scores, so
+      // it collided after any decrement (two "R-02" rows) and ran backwards.
+      mState.rackSeq = (Number(mState.rackSeq) || 0) + 1;
+
       logEntry = {
-        rackNum: totalRacks,
+        seq: mState.rackSeq,
         winnerName: player.name,
         delta: delta,
         time: timeStr,
@@ -1089,18 +1278,19 @@
         newScore: player.score,
         logEntry,
       });
+      // Bounded history: the stack used to grow forever inside localStorage.
+      if (mState.undoStack.length > 100) mState.undoStack.shift();
       mState.redoStack.length = 0;
     }
 
     saveState();
-    renderPlayers();
-    updateUndoRedoUI();
+    syncPlayersUI();
   }
 
   function updateUndoRedoUI() {
     const mState = getModeState();
-    btnUndo.disabled = mState.undoStack.length === 0;
-    btnRedo.disabled = mState.redoStack.length === 0;
+    if (btnUndo) btnUndo.disabled = mState.undoStack.length === 0;
+    if (btnRedo) btnRedo.disabled = mState.redoStack.length === 0;
   }
 
   function handleUndoAction() {
@@ -1121,8 +1311,7 @@
       tactileFeedback();
       showToast(t("undo_toast", player.name));
       saveState();
-      renderPlayers();
-      updateUndoRedoUI();
+      syncPlayersUI();
     }
   }
 
@@ -1144,8 +1333,7 @@
       tactileFeedback();
       showToast(t("redo_toast", player.name));
       saveState();
-      renderPlayers();
-      updateUndoRedoUI();
+      syncPlayersUI();
     }
   }
 
@@ -1176,12 +1364,19 @@
       }
     }
 
+    const extLeft = Math.max(0, MAX_EXTENSIONS - getExtensionsUsed());
     const clockExtText = $("clockExtText");
     if (clockExtText) {
-      clockExtText.textContent = t("extensions_left", MAX_EXTENSIONS - extensionsUsed, MAX_EXTENSIONS);
+      clockExtText.textContent = t("extensions_left", extLeft, MAX_EXTENSIONS);
     } else if (clockExtLabel) {
-      clockExtLabel.innerHTML = `<span class="material-symbols-outlined" style="font-size: 12px; vertical-align: middle;">history</span> ${t("extensions_left", MAX_EXTENSIONS - extensionsUsed, MAX_EXTENSIONS)}`;
+      clockExtLabel.innerHTML = `<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 12px; vertical-align: middle;">history</span> ${t("extensions_left", extLeft, MAX_EXTENSIONS)}`;
     }
+
+    // The allowance is a hard rule, not just a label: previous builds kept
+    // granting +30s forever while the chip read "0/1 EXT".
+    const extensionsExhausted = extLeft <= 0;
+    if (btnClockExt) btnClockExt.disabled = extensionsExhausted;
+    if (btnCompactClockExt) btnCompactClockExt.disabled = extensionsExhausted;
 
     if (clockBtnText) {
       clockBtnText.textContent = isClockRunning ? t("pause_clock") : t("start_clock");
@@ -1239,7 +1434,30 @@
     stopShotClock();
     const mState = getModeState();
     clockTimeLeft = mState.shotClockDuration;
+    // A fresh shot restores the extension allowance for this mode.
+    setExtensionsUsed(0);
     renderShotClock();
+  }
+
+  /**
+   * Grants the single allowed +30s extension for the current shot.
+   * @returns {boolean} true when the extension was applied
+   */
+  function grantExtension() {
+    if (getExtensionsUsed() >= MAX_EXTENSIONS) {
+      tactileFeedback(true);
+      showToast(t("ext_exhausted"));
+      renderShotClock();
+      return false;
+    }
+
+    const mState = getModeState();
+    setExtensionsUsed(getExtensionsUsed() + 1);
+    clockTimeLeft = Math.min(mState.shotClockDuration + 30, clockTimeLeft + 30);
+    renderShotClock();
+    saveState();
+    showToast(t("ext_granted"));
+    return true;
   }
 
   // Large Tournament Clock Handlers
@@ -1258,10 +1476,7 @@
   if (btnClockExt) {
     btnClockExt.addEventListener("click", () => {
       tactileFeedback();
-      clockTimeLeft = Math.min(90, clockTimeLeft + 30);
-      extensionsUsed = Math.min(MAX_EXTENSIONS, extensionsUsed + 1);
-      renderShotClock();
-      showToast(t("ext_granted"));
+      grantExtension();
     });
   }
 
@@ -1288,9 +1503,7 @@
   if (btnCompactClockExt) {
     btnCompactClockExt.addEventListener("click", () => {
       tactileFeedback();
-      clockTimeLeft = Math.min(90, clockTimeLeft + 30);
-      renderShotClock();
-      showToast(t("ext_granted"));
+      grantExtension();
     });
   }
 
@@ -1337,8 +1550,9 @@
       const isPositive = (h.delta || 0) > 0;
       const deltaSign = isPositive ? "+" : "";
       const deltaClass = isPositive ? "inc" : "dec";
-      const rackDisplay = h.rackNum > 0 ? `R-${String(h.rackNum).padStart(2, "0")}` : "ACT";
-
+      // Ledger id (monotonic). Legacy entries without one fall back to rackNum.
+      const seq = Number(h.seq) || Number(h.rackNum) || 0;
+      const rackDisplay = seq > 0 ? `R-${String(seq).padStart(2, "0")}` : "ACT";
       row.innerHTML = `
         <div class="log-entry-main">
           <span class="log-rack-num">${rackDisplay}</span>
@@ -1519,24 +1733,64 @@
   }
 
   // ═══════════════ STAKES & SETTLEMENT MODAL ═══════════════
-  function renderStakesModal() {
+  // Edits are held as drafts and only committed by APPLY, so closing with the X
+  // can no longer leave the board showing one rate while the state holds another.
+  let draftStakeRate = null;
+  let draftTargetRace = null;
+
+  function clearStakesDraft() {
+    draftStakeRate = null;
+    draftTargetRace = null;
+  }
+
+  function currentDraftRate() {
+    return draftStakeRate !== null ? draftStakeRate : getModeState().stakeRate;
+  }
+
+  function currentDraftRace() {
+    return draftTargetRace !== null ? draftTargetRace : getModeState().targetRace;
+  }
+
+  /** Single source of truth for every stake/race readout on the board. */
+  function refreshStakeDisplays() {
     const mState = getModeState();
-    stakeInputRate.value = mState.stakeRate.toFixed(2);
-    if (raceInputTarget && state.activeMode === "tournament") {
-      raceInputTarget.value = mState.targetRace;
+    if (metricPerRackVal) metricPerRackVal.innerHTML = `$${mState.stakeRate.toFixed(2)} <small>/ PT</small>`;
+    if (cashStakeLabel) cashStakeLabel.textContent = `$${mState.stakeRate.toFixed(2)} / PT`;
+    if (metricTargetRace) metricTargetRace.textContent = `RACE ${mState.targetRace}`;
+    if (racePillTag) racePillTag.textContent = `RACE ${mState.targetRace}`;
+    if (tourneyRaceBadge) {
+      tourneyRaceBadge.innerHTML = `<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 13px; vertical-align: middle;">flag</span> ${escapeHtml(t("target_race_badge", mState.targetRace))}`;
+    }
+  }
+
+  function renderStakesModal() {
+    const rate = currentDraftRate();
+    const race = currentDraftRace();
+
+    // Never rewrite the field the user is currently typing in (caret jump).
+    if (document.activeElement !== stakeInputRate) {
+      stakeInputRate.value = rate.toFixed(2);
+    }
+    if (raceInputTarget && state.activeMode === "tournament" && document.activeElement !== raceInputTarget) {
+      raceInputTarget.value = race;
     }
 
     document.querySelectorAll(".preset-chip:not(.race-chip)").forEach((chip) => {
-      chip.classList.toggle("active", Math.abs(parseFloat(chip.dataset.v) - mState.stakeRate) < 0.01);
+      chip.classList.toggle("active", Math.abs(parseFloat(chip.dataset.v) - rate) < 0.01);
     });
 
     if (state.activeMode === "tournament") {
       document.querySelectorAll(".race-chip").forEach((chip) => {
-        chip.classList.toggle("active", parseInt(chip.dataset.r, 10) === mState.targetRace);
+        chip.classList.toggle("active", parseInt(chip.dataset.r, 10) === race);
       });
     }
 
-    const { netCash, transfers } = calculateSettlements();
+    renderSettlementPreview(rate);
+  }
+
+  function renderSettlementPreview(rateOverride) {
+    const mState = getModeState();
+    const { netCash, transfers } = calculateSettlements(rateOverride);
     modalSettlementRoster.innerHTML = "";
     mState.players.forEach((p) => {
       const val = netCash[p.id] || 0;
@@ -1544,7 +1798,7 @@
       const row = document.createElement("div");
       row.className = "settle-row";
       row.innerHTML = `
-        <span>${escapeHtml(p.name)} (${p.score} pts)</span>
+        <span>${escapeHtml(p.name)} (${escapeHtml(t("pts_suffix", p.score))})</span>
         <strong class="${isWin ? "win" : "loss"}">${isWin ? "+" : "-"}$${Math.abs(val).toFixed(2)}</strong>
       `;
       modalSettlementRoster.appendChild(row);
@@ -1573,8 +1827,14 @@
 
   function openStakesModal() {
     tactileFeedback();
+    clearStakesDraft();
     renderStakesModal();
     stakesModal.classList.add("open");
+  }
+
+  function closeStakesModal() {
+    stakesModal.classList.remove("open");
+    clearStakesDraft();
   }
 
   if (btnOpenSettlements) btnOpenSettlements.addEventListener("click", openStakesModal);
@@ -1582,48 +1842,65 @@
   if (boxPerRack) boxPerRack.addEventListener("click", openStakesModal);
   if (boxTargetFrame) boxTargetFrame.addEventListener("click", openStakesModal);
 
-  btnCloseStakesModal.addEventListener("click", () => stakesModal.classList.remove("open"));
+  btnCloseStakesModal.addEventListener("click", closeStakesModal);
   stakesModal.addEventListener("click", (e) => {
-    if (e.target === stakesModal) stakesModal.classList.remove("open");
+    if (e.target === stakesModal) closeStakesModal();
   });
 
   btnSaveStakes.addEventListener("click", () => {
     tactileFeedback();
     const mState = getModeState();
-    mState.stakeRate = Math.max(0, parseFloat(stakeInputRate.value) || 1.0);
+
+    // Commit whatever is in the fields (typed or draft-driven).
+    const typedRate = parseFloat(stakeInputRate.value);
+    if (Number.isFinite(typedRate)) mState.stakeRate = Math.max(0, typedRate);
+    else if (draftStakeRate !== null) mState.stakeRate = draftStakeRate;
+
     if (raceInputTarget && state.activeMode === "tournament") {
-      mState.targetRace = Math.max(1, parseInt(raceInputTarget.value, 10) || 15);
+      const typedRace = parseInt(raceInputTarget.value, 10);
+      if (Number.isFinite(typedRace)) mState.targetRace = Math.max(1, Math.min(99, typedRace));
+      else if (draftTargetRace !== null) mState.targetRace = draftTargetRace;
     }
-    if (metricPerRackVal) metricPerRackVal.innerHTML = `$${mState.stakeRate.toFixed(2)} <small>/ PT</small>`;
-    if (metricTargetRace) metricTargetRace.textContent = `RACE ${mState.targetRace}`;
-    if (racePillTag) racePillTag.textContent = `RACE ${mState.targetRace}`;
-    if (tourneyRaceBadge) tourneyRaceBadge.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">flag</span> ${t("target_race_badge", mState.targetRace)}`;
-    if (cashStakeLabel) cashStakeLabel.textContent = `$${mState.stakeRate.toFixed(2)} / PT`;
+
+    clearStakesDraft();
+    refreshStakeDisplays();
     saveState();
     renderPlayers();
     stakesModal.classList.remove("open");
-    showToast(`Saved: $${mState.stakeRate.toFixed(2)}/pt`);
+    showToast(t("stake_saved", mState.stakeRate.toFixed(2)));
   });
 
   btnStakeStepMinus.addEventListener("click", () => {
-    const mState = getModeState();
-    stakeInputRate.value = Math.max(0, parseFloat(stakeInputRate.value) - 0.5).toFixed(2);
-    mState.stakeRate = parseFloat(stakeInputRate.value);
+    const typed = parseFloat(stakeInputRate.value);
+    const base = Number.isFinite(typed) ? typed : currentDraftRate();
+    draftStakeRate = Math.max(0, Math.round((base - 0.5) * 100) / 100);
     renderStakesModal();
   });
 
   btnStakeStepPlus.addEventListener("click", () => {
-    const mState = getModeState();
-    stakeInputRate.value = (parseFloat(stakeInputRate.value) + 0.5).toFixed(2);
-    mState.stakeRate = parseFloat(stakeInputRate.value);
+    const typed = parseFloat(stakeInputRate.value);
+    const base = Number.isFinite(typed) ? typed : currentDraftRate();
+    draftStakeRate = Math.max(0, Math.round((base + 0.5) * 100) / 100);
     renderStakesModal();
   });
+
+  // Live preview while typing a custom rate.
+  if (stakeInputRate) {
+    stakeInputRate.addEventListener("input", () => {
+      const typed = parseFloat(stakeInputRate.value);
+      if (Number.isFinite(typed)) {
+        draftStakeRate = Math.max(0, typed);
+        renderStakesModal();
+      }
+    });
+  }
 
   if (btnRaceMinus) {
     btnRaceMinus.addEventListener("click", () => {
       if (state.activeMode !== "tournament") return;
-      raceInputTarget.value = Math.max(1, parseInt(raceInputTarget.value, 10) - 1);
-      state.tournament.targetRace = parseInt(raceInputTarget.value, 10);
+      const typed = parseInt(raceInputTarget.value, 10);
+      const base = Number.isFinite(typed) ? typed : currentDraftRace();
+      draftTargetRace = Math.max(1, base - 1);
       renderStakesModal();
     });
   }
@@ -1631,17 +1908,16 @@
   if (btnRacePlus) {
     btnRacePlus.addEventListener("click", () => {
       if (state.activeMode !== "tournament") return;
-      raceInputTarget.value = parseInt(raceInputTarget.value, 10) + 1;
-      state.tournament.targetRace = parseInt(raceInputTarget.value, 10);
+      const typed = parseInt(raceInputTarget.value, 10);
+      const base = Number.isFinite(typed) ? typed : currentDraftRace();
+      draftTargetRace = Math.min(99, base + 1);
       renderStakesModal();
     });
   }
 
   document.querySelectorAll(".preset-chip:not(.race-chip)").forEach((chip) => {
     chip.addEventListener("click", () => {
-      const mState = getModeState();
-      mState.stakeRate = parseFloat(chip.dataset.v);
-      stakeInputRate.value = mState.stakeRate.toFixed(2);
+      draftStakeRate = parseFloat(chip.dataset.v);
       renderStakesModal();
     });
   });
@@ -1649,8 +1925,7 @@
   document.querySelectorAll(".race-chip").forEach((chip) => {
     chip.addEventListener("click", () => {
       if (state.activeMode !== "tournament") return;
-      state.tournament.targetRace = parseInt(chip.dataset.r, 10);
-      if (raceInputTarget) raceInputTarget.value = state.tournament.targetRace;
+      draftTargetRace = parseInt(chip.dataset.r, 10);
       renderStakesModal();
     });
   });
@@ -1789,14 +2064,40 @@
   });
 
   // ═══════════════ KEYBOARD SHORTCUTS ═══════════════
-  window.addEventListener("keydown", (e) => {
-    if (e.target.tagName === "INPUT") return;
+  function anyModalOpen() {
+    return [stakesModal, infoModal, tutorialModal].some((m) => m && m.classList.contains("open"));
+  }
 
-    // Close tutorial on Escape
-    if (e.key === "Escape" && tutorialModal && tutorialModal.classList.contains("open")) {
+  /** Closes the topmost overlay. @returns {boolean} true when something closed */
+  function closeTopModal() {
+    if (tutorialModal && tutorialModal.classList.contains("open")) {
       closeTutorial();
+      return true;
+    }
+    if (stakesModal && stakesModal.classList.contains("open")) {
+      closeStakesModal();
+      return true;
+    }
+    if (infoModal && infoModal.classList.contains("open")) {
+      infoModal.classList.remove("open");
+      return true;
+    }
+    return false;
+  }
+
+  window.addEventListener("keydown", (e) => {
+    const tag = e.target && e.target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || (e.target && e.target.isContentEditable)) return;
+
+    // Escape always dismisses the topmost overlay (previously only the tutorial).
+    if (e.key === "Escape") {
+      if (closeTopModal()) e.preventDefault();
       return;
     }
+
+    // Global score/clock shortcuts must never fire behind an open dialog:
+    // pressing "w" while Settlements was open used to silently score a point.
+    if (anyModalOpen()) return;
 
     const mState = getModeState();
     const key = e.key.toLowerCase();
@@ -1818,22 +2119,124 @@
     } else if (key === "r") {
       if (btnClockReset) btnClockReset.click();
       else if (btnCompactClockReset) btnCompactClockReset.click();
+    } else if ((e.ctrlKey || e.metaKey) && (key === "y" || (key === "z" && e.shiftKey))) {
+      e.preventDefault();
+      handleRedoAction();
     } else if (key === "z" && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       handleUndoAction();
     }
   });
 
+  // ═══════════════ OFFLINE / INSTALLABLE APP (PWA) ═══════════════
+  /**
+   * Registers the service worker so the scoreboard boots, scores a full match
+   * and settles debts with no network at all.
+   *
+   * The UI never claims "offline ready" until a worker is genuinely
+   * controlling the page - the previous build showed that badge permanently
+   * while every icon was still fetched from a CDN.
+   */
+  function registerServiceWorker() {
+    const setBadge = (key) => {
+      const badge = $("lblGuideBadgeOffline");
+      if (badge) badge.textContent = t(key);
+    };
+
+    if (!("serviceWorker" in navigator) || location.protocol === "file:") {
+      setBadge("offline_pending");
+      return;
+    }
+
+    const markReady = () => {
+      setBadge("offline_ready");
+      document.documentElement.classList.add("offline-ready");
+    };
+
+    if (navigator.serviceWorker.controller) markReady();
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      let announced = false;
+      try { announced = localStorage.getItem(OFFLINE_FLAG_KEY) === "1"; } catch {}
+      markReady();
+      if (!announced) {
+        try { localStorage.setItem(OFFLINE_FLAG_KEY, "1"); } catch {}
+        showToast(t("offline_cached"));
+      }
+    });
+
+    window.addEventListener("load", async () => {
+      try {
+        const reg = await navigator.serviceWorker.register("sw.js");
+        reg.addEventListener("updatefound", () => {
+          const installing = reg.installing;
+          if (!installing) return;
+          installing.addEventListener("statechange", () => {
+            if (installing.state === "installed" && navigator.serviceWorker.controller) {
+              showToast(t("update_ready"));
+            }
+          });
+        });
+      } catch {
+        setBadge("offline_pending");
+      }
+    });
+  }
+
+  /**
+   * Home-screen / manifest shortcuts launch with ?mode=cash or ?mode=tournament.
+   * @returns {string|null} requested mode
+   */
+  function modeFromQuery() {
+    try {
+      const mode = new URLSearchParams(location.search).get("mode");
+      if (mode === "cash" || mode === "tournament") return mode;
+    } catch {}
+    return null;
+  }
+
+  /* ── Install prompt (Chrome / Edge / Android; iOS uses Share > Add to Home Screen) ── */
+  let deferredInstallPrompt = null;
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    const btn = $("btnInstallApp");
+    if (btn) btn.hidden = false;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    const btn = $("btnInstallApp");
+    if (btn) btn.hidden = true;
+    showToast(t("install_done"));
+  });
+
+  const btnInstallApp = $("btnInstallApp");
+  if (btnInstallApp) {
+    btnInstallApp.addEventListener("click", async () => {
+      tactileFeedback();
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      try {
+        await deferredInstallPrompt.userChoice;
+      } catch {}
+      deferredInstallPrompt = null;
+      btnInstallApp.hidden = true;
+    });
+  }
+
   // ═══════════════ INITIALIZATION ═══════════════
   function init() {
     loadState();
+    normalizeState();
     applyTheme(state.theme);
 
     // Apply language
     setLanguage(state.lang || "vi");
 
-    // Apply active mode
-    setGameMode(state.activeMode || "cash");
+    // Apply active mode (a launch shortcut may request one explicitly)
+    setGameMode(modeFromQuery() || state.activeMode || "cash");
 
     // Request screen wake lock
     requestScreenWakeLock();
@@ -1849,6 +2252,9 @@
     }
 
     resetBlurCountdown();
+
+    // Go offline-capable (no-op on file://, where service workers are blocked)
+    registerServiceWorker();
 
     // Auto-show tutorial on first visit
     if (!state.tutorialSeen) {
