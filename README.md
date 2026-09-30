@@ -1,6 +1,6 @@
 # 21N2 · Billiards Related Tools and WebApps
 
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-black?style=flat-square&logo=github)](https://brdnwtocode.github.io/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-black?style=flat-square&logo=github)](https://brdnwtocode.github.io/Pool-Score-Tracker/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-black?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Mobile%20PWA-black?style=flat-square)](#)
 [![Design](https://img.shields.io/badge/Design-Monochrome%20Editorial-black?style=flat-square)](#design-system--architecture)
@@ -13,9 +13,9 @@
 
 Experience the live web app on GitHub Pages:
 
-### 👉 **[Launch Pool Scoreboard Live →](https://brdnwtocode.github.io/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS/)**
+### 👉 **[Launch Pool Scoreboard Live →](https://brdnwtocode.github.io/Pool-Score-Tracker/)**
 
-*(Direct URL: `https://brdnwtocode.github.io/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS/pool-scoreboard/`)*
+*(Direct URL: `https://brdnwtocode.github.io/Pool-Score-Tracker/`)*
 
 ---
 
@@ -82,7 +82,7 @@ You can access developer and system information directly inside the web app by t
 ### Lead Developer: **Phạm Nam Hào** (`@Brdnwtocode`)
 
 - 🌐 **GitHub Profile:** [github.com/Brdnwtocode](https://github.com/Brdnwtocode)
-- 📁 **Repository:** [21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS](https://github.com/Brdnwtocode/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS)
+- 📁 **Repository:** [Pool-Score-Tracker](https://github.com/Brdnwtocode/Pool-Score-Tracker)
 - ✉️ **Direct Contact / Email:** [phmnamhao@gmail.com](mailto:phmnamhao@gmail.com)
 - 💼 **Portfolio:** [Brdnwtocode's GitHub Projects](https://github.com/Brdnwtocode?tab=repositories)
 
@@ -100,12 +100,12 @@ You can access developer and system information directly inside the web app by t
 This project is built with vanilla web standards and requires no build pipeline, bundler, or Node.js server.
 
 ### Option 1: Direct Browser Access
-Simply clone or download the repository and open `pool-scoreboard/index.html` in any modern web browser:
+Simply clone or download the repository and open `index.html` in any modern web browser:
 
 ```bash
-git clone https://github.com/Brdnwtocode/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS.git
-cd 21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS
-# Open pool-scoreboard/index.html in Chrome, Safari, Edge, or Firefox
+git clone https://github.com/Brdnwtocode/Pool-Score-Tracker.git
+cd Pool-Score-Tracker
+# Open index.html in Chrome, Safari, Edge, or Firefox
 ```
 
 ### Option 2: Local HTTP Server (Optional)

@@ -4,8 +4,8 @@
 > **Project:** 21N2 Billiards Championship Scoreboard & Tournament HUD  
 > **Role:** Lead Frontend Engineer & UI/UX Designer — **Phạm Nam Hào** ([@Brdnwtocode](https://github.com/Brdnwtocode))  
 > **Tech Stack:** Vanilla JavaScript (ES2022+), Modern CSS3, HTML5, Web Audio API, Screen Wake Lock API, Vibration API, LocalStorage  
-> **Live Demo:** [brdnwtocode.github.io/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS/](https://brdnwtocode.github.io/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS/)  
-> **Repository:** [github.com/Brdnwtocode/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS](https://github.com/Brdnwtocode/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS)  
+> **Live Demo:** [brdnwtocode.github.io/Pool-Score-Tracker/](https://brdnwtocode.github.io/Pool-Score-Tracker/)  
+> **Repository:** [github.com/Brdnwtocode/Pool-Score-Tracker](https://github.com/Brdnwtocode/Pool-Score-Tracker)  
 
 ---
 
@@ -167,8 +167,8 @@ I built the 21N2 Championship Pool Scoreboard from the ground up using pure Vani
 🎨 Monochrome Editorial: Flat 1px hairline grid, strict 0px border-radius, and Newsreader serif typography readable from 40 feet across the room.
 
 Check out the live demo and open-source repo:
-🔗 Live: https://brdnwtocode.github.io/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS/
-📂 GitHub: https://github.com/Brdnwtocode/21N2-BILLIARDS-RELATED-TOOLS-AND-WEBAPPS
+🔗 Live: https://brdnwtocode.github.io/Pool-Score-Tracker/
+📂 GitHub: https://github.com/Brdnwtocode/Pool-Score-Tracker
 
 #JavaScript #WebDevelopment #Frontend #UIUX #WebAudioAPI #Portfolio
 ```
