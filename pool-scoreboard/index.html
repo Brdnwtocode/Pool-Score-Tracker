@@ -424,6 +424,12 @@
           </a>
         </div>
 
+        <button class="btn-open-guide" id="btnOpenGuideFromInfo" type="button">
+          <span class="material-symbols-outlined">menu_book</span>
+          <span id="lblOpenGuide">HOW TO USE THIS APP</span>
+          <span class="material-symbols-outlined icon-ext">arrow_forward</span>
+        </button>
+
         <div class="system-specs-summary">
           <span class="meta-tag" id="lblSpecsSummaryTag">DUAL-MODE ARCHITECTURE</span>
           <ul id="lblSpecsList">
@@ -439,6 +445,109 @@
         <button class="btn-modal-action" id="btnDismissInfo" type="button">
           <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">close</span>
           <span id="lblDismissBtnText">CLOSE</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ ONBOARDING / USER GUIDE MODAL ══════════ -->
+  <div class="modal-backdrop" id="tutorialModal">
+    <div class="modal-window tutorial-window">
+      <div class="modal-head">
+        <div class="modal-title-row">
+          <span class="material-symbols-outlined">menu_book</span>
+          <h2 id="lblTutorialTitle">USER GUIDE</h2>
+        </div>
+        <button class="btn-modal-close" id="btnCloseTutorial" type="button">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body tutorial-body" id="tutorialBody">
+
+        <!-- Feature 1: Dual Modes -->
+        <div class="guide-section">
+          <div class="guide-section-head">
+            <span class="material-symbols-outlined guide-icon">swap_horiz</span>
+            <h3 id="lblGuideMode">TWO GAME MODES</h3>
+          </div>
+          <div class="guide-cards-row">
+            <div class="guide-card">
+              <span class="material-symbols-outlined">payments</span>
+              <strong id="lblGuideCash">CASH</strong>
+              <span class="guide-card-desc" id="lblGuideCashDesc">Zero-sum betting. Scores can go negative. Live balance tracker shows who owes whom.</span>
+            </div>
+            <div class="guide-card">
+              <span class="material-symbols-outlined">emoji_events</span>
+              <strong id="lblGuideTourney">TOURNEY</strong>
+              <span class="guide-card-desc" id="lblGuideTourneyDesc">WPA race-to-X frames. Shot clock with 30s/45s/60s presets. Official match protocol.</span>
+            </div>
+          </div>
+          <p class="guide-hint" id="lblGuideModeTip">
+            <span class="material-symbols-outlined" style="font-size: 13px;">info</span>
+            Each mode has completely separate memory — switching back and forth preserves both trackers independently.
+          </p>
+        </div>
+
+        <!-- Feature 2: Scoring -->
+        <div class="guide-section">
+          <div class="guide-section-head">
+            <span class="material-symbols-outlined guide-icon">touch_app</span>
+            <h3 id="lblGuideScore">SCORING</h3>
+          </div>
+          <ul class="guide-list">
+            <li id="lblGuideTap"><span class="material-symbols-outlined" style="font-size: 14px;">add</span> <strong>Tap</strong> the + or − button for ±1 point</li>
+            <li id="lblGuideDrag"><span class="material-symbols-outlined" style="font-size: 14px;">swipe_up</span> <strong>Hold 0.7s + drag</strong> up/down for 1–12 points instantly — no popup, direct update</li>
+            <li id="lblGuideUndo"><span class="material-symbols-outlined" style="font-size: 14px;">undo</span> <strong>Undo / Redo</strong> via toolbar or Ctrl+Z / Ctrl+Y</li>
+          </ul>
+        </div>
+
+        <!-- Feature 3: Cash Settlements -->
+        <div class="guide-section">
+          <div class="guide-section-head">
+            <span class="material-symbols-outlined guide-icon">sync_alt</span>
+            <h3 id="lblGuideSettle">CASH SETTLEMENTS</h3>
+          </div>
+          <ul class="guide-list">
+            <li id="lblGuideRate"><span class="material-symbols-outlined" style="font-size: 14px;">sell</span> Set your <strong>rate per point</strong> (e.g. $1.00/pt)</li>
+            <li id="lblGuideWho"><span class="material-symbols-outlined" style="font-size: 14px;">payments</span> App calculates <strong>who pays whom</strong> with minimum cash transfers</li>
+            <li id="lblGuideZero"><span class="material-symbols-outlined" style="font-size: 14px;">balance</span> <strong>Zero-sum tracker</strong> highlights discrepancy if scores don't balance</li>
+          </ul>
+        </div>
+
+        <!-- Feature 4: Shot Clock -->
+        <div class="guide-section">
+          <div class="guide-section-head">
+            <span class="material-symbols-outlined guide-icon">timer</span>
+            <h3 id="lblGuideClock">SHOT CLOCK</h3>
+          </div>
+          <ul class="guide-list">
+            <li id="lblGuidePresets"><span class="material-symbols-outlined" style="font-size: 14px;">speed</span> <strong>30s / 45s / 60s</strong> presets — tap to switch</li>
+            <li id="lblGuideExt"><span class="material-symbols-outlined" style="font-size: 14px;">more_time</span> <strong>+30s extension</strong> (1 per turn) for tactical shots</li>
+            <li id="lblGuideFoul"><span class="material-symbols-outlined" style="font-size: 14px;">warning</span> Visual + audio <strong>time foul alert</strong> when clock expires</li>
+          </ul>
+        </div>
+
+        <!-- Feature 5: History & Extras -->
+        <div class="guide-section">
+          <div class="guide-section-head">
+            <span class="material-symbols-outlined guide-icon">history</span>
+            <h3 id="lblGuideExtras">LOG & EXTRAS</h3>
+          </div>
+          <ul class="guide-list">
+            <li id="lblGuideLog"><span class="material-symbols-outlined" style="font-size: 14px;">history</span> <strong>Rack log</strong> records every score change with timestamp & table snapshot</li>
+            <li id="lblGuideWake"><span class="material-symbols-outlined" style="font-size: 14px;">visibility</span> <strong>Screen wake lock</strong> keeps display on during matches</li>
+            <li id="lblGuideLang"><span class="material-symbols-outlined" style="font-size: 14px;">language</span> <strong>EN / VI</strong> language toggle in toolbar</li>
+            <li id="lblGuideTheme"><span class="material-symbols-outlined" style="font-size: 14px;">contrast</span> <strong>Dark / Light</strong> theme + fullscreen mode</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn-modal-action" id="btnDismissTutorial" type="button">
+          <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">check</span>
+          <span id="lblGotIt">GOT IT</span>
         </button>
       </div>
     </div>

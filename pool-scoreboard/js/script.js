@@ -88,6 +88,33 @@
       lang_switched: "Language: English",
       snapshot: "Table",
       lead: "Lead",
+      // Tutorial / Guide
+      guide_title: "USER GUIDE",
+      guide_open: "HOW TO USE THIS APP",
+      guide_got_it: "GOT IT",
+      guide_mode_title: "TWO GAME MODES",
+      guide_cash_label: "CASH",
+      guide_cash_desc: "Zero-sum betting. Scores can go negative. Live balance tracker shows who owes whom.",
+      guide_tourney_label: "TOURNEY",
+      guide_tourney_desc: "WPA race-to-X frames. Shot clock with 30s/45s/60s presets. Official match protocol.",
+      guide_mode_tip: "Each mode has completely separate memory — switching back and forth preserves both trackers independently.",
+      guide_score_title: "SCORING",
+      guide_tap: "<strong>Tap</strong> the + or − button for ±1 point",
+      guide_drag: "<strong>Hold 0.7s + drag</strong> up/down for 1–12 points instantly — no popup, direct update",
+      guide_undo: "<strong>Undo / Redo</strong> via toolbar or Ctrl+Z / Ctrl+Y",
+      guide_settle_title: "CASH SETTLEMENTS",
+      guide_rate: "Set your <strong>rate per point</strong> (e.g. $1.00/pt)",
+      guide_who: "App calculates <strong>who pays whom</strong> with minimum cash transfers",
+      guide_zero: "<strong>Zero-sum tracker</strong> highlights discrepancy if scores don't balance",
+      guide_clock_title: "SHOT CLOCK",
+      guide_presets: "<strong>30s / 45s / 60s</strong> presets — tap to switch",
+      guide_ext: "<strong>+30s extension</strong> (1 per turn) for tactical shots",
+      guide_foul: "Visual + audio <strong>time foul alert</strong> when clock expires",
+      guide_extras_title: "LOG & EXTRAS",
+      guide_log: "<strong>Rack log</strong> records every score change with timestamp & table snapshot",
+      guide_wake: "<strong>Screen wake lock</strong> keeps display on during matches",
+      guide_lang: "<strong>EN / VI</strong> language toggle in toolbar",
+      guide_theme: "<strong>Dark / Light</strong> theme + fullscreen mode",
     },
     vi: {
       cash_mode: "ĐÁNH ĐIỂM",
@@ -160,6 +187,33 @@
       lang_switched: "Ngôn ngữ: Tiếng Việt",
       snapshot: "Bàn đấu",
       lead: "Dẫn đầu",
+      // Tutorial / Guide
+      guide_title: "HƯỚNG DẪN SỬ DỤNG",
+      guide_open: "CÁCH SỬ DỤNG ỨNG DỤNG",
+      guide_got_it: "ĐÃ HIỂU",
+      guide_mode_title: "HAI CHẾ ĐỘ CHƠI",
+      guide_cash_label: "ĐÁNH ĐIỂM",
+      guide_cash_desc: "Tính tiền theo điểm. Điểm có thể âm. Theo dõi cân bằng trực tiếp, ai nợ ai.",
+      guide_tourney_label: "THI ĐẤU",
+      guide_tourney_desc: "Thi đấu chạm X ván theo WPA. Shot clock 30s/45s/60s. Thể thức chính thức.",
+      guide_mode_tip: "Mỗi chế độ có bộ nhớ riêng hoàn toàn — chuyển qua lại giữa hai chế độ sẽ giữ nguyên dữ liệu của từng bên.",
+      guide_score_title: "GHI ĐIỂM",
+      guide_tap: "<strong>Bấm</strong> nút + hoặc − để cộng/trừ 1 điểm",
+      guide_drag: "<strong>Giữ 0.7s + kéo</strong> lên/xuống để điều chỉnh 1–12 điểm trực tiếp — không popup",
+      guide_undo: "<strong>Hoàn tác / Làm lại</strong> qua thanh công cụ hoặc Ctrl+Z / Ctrl+Y",
+      guide_settle_title: "THANH TOÁN TIỀN",
+      guide_rate: "Đặt <strong>mức cược mỗi điểm</strong> (VD: $1.00/điểm)",
+      guide_who: "Ứng dụng tính toán <strong>ai trả tiền ai</strong> với số lần chuyển ít nhất",
+      guide_zero: "<strong>Bộ theo dõi tổng điểm</strong> cảnh báo khi điểm không cân bằng",
+      guide_clock_title: "ĐỒNG HỒ SHOT",
+      guide_presets: "Cài sẵn <strong>30s / 45s / 60s</strong> — bấm để chuyển",
+      guide_ext: "<strong>Gia hạn +30s</strong> (1 lần/lượt) cho những cú đánh chiến thuật",
+      guide_foul: "Cảnh báo hình ảnh + âm thanh <strong>khi hết giờ phạm quy</strong>",
+      guide_extras_title: "NHẬT KÝ & TIỆN ÍCH",
+      guide_log: "<strong>Nhật ký</strong> ghi lại mọi thay đổi điểm kèm thời gian & trạng thái bàn",
+      guide_wake: "<strong>Giữ màn hình sáng</strong> trong suốt trận đấu",
+      guide_lang: "<strong>EN / VI</strong> chuyển ngôn ngữ trên thanh công cụ",
+      guide_theme: "Giao diện <strong>Tối / Sáng</strong> + chế độ toàn màn hình",
     }
   };
 
@@ -179,6 +233,7 @@
     soundEnabled: true,
     theme: "dark",      // "dark" or "light"
     showExtendedHistory: false,
+    tutorialSeen: false,
 
     // CASH MODE STATE (Zero-sum betting, negative scores permitted)
     cash: {
@@ -350,6 +405,12 @@
   const btnCloseInfoModal = $("btnCloseInfoModal");
   const btnDismissInfo = $("btnDismissInfo");
   const hudToast = $("hudToast");
+
+  // Tutorial / Guide Modal
+  const tutorialModal = $("tutorialModal");
+  const btnCloseTutorial = $("btnCloseTutorial");
+  const btnDismissTutorial = $("btnDismissTutorial");
+  const btnOpenGuideFromInfo = $("btnOpenGuideFromInfo");
 
   // ═══════════════ SCREEN WAKE LOCK (DEFAULT ACTIVE) ═══════════════
   let wakeLockSentinel = null;
@@ -562,6 +623,9 @@
     if (moreInfoBtnText) {
       moreInfoBtnText.textContent = state.showExtendedHistory ? t("less_info") : t("more_info");
     }
+
+    // Tutorial / Guide localization
+    updateTutorialText();
 
     renderShotClock();
     renderPlayers();
@@ -1583,6 +1647,89 @@
     if (e.target === infoModal) infoModal.classList.remove("open");
   });
 
+  // ═══════════════ TUTORIAL / ONBOARDING GUIDE ═══════════════
+  function updateTutorialText() {
+    const el = (id) => document.getElementById(id);
+    const s = (id, key) => { const e = el(id); if (e) e.textContent = t(key); };
+
+    s("lblTutorialTitle", "guide_title");
+    s("lblOpenGuide", "guide_open");
+    s("lblGotIt", "guide_got_it");
+    s("lblGuideMode", "guide_mode_title");
+    s("lblGuideCash", "guide_cash_label");
+    s("lblGuideCashDesc", "guide_cash_desc");
+    s("lblGuideTourney", "guide_tourney_label");
+    s("lblGuideTourneyDesc", "guide_tourney_desc");
+    s("lblGuideScore", "guide_score_title");
+    s("lblGuideSettle", "guide_settle_title");
+    s("lblGuideClock", "guide_clock_title");
+    s("lblGuideExtras", "guide_extras_title");
+
+    // Elements with inline icons — use innerHTML
+    const tipEl = el("lblGuideModeTip");
+    if (tipEl) tipEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px;">info</span> ${t("guide_mode_tip")}`;
+
+    const guideListItems = [
+      ["lblGuideTap", "guide_tap", "add"],
+      ["lblGuideDrag", "guide_drag", "swipe_up"],
+      ["lblGuideUndo", "guide_undo", "undo"],
+      ["lblGuideRate", "guide_rate", "sell"],
+      ["lblGuideWho", "guide_who", "payments"],
+      ["lblGuideZero", "guide_zero", "balance"],
+      ["lblGuidePresets", "guide_presets", "speed"],
+      ["lblGuideExt", "guide_ext", "more_time"],
+      ["lblGuideFoul", "guide_foul", "warning"],
+      ["lblGuideLog", "guide_log", "history"],
+      ["lblGuideWake", "guide_wake", "visibility"],
+      ["lblGuideLang", "guide_lang", "language"],
+      ["lblGuideTheme", "guide_theme", "contrast"],
+    ];
+
+    guideListItems.forEach(([id, key, icon]) => {
+      const li = el(id);
+      if (li) {
+        // Parse the translated text for bold segments marked with ** **
+        const raw = t(key);
+        // Split translated text on the first space to separate the bold keyword
+        li.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">${icon}</span> ${raw}`;
+      }
+    });
+  }
+
+  function openTutorial() {
+    if (tutorialModal) {
+      updateTutorialText();
+      tutorialModal.classList.add("open");
+    }
+  }
+
+  function closeTutorial() {
+    if (tutorialModal) {
+      tutorialModal.classList.remove("open");
+      if (!state.tutorialSeen) {
+        state.tutorialSeen = true;
+        saveState();
+      }
+    }
+  }
+
+  if (btnCloseTutorial) btnCloseTutorial.addEventListener("click", closeTutorial);
+  if (btnDismissTutorial) btnDismissTutorial.addEventListener("click", closeTutorial);
+  if (tutorialModal) {
+    tutorialModal.addEventListener("click", (e) => {
+      if (e.target === tutorialModal) closeTutorial();
+    });
+  }
+
+  // "How to Use" button inside info modal → close info, open tutorial
+  if (btnOpenGuideFromInfo) {
+    btnOpenGuideFromInfo.addEventListener("click", () => {
+      tactileFeedback();
+      infoModal.classList.remove("open");
+      openTutorial();
+    });
+  }
+
   // ═══════════════ TOOLBAR CONTROLS ═══════════════
   btnFullscreen.addEventListener("click", () => {
     tactileFeedback();
@@ -1616,6 +1763,12 @@
   // ═══════════════ KEYBOARD SHORTCUTS ═══════════════
   window.addEventListener("keydown", (e) => {
     if (e.target.tagName === "INPUT") return;
+
+    // Close tutorial on Escape
+    if (e.key === "Escape" && tutorialModal && tutorialModal.classList.contains("open")) {
+      closeTutorial();
+      return;
+    }
 
     const mState = getModeState();
     const key = e.key.toLowerCase();
@@ -1668,6 +1821,11 @@
     }
 
     resetBlurCountdown();
+
+    // Auto-show tutorial on first visit
+    if (!state.tutorialSeen) {
+      openTutorial();
+    }
   }
 
   if (document.readyState === "loading") {

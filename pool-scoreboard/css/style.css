@@ -1686,3 +1686,155 @@ html:not(.dark) .player-championship-card.hotcell {
 @keyframes flashDanger {
   50% { background: var(--accent-red) !important; color: #ffffff !important; }
 }
+
+/* ══════════ TUTORIAL / ONBOARDING MODAL ══════════ */
+.tutorial-window {
+  max-width: 480px;
+}
+
+.tutorial-body {
+  padding: 14px 16px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.guide-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.guide-section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.guide-section-head h3 {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+}
+
+.guide-icon {
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+.guide-cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.guide-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
+  text-align: center;
+}
+
+.guide-card .material-symbols-outlined {
+  font-size: 24px;
+  color: var(--text-secondary);
+}
+
+.guide-card strong {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.guide-card-desc {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.guide-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.guide-hint .material-symbols-outlined {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--text-muted);
+}
+
+.guide-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.guide-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+.guide-list li .material-symbols-outlined {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--text-secondary);
+}
+
+.guide-list li strong {
+  font-weight: 600;
+}
+
+/* "How to Use" button inside info modal */
+.btn-open-guide {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 100ms;
+}
+
+.btn-open-guide:hover {
+  border-color: var(--border-bold);
+  background: var(--bg-elevated);
+}
+
+.btn-open-guide .icon-ext {
+  margin-left: auto;
+  font-size: 16px;
+  color: var(--text-muted);
+}
