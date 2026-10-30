@@ -1,8 +1,29 @@
+---
+title: 21N2 Championship Pool Scoreboard
+type: note
+tags: [billiards, pwa, offline, scoreboard, vanilla-js]
+project: Projects
+updated: 2026-10-14
+summary: >
+  Dual-mode billiards scoreboard for cash ring games and WPA tournament frames — plain HTML/CSS/JS, fully offline-capable and installable.
+---
+
 # 21N2 Championship Pool Scoreboard
 
 Dual-mode billiards scoreboard for cash ring games (zero-sum) and WPA tournament
-frames (race-to-X + shot clock). Plain HTML/CSS/JS — no build step, no backend,
-**fully offline-capable and installable**.
+frames (race-to-X + shot clock, Chinese pool +4/+7/+10 support). Plain HTML/CSS/JS — no build step, no backend,
+**fully offline-capable, battery-optimized, and installable**.
+
+## Key Features
+
+- **Dual Mode (Cash vs. Tournament)**: Isolated state and memories.
+- **Cash Mode Cockpit**: Quick step buttons (`-2, +2, -3, +3, -4, +4, -5, +5`), zero-sum audit highlighting (`.hotcell`) whenever the table is unbalanced ($\ne 0$), and natural free-scrolling layout without intrusive snap.
+- **Tournament Pool Formats**: Toggle between American (±1) and Chinese Pool (Heyball: +4 standard rack win, +7 table run, +10 break & run).
+- **Smart History Narrative**: Action logs coalesce rapid single-tap streaks and explicitly display score transitions (e.g. `Player A +3 (12 → 15)`) rather than spamming individual `+1` / `-1` rows.
+- **Redesigned Shot Clock**: 1/3 horizontal width allocated to massive high-contrast digits, 2/3 for controls, session elapsed timer, and intense 5-second critical warnings with escalating audio feedback.
+- **Clean Viewport Snapping**: In tournament mode, player cards snap cleanly to fill the screen on scroll and unsnap when scrolling past with optimized scroll margins on desktop to prevent premature snapping.
+- **Battery Life Preservation**: CSS rendering containment (`contain: layout style paint`), deep OLED-friendly dark theme, passive gesture listeners, and tab visibility change handlers that release wake locks and freeze background timer churn.
+
 
 ## Offline / installable app
 

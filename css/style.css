@@ -60,12 +60,12 @@ html.dark {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  border-radius: 0 !important; /* Strict 0px mandate */
 }
 
 html, body {
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--bg-canvas);
   color: var(--text-primary);
   font-family: var(--font-sans);
@@ -74,6 +74,27 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   user-select: none;
+  scroll-behavior: smooth;
+}
+
+/* ── Mode-Specific Scrolling & Snap Behaviors ── */
+html.mode-tournament,
+html.mode-tournament body {
+  scroll-snap-type: y proximity;
+  scroll-padding-top: 60px;
+}
+
+/* Anchor top telemetry card so scrolling towards the top never snaps back down */
+html.mode-tournament .telemetry-grid.tournament-only {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+  scroll-margin-top: 60px;
+}
+
+html.mode-cash,
+html.mode-cash body {
+  scroll-snap-type: none !important;
+  scroll-padding-top: 0 !important;
 }
 
 button, input {
@@ -246,6 +267,29 @@ html.mode-tournament .cash-only {
 .icon-tool:disabled {
   opacity: 0.3;
   pointer-events: none;
+}
+
+.pool-format-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 1px 4px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  transition: all 120ms ease;
+}
+
+.pool-format-badge.chinese {
+  background: #f59e0b;
+  color: #000000;
+  border-color: #f59e0b;
+  font-weight: 900;
 }
 
 .lang-toggle-btn {
@@ -430,17 +474,11 @@ html.mode-tournament .cash-only {
   gap: 12px;
 }
 
-/* ── 3A. TOURNAMENT: Dual Precision Telemetry Widgets ── */
+/* ── 3A. TOURNAMENT: Shot Clock Readout ── */
 .telemetry-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
-}
-
-@media(min-width: 860px) {
-  .telemetry-grid {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 
 .telemetry-card {
@@ -515,84 +553,53 @@ html.mode-tournament .cash-only {
   border-color: var(--text-primary);
 }
 
-/* Clock Hero display */
-.clock-hero-row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
+/* ── Shot Clock Readout Split Layout (1/3 Digits, 2/3 Controls) ── */
+.clock-split-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 16px;
+  align-items: stretch;
 }
 
-.clock-digits-wrap {
+@media (max-width: 600px) {
+  .clock-split-container {
+    grid-template-columns: 1fr 1.8fr;
+    gap: 10px;
+  }
+}
+
+/* Left 1/3: Digits Column (Pure high-visibility number, no clutter) */
+.clock-digits-column {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
+  padding: 10px 8px;
+  position: relative;
+  transition: all 140ms ease;
+  overflow: hidden;
 }
 
 .clock-digits-hero {
   font-family: var(--font-serif);
-  font-size: 58px;
+  font-size: clamp(74px, 10vw, 118px);
   font-weight: 500;
-  line-height: 0.9;
+  line-height: 0.82;
   letter-spacing: -0.04em;
   color: var(--text-primary);
-}
-
-.clock-digits-hero.crit {
-  color: var(--accent-red);
-  animation: clockCrit 0.4s infinite alternate;
-}
-
-@keyframes clockCrit {
-  to { transform: scale(1.05); }
-}
-
-.clock-digits-sub {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.clock-status-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-}
-
-.status-chip {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 2px 8px;
-  background: var(--bg-inset);
-  border: 1px solid var(--border-hairline);
-  color: var(--text-secondary);
-}
-
-.status-chip.running {
-  background: var(--text-primary);
-  color: var(--bg-surface);
-}
-
-.status-chip.foul {
-  background: var(--accent-red);
-  color: #ffffff;
-}
-
-.extension-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
+  transition: color 120ms ease, transform 120ms ease;
+  padding: 4px 0;
 }
 
 .clock-progress-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
   width: 100%;
-  height: 2px;
+  height: 3px;
   background: var(--border-hairline);
   overflow: hidden;
 }
@@ -603,8 +610,130 @@ html.mode-tournament .cash-only {
   transition: width 200ms linear;
 }
 
+/* ── Urgent 5-Second Warning (Highly Informant) ── */
+.clock-readout-card.crit {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.4), inset 0 0 16px rgba(239, 68, 68, 0.12) !important;
+  animation: clockCardUrgent 0.6s infinite alternate ease-in-out;
+}
+
+.clock-digits-column.crit {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: #ef4444;
+}
+
+.clock-digits-hero.crit {
+  color: #ef4444 !important;
+  text-shadow: 0 0 20px rgba(239, 68, 68, 0.7);
+  animation: clockCritStrobe 0.5s infinite alternate ease-in-out;
+}
+
 .clock-progress-fill.crit {
+  background: #ef4444 !important;
+  box-shadow: 0 0 10px #ef4444;
+}
+
+.status-chip.crit {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  border-color: #ff0000;
+  animation: clockChipStrobe 0.5s infinite alternate;
+}
+
+@keyframes clockCritStrobe {
+  from { transform: scale(1); filter: brightness(1); }
+  to { transform: scale(1.06); filter: brightness(1.3); }
+}
+
+@keyframes clockCardUrgent {
+  from { border-color: rgba(239, 68, 68, 0.6); }
+  to { border-color: rgba(239, 68, 68, 1); }
+}
+
+@keyframes clockChipStrobe {
+  from { opacity: 0.9; }
+  to { opacity: 1; transform: scale(1.05); }
+}
+
+/* Right 2/3: Controls Column */
+.clock-controls-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.clock-controls-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clock-controls-header .mode-chips {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.clock-controls-header .mode-chips .clock-mode-btn {
+  flex: 1;
+}
+
+.session-timer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
+  padding: 5px 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  touch-action: none;
+  transition: all 120ms ease;
+}
+
+.session-timer-badge:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-bold);
+}
+
+.session-timer-badge.is-paused {
+  border-color: var(--accent-amber);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.session-timer-badge.is-paused .session-icon {
+  color: var(--accent-amber);
+  animation: pausePulse 1s infinite alternate;
+}
+
+@keyframes pausePulse {
+  from { opacity: 0.45; }
+  to { opacity: 1; }
+}
+
+.session-digits {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.session-hold-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
   background: var(--accent-red);
+  width: 0%;
+  pointer-events: none;
 }
 
 .clock-controls-bar {
@@ -677,6 +806,31 @@ html.mode-tournament .cash-only {
 .btn-clock-icon:hover {
   color: var(--text-primary);
   background: var(--bg-elevated);
+}
+
+.clock-controls-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.extension-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.clock-kbd-hint kbd {
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
+  padding: 1px 4px;
+  font-size: 9px;
+  color: var(--text-secondary);
 }
 
 /* Stakes Triad Metric Cards */
@@ -962,114 +1116,329 @@ html.mode-tournament .cash-only {
 /* ── 6. Ultra-Clean Dynamic Player Roster Array ── */
 .players-array-grid {
   display: grid;
-  grid-template-columns: 1fr;
   gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-@media(min-width: 640px) {
-  .players-array-grid {
+/* ── Tournament Mode: Full-Viewport Dynamic Snap ── */
+html.mode-tournament .players-array-grid {
+  min-height: calc(100dvh - 76px);
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+  align-items: stretch;
+}
+
+/* On PC / larger screens, reduce snap region sensitivity so player cards don't snap prematurely */
+@media (min-width: 768px) {
+  html.mode-tournament .players-array-grid {
+    scroll-margin-top: 150px;
+  }
+}
+@media (min-width: 1024px) {
+  html.mode-tournament .players-array-grid {
+    scroll-margin-top: 220px;
+  }
+}
+
+html.mode-tournament .players-array-grid[data-count="1"] {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+html.mode-tournament .players-array-grid[data-count="2"] {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+@media (min-width: 700px) {
+  html.mode-tournament .players-array-grid[data-count="2"] {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+  }
+}
+
+html.mode-tournament .players-array-grid[data-count="3"] {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+}
+
+@media (min-width: 800px) {
+  html.mode-tournament .players-array-grid[data-count="3"] {
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+  }
+}
+
+html.mode-tournament .players-array-grid[data-count="4"] {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+html.mode-tournament .player-championship-card {
+  height: 100%;
+}
+
+/* ── Cash Mode: No Snap, Natural Flow & Compact Cards ── */
+html.mode-cash .players-array-grid {
+  scroll-snap-align: none !important;
+  scroll-snap-stop: normal;
+  min-height: auto !important;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto !important;
+}
+
+@media (min-width: 640px) {
+  html.mode-cash .players-array-grid {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-@media(min-width: 1040px) {
-  .players-array-grid {
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+@media (min-width: 1040px) {
+  html.mode-cash .players-array-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   }
 }
 
-/* Player Card Component (Ultra-Clean Focus on Name & Score) */
+html.mode-cash .player-championship-card {
+  height: auto;
+  min-height: 180px;
+}
+
+/* ── Refined Cash Mode Quick Points Deck (Monochrome Minimalist Dock) ── */
+.cash-quick-deck {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  max-width: 440px;
+  margin-top: 12px;
+  padding: 4px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
+  border-radius: 999px;
+  box-shadow: none;
+  box-sizing: border-box;
+}
+
+html:not(.dark) .cash-quick-deck {
+  background: rgba(0, 0, 0, 0.035);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: none;
+}
+
+.cash-deck-bank {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cash-deck-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border-hairline);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+html:not(.dark) .cash-deck-divider {
+  background: rgba(0, 0, 0, 0.10);
+}
+
+.btn-cash-pill {
+  flex: 1;
+  min-width: 0;
+  height: clamp(32px, 3.8vw, 38px);
+  background: transparent;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: clamp(12px, 1.35vw, 15px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  transition: all 120ms ease;
+  user-select: none;
+  touch-action: manipulation;
+  padding: 0;
+}
+
+.btn-cash-pill:hover,
+.btn-cash-pill.dec:hover,
+.btn-cash-pill.inc:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.btn-cash-pill:active,
+.btn-cash-pill.dec:active,
+.btn-cash-pill.inc:active {
+  background: var(--text-primary);
+  color: var(--bg-surface);
+  transform: scale(0.94);
+}
+
+html:not(.dark) .btn-cash-pill {
+  color: var(--text-secondary);
+}
+
+html:not(.dark) .btn-cash-pill:hover,
+html:not(.dark) .btn-cash-pill.dec:hover,
+html:not(.dark) .btn-cash-pill.inc:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-primary);
+}
+
+html:not(.dark) .btn-cash-pill:active,
+html:not(.dark) .btn-cash-pill.dec:active,
+html:not(.dark) .btn-cash-pill.inc:active {
+  background: var(--text-primary);
+  color: #ffffff;
+}
+
+@media (max-width: 380px) {
+  .cash-quick-deck {
+    flex-direction: column;
+    border-radius: 14px;
+    gap: 4px;
+    padding: 6px;
+  }
+  .cash-deck-bank {
+    width: 100%;
+  }
+  .cash-deck-divider {
+    width: 100%;
+    height: 1px;
+    margin: 2px 0;
+  }
+}
+
+/* Fallback for uncounted states */
+.players-array-grid:not([data-count]) {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/* Player Card Component (Clean Flat Monochrome Finish, No Shadows) */
 .player-championship-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
-  padding: 20px 18px;
+  border-radius: 14px;
+  padding: clamp(14px, 2.4vh, 26px) clamp(14px, 2.2vw, 24px);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  justify-content: space-evenly;
+  align-items: center;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
   width: 100%;
-  transition: all 120ms ease;
+  box-shadow: none !important;
+  contain: layout style paint; /* Battery and GPU repaint optimization */
+  transition: border-color 140ms ease, background-color 140ms ease;
 }
 
-/* Leader card outline emphasis */
+/* Leader card outline emphasis removed per user request */
 .player-championship-card.is-leader {
-  border-color: var(--border-bold);
+  border-color: var(--border-hairline) !important;
+  box-shadow: none !important;
 }
 
 /* ── HOTCELL SLIGHT HIGHLIGHTED CONTRAST (Cash Mode Imbalance) ── */
 .player-championship-card.hotcell {
   border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
   background-color: #1a1b1f !important;
-  box-shadow: 0 0 16px rgba(255, 255, 255, 0.05);
+  box-shadow: none !important;
 }
 
 html:not(.dark) .player-championship-card.hotcell {
   border: 1.5px solid #111111 !important;
   background-color: #f0f0f3 !important;
-  box-shadow: 0 0 16px rgba(0, 0, 0, 0.05);
+  box-shadow: none !important;
 }
 
 /* Player Name */
 .player-name-field {
   font-family: var(--font-serif);
-  font-size: 28px;
+  font-size: clamp(22px, 3vw, 36px);
   font-weight: 500;
   color: var(--text-primary);
   letter-spacing: -0.015em;
-  padding: 2px 0;
+  padding: 4px 8px;
+  border-radius: 6px;
   border-bottom: 1px solid transparent;
   width: 100%;
   text-align: center;
+  transition: all 120ms ease;
 }
 
 .player-name-field:focus {
+  background: rgba(255, 255, 255, 0.04);
   border-bottom-color: var(--text-primary);
 }
 
-/* Score Row: Flex with safe min-width and auto-clamping digits */
+/* Score Row: Flex with big hero digits and tactile circular steppers */
 .card-score-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: clamp(8px, 2vw, 18px);
   width: 100%;
   padding: 4px 0;
   box-sizing: border-box;
+  overflow: visible;
 }
 
 .btn-score-touch {
-  flex: 0 0 48px;
-  width: 48px;
-  height: 58px;
+  flex: 0 0 clamp(46px, 5.5vw, 62px);
+  width: clamp(46px, 5.5vw, 62px);
+  height: clamp(46px, 5.5vw, 62px);
+  border-radius: 50%;
   background: var(--bg-inset);
   border: 1px solid var(--border-hairline);
   color: var(--text-primary);
-  font-size: 22px;
-  font-weight: 400;
+  font-size: clamp(20px, 2.6vw, 28px);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 80ms;
-  touch-action: none; /* Allows smooth hold-and-drag gesture */
+  transition: all 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  touch-action: none;
+  box-shadow: none;
 }
 
 .btn-score-touch:hover {
   background: var(--bg-elevated);
+  border-color: var(--border-medium);
 }
 
 .btn-score-touch:active,
 .btn-score-touch.scrubbing {
   background: var(--text-primary);
   color: var(--bg-surface);
-  transform: scale(0.96);
+  transform: scale(0.94);
 }
 
 .btn-score-touch:focus-visible {
   outline: 2px solid var(--text-primary);
   outline-offset: 2px;
+}
+
+html:not(.dark) .btn-score-touch {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.10);
+  box-shadow: none;
+}
+
+html:not(.dark) .btn-score-touch:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.20);
 }
 
 .score-center-display {
@@ -1080,28 +1449,85 @@ html:not(.dark) .player-championship-card.hotcell {
   align-items: center;
   justify-content: center;
   text-align: center;
-  overflow: hidden;
+  overflow: visible; /* Prevents glyph ascender/descender cutoff */
+  padding: 0 2px;
 }
 
 .score-hero-digits {
   font-family: var(--font-serif);
-  font-size: clamp(40px, 4.4vw, 68px);
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: -0.03em;
+  font-size: clamp(48px, 8vw, 108px);
+  font-weight: 500;
+  line-height: 1.05; /* Ample vertical breathing room */
+  letter-spacing: -0.02em;
   color: var(--text-primary);
   white-space: nowrap;
-  overflow: hidden;
+  overflow: visible;
   max-width: 100%;
+  padding: 2px 0;
+  transition: color 100ms ease, transform 100ms ease;
 }
 
-.score-sublabel {
+/* Scrubbing live highlight */
+.score-hero-digits.scrubbing-live {
+  color: var(--accent-amber);
+  transform: scale(1.05);
+}
+
+.score-hero-digits.scrubbing-live.maxed {
+  color: var(--accent-red) !important;
+  transform: scale(1.1);
+  text-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+}
+
+/* 4-player layout adjustments so cards fit on screen without clipping */
+.players-array-grid[data-count="4"] .score-hero-digits {
+  font-size: clamp(34px, 5.2vw, 76px);
+  line-height: 1.05;
+}
+
+.players-array-grid[data-count="4"] .btn-score-touch {
+  flex: 0 0 clamp(40px, 4.8vw, 56px);
+  width: clamp(40px, 4.8vw, 56px);
+  height: clamp(48px, 5.8vw, 68px);
+}
+
+/* ── Chinese Pool Points Option Bar (+4, +7, +10) ── */
+.chinese-pts-bar {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 420px;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.btn-chinese-pts {
+  flex: 1;
+  height: clamp(34px, 4.2vw, 44px);
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: clamp(13px, 1.5vw, 16px);
   font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--text-muted);
-  margin-top: 4px;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 100ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+}
+
+.btn-chinese-pts:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-bold);
+}
+
+.btn-chinese-pts:active {
+  transform: scale(0.96);
+  background: var(--text-primary);
+  color: var(--bg-surface);
 }
 
 /* Score Pulse Animation */
@@ -1229,6 +1655,13 @@ html:not(.dark) .player-championship-card.hotcell {
   gap: 8px;
 }
 
+.drawer-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .drawer-title {
   display: flex;
   align-items: center;
@@ -1336,31 +1769,66 @@ html:not(.dark) .player-championship-card.hotcell {
 }
 
 .log-entry-main {
-  display: grid;
-  grid-template-columns: 50px 1fr auto auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.log-entry-narrative {
+  display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  flex: 1;
 }
 
 .log-rack-num {
   font-weight: 700;
   color: var(--text-secondary);
+  font-size: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  padding: 1px 5px;
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .log-winner-name {
   font-family: var(--font-sans);
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .log-point-delta {
   font-weight: 700;
-  color: var(--text-primary);
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: 11px;
+}
+
+.log-point-delta.inc {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.log-point-delta.dec {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.log-score-transition {
+  color: var(--text-muted);
+  font-size: 10px;
 }
 
 .log-timestamp {
   color: var(--text-muted);
   font-size: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Extended History Info */

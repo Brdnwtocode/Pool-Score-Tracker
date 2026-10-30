@@ -44,6 +44,7 @@
       time_foul: "TIME FOUL",
       extensions_left: "{0}/{1} EXT",
       start_clock: "START",
+      restart_clock: "RESTART",
       pause_clock: "PAUSE",
       ext_btn: "+30S",
       ext_granted: "+30s Extension Granted",
@@ -80,8 +81,8 @@
       focus_restored: "History focus restored",
       extended_info_on: "Extended Details Visible",
       extended_info_off: "Compact View",
-      modal_title_cash: "STAKES & SETTLEMENTS",
-      modal_title_tourney: "MATCH PROTOCOL",
+      modal_title_cash: "STAKES CONFIG",
+      modal_title_tourney: "STAKES CONFIG",
       rate_per_point: "RATE PER POINT",
       target_race_label: "TARGET RACE",
       who_pays_whom_header: "DIRECT TRANSFERS",
@@ -97,6 +98,13 @@
       undo_toast: "UNDO: {0} reverted",
       redo_toast: "REDO: {0} restored",
       pts_adjusted: "pts adjusted",
+      session_clock: "SESSION",
+      session_paused: "Session Paused",
+      session_resumed: "Session Resumed",
+      session_reset_toast: "Session Clock Reset",
+      shot_restarted: "Shot Clock Restarted",
+      format_us_toast: "🎱 Format: American Pool (±1)",
+      format_cn_toast: "🎱 Format: Chinese Pool (+4, +7, +10)",
       sound_active: "AUDIO ACTIVE",
       sound_muted: "MUTED",
       lang_switched: "Language: English",
@@ -124,23 +132,23 @@
       guide_got_it: "GOT IT · START PLAYING",
       guide_modes_header: "CHOOSE YOUR GAME MODE",
       guide_cash_title: "CASH RING",
-      guide_cash_tag: "Zero-Sum Betting",
+      guide_cash_tag: "Points & Stakes",
       guide_cash_b1: "Negative scores allowed (-3)",
-      guide_cash_b2: "Table balance sums to 0",
-      guide_cash_b3: "Auto-calculates who owes whom",
+      guide_cash_b2: "Configurable stake rate ($/PT)",
+      guide_cash_b3: "Built-in compact shot clock",
       guide_tourney_title: "TOURNAMENT",
-      guide_tourney_tag: "Race-to-X & Clock",
-      guide_tourney_b1: "Race to target frames (e.g. 15)",
+      guide_tourney_tag: "Match Frames & Clock",
+      guide_tourney_b1: "Negative and positive frame scores",
       guide_tourney_b2: "30s / 45s / 60s shot clock",
-      guide_tourney_b3: "Live TV broadcast match HUD",
+      guide_tourney_b3: "Quick reset & undo anytime",
       guide_modes_note: "100% separate memory: switching modes never wipes your scores or history.",
       guide_controls_header: "CONTROLS CHEAT SHEET",
       guide_key_tap: "TAP + / −",
       guide_action_tap_title: "±1 Point",
       guide_action_tap_desc: "Quick single-point tap",
       guide_key_drag: "HOLD 0.7S",
-      guide_action_drag_title: "Slide 1–12 Pts",
-      guide_action_drag_desc: "Drag up/down, release to commit",
+      guide_action_drag_title: "Slide 1–20 Pts",
+      guide_action_drag_desc: "Drag up/down · Hold to auto-increment to 20",
       guide_key_undo: "CTRL + Z",
       guide_action_undo_title: "Undo / Redo",
       guide_action_undo_desc: "Revert scoring mistakes anytime",
@@ -149,7 +157,7 @@
       guide_action_settle_desc: "Exact pairwise cash payouts",
       guide_key_clock: "SPACE",
       guide_action_clock_title: "Shot Clock",
-      guide_action_clock_desc: "Start/pause timer · +30s extension",
+      guide_action_clock_desc: "Start/Restart shot · Pause button · +30s",
       guide_key_log: "LOG",
       guide_action_log_title: "Rack Ledger",
       guide_action_log_desc: "Full history & score snapshots",
@@ -171,6 +179,7 @@
       time_foul: "HẾT GIỜ",
       extensions_left: "{0}/{1} GIA HẠN",
       start_clock: "BẮT ĐẦU",
+      restart_clock: "ĐẶT LẠI",
       pause_clock: "TẠM DỪNG",
       ext_btn: "+30S",
       ext_granted: "Đã cộng thêm 30s gia hạn",
@@ -207,8 +216,8 @@
       focus_restored: "Đã mở khóa hiển thị lịch sử",
       extended_info_on: "Hiển thị chi tiết lịch sử",
       extended_info_off: "Xem gọn",
-      modal_title_cash: "MỨC CƯỢC & THANH TOÁN",
-      modal_title_tourney: "THỂ THỨC & THƯỞNG",
+      modal_title_cash: "CẤU HÌNH TIỀN ĐIỂM",
+      modal_title_tourney: "CẤU HÌNH TIỀN ĐIỂM",
       rate_per_point: "MỖI ĐIỂM",
       target_race_label: "CHẠM MỤC TIÊU",
       who_pays_whom_header: "CHUYỂN TIỀN TRỰC TIẾP",
@@ -224,6 +233,13 @@
       undo_toast: "HOÀN TÁC: Đã phục hồi {0}",
       redo_toast: "LÀM LẠI: Đã phục hồi {0}",
       pts_adjusted: "điểm điều chỉnh",
+      session_clock: "TRẬN ĐẤU",
+      session_paused: "Đã tạm dừng thời gian trận",
+      session_resumed: "Tiếp tục tính giờ trận",
+      session_reset_toast: "Đã đặt lại thời gian trận về 00:00:00",
+      shot_restarted: "Đã bắt đầu lại lượt đánh mới",
+      format_us_toast: "🎱 Thể thức: Bida Mỹ (±1)",
+      format_cn_toast: "🎱 Thể thức: Bida Lỗ Tàu (+4, +7, +10)",
       sound_active: "ÂM THANH ĐÃ BẬT",
       sound_muted: "ĐÃ TẮT TIẾNG",
       lang_switched: "Ngôn ngữ: Tiếng Việt",
@@ -251,23 +267,23 @@
       guide_got_it: "ĐÃ HIỂU · BẮT ĐẦU",
       guide_modes_header: "CHỌN CHẾ ĐỘ CHƠI",
       guide_cash_title: "ĐÁNH ĐIỂM",
-      guide_cash_tag: "Ăn tiền theo điểm",
+      guide_cash_tag: "Đánh điểm & Mức cược",
       guide_cash_b1: "Cho phép điểm âm (-3)",
-      guide_cash_b2: "Tổng điểm bàn luôn cân bằng (0)",
-      guide_cash_b3: "Tự động tính ai trả tiền ai",
+      guide_cash_b2: "Cài đặt mức tiền mỗi điểm ($/điểm)",
+      guide_cash_b3: "Tích hợp đồng hồ shot gọn gàng",
       guide_tourney_title: "THI ĐẤU",
-      guide_tourney_tag: "Đấu chạm & Shot clock",
-      guide_tourney_b1: "Đấu chạm điểm đích (VD: chạm 15)",
+      guide_tourney_tag: "Điểm ván đấu & Đồng hồ",
+      guide_tourney_b1: "Hỗ trợ cả điểm âm và dương",
       guide_tourney_b2: "Đồng hồ shot 30s / 45s / 60s",
-      guide_tourney_b3: "Bảng dẫn điểm truyền hình",
+      guide_tourney_b3: "Đặt lại & hoàn tác bất cứ lúc nào",
       guide_modes_note: "Lưu bộ nhớ riêng 100%: chuyển chế độ không bao giờ mất điểm hay lịch sử.",
       guide_controls_header: "BẢNG THAO TÁC NHANH",
       guide_key_tap: "BẤM + / −",
       guide_action_tap_title: "±1 Điểm",
       guide_action_tap_desc: "Chạm nút để chỉnh 1 điểm",
       guide_key_drag: "GIỮ 0.7S",
-      guide_action_drag_title: "Trượt 1–12 Điểm",
-      guide_action_drag_desc: "Kéo lên/xuống rồi thả — không popup!",
+      guide_action_drag_title: "Trượt 1–20 Điểm",
+      guide_action_drag_desc: "Kéo lên/xuống · Giữ nguyên để tự tăng đến 20",
       guide_key_undo: "CTRL + Z",
       guide_action_undo_title: "Hoàn tác / Làm lại",
       guide_action_undo_desc: "Khắc phục sai sót điểm tức thì",
@@ -276,7 +292,7 @@
       guide_action_settle_desc: "Danh sách chuyển tiền tối ưu",
       guide_key_clock: "PHÍM CÁCH",
       guide_action_clock_title: "Đồng Hồ Shot",
-      guide_action_clock_desc: "Bắt đầu/dừng · Bấm +30s gia hạn",
+      guide_action_clock_desc: "Bắt đầu/Bắt đầu lại · Nút tạm dừng · +30s",
       guide_key_log: "LỊCH SỬ",
       guide_action_log_title: "Nhật Ký Ván",
       guide_action_log_desc: "Lịch sử kèm mốc giờ & trạng thái bàn",
@@ -306,6 +322,9 @@
     theme: "dark",      // "dark" or "light"
     showExtendedHistory: false,
     tutorialSeen: false,
+    sessionStartTime: Date.now(),
+    sessionElapsedMs: 0,
+    isSessionPaused: false,
 
     // CASH MODE STATE (Zero-sum betting, negative scores permitted)
     cash: {
@@ -328,6 +347,7 @@
         { id: 101, name: "Efren Reyes", score: 0 },
         { id: 102, name: "Earl Strickland", score: 0 },
       ],
+      format: "american", // "american" (±1) or "chinese" (+4, +7, +10)
       stakeRate: 1.0,
       targetRace: 15,
       shotClockDuration: 45,
@@ -382,6 +402,8 @@
   const themeIcon = $("themeIcon");
   const btnResetQuick = $("btnResetQuick");
   const btnInfo = $("btnInfo");
+  const btnPoolFormat = $("btnPoolFormat");
+  const poolFormatIcon = $("poolFormatIcon");
 
   // Masthead localized spans
   const lblModeCash = $("lblModeCash");
@@ -392,18 +414,22 @@
   const hudDeltaStat = $("hudDeltaStat");
 
   // Tournament Shot Clock Widget
-  const lblShotClockTitle = $("lblShotClockTitle");
+  const clockReadoutCard = $("clockReadoutCard");
+  const clockDigitsColumn = $("clockDigitsColumn");
   const clockHeroDigits = $("clockHeroDigits");
-  const lblClockSecRem = $("lblClockSecRem");
-  const clockStatusChip = $("clockStatusChip");
   const clockExtLabel = $("clockExtLabel");
   const clockProgressFill = $("clockProgressFill");
+  const sessionTimerBadge = $("sessionTimerBadge");
+  const sessionTimerDigits = $("sessionTimerDigits");
+  const sessionClockIcon = $("sessionClockIcon");
+  const sessionHoldBar = $("sessionHoldBar");
   const btnClockStart = $("btnClockStart");
   const clockBtnIcon = $("clockBtnIcon");
   const clockBtnText = $("clockBtnText");
   const btnClockExt = $("btnClockExt");
   const lblClockExtBtn = $("lblClockExtBtn");
-  const btnClockReset = $("btnClockReset");
+  const btnClockPause = $("btnClockPause");
+  const clockPauseIcon = $("clockPauseIcon");
 
   // Tournament Stakes Widget
   const lblStakesProtocolTitle = $("lblStakesProtocolTitle");
@@ -495,23 +521,52 @@
   const btnDismissTutorial = $("btnDismissTutorial");
   const btnOpenGuideFromInfo = $("btnOpenGuideFromInfo");
 
-  // ═══════════════ SCREEN WAKE LOCK (DEFAULT ACTIVE) ═══════════════
+  // ═══════════════ SCREEN WAKE LOCK & BATTERY OPTIMIZER ═══════════════
   let wakeLockSentinel = null;
+  let isPageHidden = false;
+  let clockHiddenTimestamp = null;
 
   async function requestScreenWakeLock() {
-    if ("wakeLock" in navigator) {
+    if ("wakeLock" in navigator && !isPageHidden) {
       try {
-        wakeLockSentinel = await navigator.wakeLock.request("screen");
-        wakeLockSentinel.addEventListener("release", () => {
-          wakeLockSentinel = null;
-        });
+        if (!wakeLockSentinel) {
+          wakeLockSentinel = await navigator.wakeLock.request("screen");
+          wakeLockSentinel.addEventListener("release", () => {
+            wakeLockSentinel = null;
+          });
+        }
       } catch {}
     }
   }
 
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") {
+    if (document.visibilityState === "hidden") {
+      isPageHidden = true;
+      if (isClockRunning) {
+        clockHiddenTimestamp = Date.now();
+      }
+      if (wakeLockSentinel) {
+        try { wakeLockSentinel.release(); } catch {}
+        wakeLockSentinel = null;
+      }
+    } else if (document.visibilityState === "visible") {
+      isPageHidden = false;
       requestScreenWakeLock();
+
+      if (isClockRunning && clockHiddenTimestamp) {
+        const elapsed = Math.floor((Date.now() - clockHiddenTimestamp) / 1000);
+        clockHiddenTimestamp = null;
+        if (elapsed > 0) {
+          clockTimeLeft = Math.max(0, clockTimeLeft - elapsed);
+          renderShotClock();
+          if (clockTimeLeft === 0) {
+            stopShotClock();
+            tactileFeedback(true);
+            showToast(t("clock_expired"));
+          }
+        }
+      }
+      renderSessionClock();
     }
   });
 
@@ -710,6 +765,16 @@
     if (!Number.isFinite(state.tournament.targetRace) || state.tournament.targetRace < 1) {
       state.tournament.targetRace = 15;
     }
+    if (state.tournament.format !== "american" && state.tournament.format !== "chinese") {
+      state.tournament.format = "american";
+    }
+    if (!Number.isFinite(state.sessionStartTime) || state.sessionStartTime <= 0) {
+      state.sessionStartTime = Number.isFinite(state.tournament?.sessionStartTime) ? state.tournament.sessionStartTime : Date.now();
+    }
+    if (!Number.isFinite(state.sessionElapsedMs) || state.sessionElapsedMs < 0) {
+      state.sessionElapsedMs = Number.isFinite(state.tournament?.sessionElapsedMs) ? state.tournament.sessionElapsedMs : 0;
+    }
+    state.isSessionPaused = state.isSessionPaused !== undefined ? !!state.isSessionPaused : !!state.tournament?.isSessionPaused;
     if (state.lang !== "vi" && state.lang !== "en") state.lang = "vi";
     if (state.activeMode !== "cash" && state.activeMode !== "tournament") state.activeMode = "cash";
   }
@@ -733,8 +798,6 @@
     // Static text updates
     if (lblModeCash) lblModeCash.textContent = t("cash_mode");
     if (lblModeTourney) lblModeTourney.textContent = t("tourney_mode");
-    if (lblShotClockTitle) lblShotClockTitle.textContent = t("shot_clock_title");
-    if (lblClockSecRem) lblClockSecRem.textContent = t("sec_remaining");
     if (lblClockExtBtn) lblClockExtBtn.textContent = t("ext_btn");
     if (lblStakesProtocolTitle) lblStakesProtocolTitle.textContent = t("stakes_protocol_title");
     if (lblPerRackVal) lblPerRackVal.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">sell</span> ${t("per_rack_val")}`;
@@ -771,7 +834,9 @@
     // Tutorial / Guide localization
     updateTutorialText();
 
+    updatePoolFormatUI();
     renderShotClock();
+    renderSessionClock();
     renderPlayers();
     renderRackLog();
     if (state.activeMode === "cash") {
@@ -791,6 +856,147 @@
     });
   }
 
+  // ═══════════════ TOURNAMENT POOL FORMAT & SESSION CLOCK ENGINE ═══════════════
+  function updatePoolFormatUI() {
+    if (!btnPoolFormat || !poolFormatIcon) return;
+    const isChinese = state.tournament.format === "chinese";
+    poolFormatIcon.textContent = isChinese ? "CN" : "US";
+    poolFormatIcon.classList.toggle("chinese", isChinese);
+    btnPoolFormat.title = isChinese
+      ? "Chinese Pool Format (+4, +7, +10) · Tap for American"
+      : "American Pool Format (±1) · Tap for Chinese Pool";
+  }
+
+  if (btnPoolFormat) {
+    btnPoolFormat.addEventListener("click", () => {
+      tactileFeedback();
+      state.tournament.format = state.tournament.format === "chinese" ? "american" : "chinese";
+      updatePoolFormatUI();
+      saveState();
+      renderPlayers();
+      showToast(state.tournament.format === "chinese" ? t("format_cn_toast") : t("format_us_toast"));
+    });
+  }
+
+  function formatSessionDuration(ms) {
+    const totalSec = Math.floor(Math.max(0, ms) / 1000);
+    const hrs = Math.floor(totalSec / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    const secs = totalSec % 60;
+    return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  }
+
+  function getSessionElapsedMs() {
+    if (!state.sessionStartTime) state.sessionStartTime = Date.now();
+    let total = state.sessionElapsedMs || 0;
+    if (!state.isSessionPaused) {
+      total += Math.max(0, Date.now() - state.sessionStartTime);
+    }
+    return total;
+  }
+
+  function renderSessionClock() {
+    if (!sessionTimerDigits) return;
+    const elapsed = getSessionElapsedMs();
+    sessionTimerDigits.textContent = formatSessionDuration(elapsed);
+    if (sessionTimerBadge) {
+      sessionTimerBadge.classList.toggle("is-paused", !!state.isSessionPaused);
+    }
+  }
+
+  function toggleSessionPause() {
+    tactileFeedback();
+    if (state.isSessionPaused) {
+      state.isSessionPaused = false;
+      state.sessionStartTime = Date.now();
+      showToast("▶️ " + t("session_resumed"));
+    } else {
+      state.sessionElapsedMs = getSessionElapsedMs();
+      state.isSessionPaused = true;
+      showToast("⏸️ " + t("session_paused"));
+    }
+    saveState();
+    renderSessionClock();
+  }
+
+  function resetSessionClock() {
+    tactileFeedback(true);
+    playTone(520, 0.15, "triangle");
+    state.sessionStartTime = Date.now();
+    state.sessionElapsedMs = 0;
+    state.isSessionPaused = false;
+    if (sessionHoldBar) sessionHoldBar.style.width = "0%";
+    saveState();
+    renderSessionClock();
+    showToast("⏱️ " + t("session_reset_toast"));
+  }
+
+  setInterval(() => {
+    if (!isPageHidden && !state.isSessionPaused) {
+      renderSessionClock();
+    }
+  }, 1000);
+
+  // Session Clock Interaction: Tap to Pause/Resume, Hold 2s to Reset
+  if (sessionTimerBadge) {
+    let sessionHoldTimer = null;
+    let sessionHoldAnimFrame = null;
+    let sessionHoldStart = 0;
+    let sessionHoldTriggered = false;
+    const SESSION_HOLD_DURATION = 2000;
+
+    function cancelSessionHold() {
+      if (sessionHoldTimer) {
+        clearTimeout(sessionHoldTimer);
+        sessionHoldTimer = null;
+      }
+      if (sessionHoldAnimFrame) {
+        cancelAnimationFrame(sessionHoldAnimFrame);
+        sessionHoldAnimFrame = null;
+      }
+      if (sessionHoldBar) {
+        sessionHoldBar.style.width = "0%";
+      }
+    }
+
+    sessionTimerBadge.addEventListener("pointerdown", (e) => {
+      sessionHoldTriggered = false;
+      sessionHoldStart = Date.now();
+      cancelSessionHold();
+
+      function updateHoldProgress() {
+        const elapsed = Date.now() - sessionHoldStart;
+        const pct = Math.min(100, (elapsed / SESSION_HOLD_DURATION) * 100);
+        if (sessionHoldBar) sessionHoldBar.style.width = `${pct}%`;
+        if (elapsed < SESSION_HOLD_DURATION) {
+          sessionHoldAnimFrame = requestAnimationFrame(updateHoldProgress);
+        }
+      }
+      sessionHoldAnimFrame = requestAnimationFrame(updateHoldProgress);
+
+      sessionHoldTimer = setTimeout(() => {
+        sessionHoldTriggered = true;
+        cancelSessionHold();
+        resetSessionClock();
+      }, SESSION_HOLD_DURATION);
+    });
+
+    sessionTimerBadge.addEventListener("pointerup", (e) => {
+      const pressDuration = Date.now() - sessionHoldStart;
+      const wasTriggered = sessionHoldTriggered;
+      cancelSessionHold();
+      sessionHoldTriggered = false;
+
+      // Tap (< 600ms) without triggering 2s hold toggles pause/resume
+      if (!wasTriggered && pressDuration < 600) {
+        toggleSessionPause();
+      }
+    });
+
+    sessionTimerBadge.addEventListener("pointercancel", cancelSessionHold);
+    sessionTimerBadge.addEventListener("pointerleave", cancelSessionHold);
+  }
+
   // ═══════════════ DUAL-MODE ENGINE (COMPLETELY SEPARATE MEMORY) ═══════════════
   function setGameMode(mode) {
     if (state.activeMode !== mode) {
@@ -806,6 +1012,8 @@
     const mState = getModeState();
     clockTimeLeft = mState.shotClockDuration;
     renderShotClock();
+    renderSessionClock();
+    updatePoolFormatUI();
 
     refreshStakeDisplays();
 
@@ -823,94 +1031,35 @@
     renderPlayers();
     renderRackLog();
     updateUndoRedoUI();
+    if (mode === "cash") {
+      updateZeroSumAudit();
+    } else {
+      updateTournamentHUD();
+    }
     showToast(mode === "tournament" ? "🏆 " + t("tourney_mode") : "💰 " + t("cash_mode"));
   }
 
   btnModeCash.addEventListener("click", () => setGameMode("cash"));
   btnModeTournament.addEventListener("click", () => setGameMode("tournament"));
 
-  // ═══════════════ ZERO-SUM AUDIT (INTEGRATED UPPER CARD) ═══════════════
+  // ═══════════════ ZERO-SUM AUDIT ═══════════════
   function updateZeroSumAudit() {
-    if (state.activeMode !== "cash") return;
+    if (state.activeMode !== "cash") {
+      document.querySelectorAll(".player-championship-card.hotcell").forEach((c) => c.classList.remove("hotcell"));
+      return;
+    }
 
     const mState = state.cash;
-    const currentSum = mState.players.reduce((sum, p) => sum + p.score, 0);
+    const currentSum = mState.players.reduce((sum, p) => sum + (p.score || 0), 0);
     const isBalanced = currentSum === 0;
 
     const cards = document.querySelectorAll(".player-championship-card");
     cards.forEach((c) => c.classList.toggle("hotcell", !isBalanced));
-
-    if (balanceStatusBar) {
-      balanceStatusBar.classList.toggle("unbalanced", !isBalanced);
-    }
-    if (balanceDot) {
-      balanceDot.classList.toggle("alert", !isBalanced);
-    }
-    if (balanceStatusText) {
-      balanceStatusText.textContent = isBalanced
-        ? t("balanced_zero")
-        : t("table_unbalanced", `${currentSum > 0 ? "+" : ""}${currentSum}`);
-    }
-    if (totalSumEl) {
-      totalSumEl.textContent = `${currentSum > 0 ? "+" : ""}${currentSum}`;
-    }
   }
 
-  // ═══════════════ PAIRWISE SETTLEMENT & CASH TRANSFERS ═══════════════
-  function calculateSettlements(rateOverride) {
-    const mState = getModeState();
-    const players = mState.players;
-    // rateOverride lets the modal preview a draft rate without committing it.
-    const rate = parseFloat(rateOverride !== undefined ? rateOverride : mState.stakeRate) || 0;
-    const netCash = {};
-
-    if (state.activeMode === "cash") {
-      players.forEach((p) => {
-        netCash[p.id] = p.score * rate;
-      });
-    } else {
-      const n = players.length;
-      const netPoints = {};
-      players.forEach((p) => (netPoints[p.id] = 0));
-
-      for (let i = 0; i < n; i++) {
-        for (let j = i + 1; j < n; j++) {
-          const diff = players[i].score - players[j].score;
-          netPoints[players[i].id] += diff;
-          netPoints[players[j].id] -= diff;
-        }
-      }
-      players.forEach((p) => {
-        netCash[p.id] = netPoints[p.id] * rate;
-      });
-    }
-
-    const debtors = [];
-    const creditors = [];
-    players.forEach((p) => {
-      const amt = netCash[p.id] || 0;
-      if (amt > 0.001) creditors.push({ name: p.name, balance: amt });
-      else if (amt < -0.001) debtors.push({ name: p.name, balance: -amt });
-    });
-
-    const transfers = [];
-    let d = 0, c = 0;
-    while (d < debtors.length && c < creditors.length) {
-      const transferAmt = Math.min(debtors[d].balance, creditors[c].balance);
-      if (transferAmt > 0.01) {
-        transfers.push({
-          from: debtors[d].name,
-          to: creditors[c].name,
-          amount: transferAmt.toFixed(2),
-        });
-      }
-      debtors[d].balance -= transferAmt;
-      creditors[c].balance -= transferAmt;
-      if (debtors[d].balance <= 0.01) d++;
-      if (creditors[c].balance <= 0.01) c++;
-    }
-
-    return { netCash, transfers };
+  // ═══════════════ SETTLEMENTS ═══════════════
+  function calculateSettlements() {
+    return { netCash: {}, transfers: [] };
   }
 
   // ═══════════════ ULTRA-CLEAN PLAYER CARD RENDERING ═══════════════
@@ -919,14 +1068,43 @@
     const mState = getModeState();
     const players = mState.players;
     const isCashMode = state.activeMode === "cash";
+    const isTourneyChinese = !isCashMode && state.tournament.format === "chinese";
     const maxScore = Math.max(...players.map((p) => p.score));
+    const hasLead = players.some((p) => p.score !== maxScore);
+
+    // Set count for dynamic responsive grid sizing (1, 2, 3, 4 players)
+    playersArrayContainer.dataset.count = players.length;
 
     players.forEach((p, index) => {
-      const isLeader = p.score > 0 && p.score === maxScore;
-
       const card = document.createElement("article");
-      card.className = `player-championship-card ${isLeader ? "is-leader" : ""}`;
+      card.className = "player-championship-card";
       card.id = `card-player-${p.id}`;
+
+      const chineseButtonsHtml = isTourneyChinese ? `
+        <div class="chinese-pts-bar">
+          <button class="btn-chinese-pts" data-pid="${p.id}" data-pts="4" type="button" title="Standard Win (+4 pts)">+4</button>
+          <button class="btn-chinese-pts" data-pid="${p.id}" data-pts="7" type="button" title="Table Run (+7 pts)">+7</button>
+          <button class="btn-chinese-pts" data-pid="${p.id}" data-pts="10" type="button" title="Break & Run (+10 pts)">+10</button>
+        </div>
+      ` : "";
+
+      const cashButtonsHtml = isCashMode ? `
+        <div class="cash-quick-deck">
+          <div class="cash-deck-bank dec-bank">
+            <button class="btn-cash-pill dec" data-pid="${p.id}" data-pts="-5" type="button" title="-5 pts">-5</button>
+            <button class="btn-cash-pill dec" data-pid="${p.id}" data-pts="-4" type="button" title="-4 pts">-4</button>
+            <button class="btn-cash-pill dec" data-pid="${p.id}" data-pts="-3" type="button" title="-3 pts">-3</button>
+            <button class="btn-cash-pill dec" data-pid="${p.id}" data-pts="-2" type="button" title="-2 pts">-2</button>
+          </div>
+          <div class="cash-deck-divider" aria-hidden="true"></div>
+          <div class="cash-deck-bank inc-bank">
+            <button class="btn-cash-pill inc" data-pid="${p.id}" data-pts="2" type="button" title="+2 pts">+2</button>
+            <button class="btn-cash-pill inc" data-pid="${p.id}" data-pts="3" type="button" title="+3 pts">+3</button>
+            <button class="btn-cash-pill inc" data-pid="${p.id}" data-pts="4" type="button" title="+4 pts">+4</button>
+            <button class="btn-cash-pill inc" data-pid="${p.id}" data-pts="5" type="button" title="+5 pts">+5</button>
+          </div>
+        </div>
+      ` : "";
 
       card.innerHTML = `
         <input 
@@ -945,13 +1123,15 @@
 
           <div class="score-center-display">
             <span class="score-hero-digits" id="digits-${p.id}">${formatScore(p.score)}</span>
-            <span class="score-sublabel">${isCashMode ? '<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">monetization_on</span> ' + t("net_points") : '<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">emoji_events</span> ' + t("frames")}</span>
           </div>
 
           <button class="btn-score-touch btn-inc" data-pid="${p.id}" aria-label="${escapeHtml(t("aria_inc", p.name))}" title="Tap +1 · Hold 0.7s to drag">
             <span class="material-symbols-outlined" aria-hidden="true">add</span>
           </button>
         </div>
+
+        ${chineseButtonsHtml}
+        ${cashButtonsHtml}
       `;
 
       // Name change listener
@@ -972,6 +1152,26 @@
 
       attachScrubberGesture(btnInc, p.id, 1);
       attachScrubberGesture(btnDec, p.id, -1);
+
+      // Attach click listeners for Chinese Pool quick points (+4, +7, +10)
+      if (isTourneyChinese) {
+        card.querySelectorAll(".btn-chinese-pts").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const pts = parseInt(btn.dataset.pts, 10);
+            modifyScore(p.id, pts);
+          });
+        });
+      }
+
+      // Attach click listeners for Cash Mode quick points (-2..-5, +2..+5)
+      if (isCashMode) {
+        card.querySelectorAll(".btn-cash-pill").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const pts = parseInt(btn.dataset.pts, 10);
+            modifyScore(p.id, pts);
+          });
+        });
+      }
 
       playersArrayContainer.appendChild(card);
     });
@@ -999,17 +1199,12 @@
   function syncPlayersUI() {
     const mState = getModeState();
     const players = mState.players;
-    const maxScore = players.length ? Math.max(...players.map((p) => p.score)) : 0;
 
     players.forEach((p) => {
       const digitsEl = document.getElementById(`digits-${p.id}`);
       const nextScore = formatScore(p.score);
       if (digitsEl && digitsEl.textContent !== nextScore) {
         digitsEl.textContent = nextScore;
-      }
-      const card = document.getElementById(`card-player-${p.id}`);
-      if (card) {
-        card.classList.toggle("is-leader", p.score > 0 && p.score === maxScore);
       }
     });
 
@@ -1030,47 +1225,17 @@
     const players = state.tournament.players;
     const sorted = [...players].sort((a, b) => b.score - a.score);
     const leader = sorted[0];
-    const runnerUp = sorted[1] || { score: 0 };
+    const runnerUp = sorted[1] || leader;
     const leadDiff = leader.score - runnerUp.score;
 
-    if (leader.score === 0) return t("lead_even");
-    if (leadDiff === 0) return t("lead_tied", leader.score);
+    if (leadDiff === 0) {
+      return leader.score === 0 ? t("lead_even") : t("lead_tied", leader.score);
+    }
     return t("lead_named", leader.name.toUpperCase(), leadDiff);
   }
 
   function updateTournamentHUD() {
-    const mState = state.tournament;
-    const players = mState.players;
-    const sorted = [...players].sort((a, b) => b.score - a.score);
-    const leader = sorted[0];
-    const runnerUp = sorted[1] || { score: 0 };
-    const leadDiff = leader.score - runnerUp.score;
-    const { netCash } = calculateSettlements();
-
-    if (hudLeadStat) {
-      if (leader.score === 0) {
-        hudLeadStat.innerHTML = `<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>${escapeHtml(t("hud_even"))}</strong>`;
-      } else if (leadDiff === 0) {
-        hudLeadStat.innerHTML = `<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>${escapeHtml(t("hud_tied", leader.score))}</strong>`;
-      } else {
-        // Player names are user input and must be escaped before hitting innerHTML.
-        hudLeadStat.innerHTML = `<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 13px; vertical-align: middle;">leaderboard</span> <strong>${escapeHtml(t("hud_lead", leader.name.toUpperCase(), leadDiff))}</strong>`;
-      }
-    }
-
-    if (hudDeltaStat) {
-      const cashDelta = (netCash[leader.id] || 0).toFixed(2);
-      hudDeltaStat.innerHTML = `<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 13px; vertical-align: middle;">monetization_on</span> <strong>+$${cashDelta}</strong>`;
-    }
-
-    const totalPositive = players.reduce((sum, p) => sum + Math.max(0, p.score), 0);
-    const pot = (totalPositive * mState.stakeRate).toFixed(2);
-    if (metricCurrentPotVal) {
-      metricCurrentPotVal.textContent = `$${pot}`;
-    }
-    if (tourneyRaceBadge) {
-      tourneyRaceBadge.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">flag</span> ${t("target_race_badge", mState.targetRace)}`;
-    }
+    // Tournament HUD strip and race header removed
   }
 
   // ═══════════════ 0.7S HOLD & DIRECT SCORE DRAG (NO MODAL) ═══════════════
@@ -1084,20 +1249,72 @@
     let holdTimer = null;
     let isScrubbing = false;
     let startY = 0;
+    let currentMagnitude = 1;
     let currentDelta = baseDirection;
     let initialScore = 0;
     let activePointerId = null;
+    let autoTickTimeout = null;
+    let autoTickInterval = null;
+
     const HOLD_THRESHOLD_MS = 700;
-    const PIXELS_PER_POINT = 14;
+    const MAX_POINTS = 20;
 
     function getDigitsEl() {
       return document.getElementById(`digits-${playerId}`);
     }
 
+    function calcMagnitude(d) {
+      if (d <= 0) return 1;
+      if (d <= 144) {
+        return Math.min(10, 1 + Math.floor(d / 16));
+      }
+      return Math.min(MAX_POINTS, 10 + Math.floor((d - 144) / 8));
+    }
+
     function setPreview(nextDelta) {
       currentDelta = nextDelta;
       const digitsEl = getDigitsEl();
-      if (digitsEl) digitsEl.textContent = formatScore(initialScore + currentDelta);
+      const isMax = Math.abs(currentDelta) >= MAX_POINTS;
+      if (digitsEl) {
+        digitsEl.textContent = formatScore(initialScore + currentDelta);
+        digitsEl.classList.toggle("maxed", isMax);
+      }
+      btn.classList.toggle("maxed", isMax);
+    }
+
+    function stopAutoTick() {
+      if (autoTickTimeout) {
+        clearTimeout(autoTickTimeout);
+        autoTickTimeout = null;
+      }
+      if (autoTickInterval) {
+        clearInterval(autoTickInterval);
+        autoTickInterval = null;
+      }
+    }
+
+    function scheduleAutoTick() {
+      stopAutoTick();
+      if (currentMagnitude >= MAX_POINTS) return;
+      autoTickTimeout = setTimeout(() => {
+        autoTickInterval = setInterval(() => {
+          if (currentMagnitude < MAX_POINTS) {
+            currentMagnitude++;
+            const nextDelta = currentMagnitude * baseDirection;
+            setPreview(nextDelta);
+            playTone(430 + currentMagnitude * 28, 0.025);
+            vibrateDevice(12);
+
+            if (currentMagnitude >= MAX_POINTS) {
+              playTone(880, 0.12, "triangle");
+              vibrateDevice([35, 25, 35]);
+              stopAutoTick();
+            }
+          } else {
+            stopAutoTick();
+          }
+        }, 130);
+      }, 200);
     }
 
     function clearListeners() {
@@ -1106,19 +1323,15 @@
       btn.removeEventListener("pointercancel", onPointerUp);
     }
 
-    /**
-     * A single Pointer Events stream replaces the old mouse+touch pair.
-     * Previously both `mousedown` and `touchstart` were bound, so a tap fired
-     * the handler twice (touch, then the compatibility mouse event) and scored
-     * +/-2 per tap on every touch device.
-     */
     function onPointerDown(e) {
-      if (activePointerId !== null) return; // ignore extra fingers / secondary streams
+      if (activePointerId !== null) return;
       activePointerId = e.pointerId;
 
       startY = e.clientY;
       isScrubbing = false;
+      currentMagnitude = 1;
       currentDelta = baseDirection;
+      stopAutoTick();
 
       const mState = getModeState();
       const player = mState.players.find((p) => p.id === playerId);
@@ -1127,15 +1340,12 @@
       try { btn.setPointerCapture(e.pointerId); } catch {}
 
       holdTimer = setTimeout(() => {
-        // 0.7s reached: activate direct in-place scrubbing
         isScrubbing = true;
         btn.classList.add("scrubbing");
         const digitsEl = getDigitsEl();
         if (digitsEl) digitsEl.classList.add("scrubbing-live");
 
-        // Immediately preview the score directly on the card
         setPreview(baseDirection);
-
         playTone(baseDirection > 0 ? 560 : 330, 0.1);
         vibrateDevice([25, 20]);
       }, HOLD_THRESHOLD_MS);
@@ -1149,27 +1359,26 @@
       if (!isScrubbing || eMove.pointerId !== activePointerId) return;
       if (eMove.cancelable) eMove.preventDefault();
 
-      const diffY = startY - eMove.clientY;
+      const diffY = baseDirection > 0 ? (startY - eMove.clientY) : (eMove.clientY - startY);
+      const d = Math.max(0, diffY);
+      const computed = calcMagnitude(d);
 
-      let magnitude;
-      if (baseDirection > 0) {
-        magnitude = 1 + Math.floor(diffY / PIXELS_PER_POINT);
-      } else {
-        magnitude = 1 + Math.floor(-diffY / PIXELS_PER_POINT);
-      }
-
-      magnitude = Math.max(1, Math.min(12, magnitude));
-      const nextDelta = magnitude * baseDirection;
-
-      // In tournament mode, score cannot drop below 0
-      if (state.activeMode === "tournament" && initialScore + nextDelta < 0) {
-        return;
-      }
-
-      if (nextDelta !== currentDelta) {
+      if (computed !== currentMagnitude) {
+        currentMagnitude = computed;
+        const nextDelta = currentMagnitude * baseDirection;
         setPreview(nextDelta);
-        playTone(430 + magnitude * 32, 0.025);
+        playTone(430 + currentMagnitude * 28, 0.025);
         vibrateDevice(10);
+        if (currentMagnitude >= MAX_POINTS) {
+          playTone(880, 0.12, "triangle");
+          vibrateDevice([35, 25, 35]);
+        }
+      }
+
+      if (d >= 30 && currentMagnitude < MAX_POINTS) {
+        scheduleAutoTick();
+      } else {
+        stopAutoTick();
       }
     }
 
@@ -1182,11 +1391,12 @@
 
       clearTimeout(holdTimer);
       holdTimer = null;
+      stopAutoTick();
       clearListeners();
 
-      btn.classList.remove("scrubbing");
+      btn.classList.remove("scrubbing", "maxed");
       const digitsEl = getDigitsEl();
-      if (digitsEl) digitsEl.classList.remove("scrubbing-live");
+      if (digitsEl) digitsEl.classList.remove("scrubbing-live", "maxed");
 
       if (isScrubbing) {
         isScrubbing = false;
@@ -1201,9 +1411,6 @@
     btn.addEventListener("pointerdown", onPointerDown);
 
     if (!window.PointerEvent) {
-      // Last-resort path for pre-2019 engines without Pointer Events: a plain
-      // click commits the standard ±1 tap (hold-and-scrub unavailable). Only one
-      // input stream is ever bound, so a tap can never be counted twice.
       btn.addEventListener("click", () => modifyScore(playerId, baseDirection));
     }
   }
@@ -1213,13 +1420,6 @@
     const mState = getModeState();
     const player = mState.players.find((p) => p.id === playerId);
     if (!player) return;
-
-    // IN TOURNAMENT MODE: frames cannot be negative
-    if (state.activeMode === "tournament" && player.score + delta < 0) {
-      tactileFeedback(true);
-      showToast(t("tourney_negative_err"));
-      return;
-    }
 
     const prevScore = player.score;
     player.score = player.score + delta;
@@ -1236,38 +1436,56 @@
 
     // Auto-record history log entry on ALL score changes (increments AND decrements)
     let logEntry = null;
+    let isCoalesced = false;
     if (delta !== 0 && !isUndoRedo) {
       const now = new Date();
+      const nowMs = now.getTime();
       const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
       const snapshot = mState.players.map((p) => `${p.name}: ${p.score}`).join(" · ");
-      const curSum = mState.players.reduce((sum, p) => sum + p.score, 0);
+      const totalSum = mState.players.reduce((sum, p) => sum + p.score, 0);
+      const balanceSummary = state.activeMode === "tournament"
+        ? `${t("lead")}: ${getTournamentLeadSummary()}`
+        : (totalSum === 0 ? t("balanced_zero") : t("table_unbalanced", `${totalSum > 0 ? "+" : ""}${totalSum}`));
 
-      // Monotonic ledger id. The old rack number was derived from live scores, so
-      // it collided after any decrement (two "R-02" rows) and ran backwards.
-      mState.rackSeq = (Number(mState.rackSeq) || 0) + 1;
+      const lastLog = mState.history.length > 0 ? mState.history[0] : null;
+      const STREAK_WINDOW_MS = 1400;
 
-      logEntry = {
-        seq: mState.rackSeq,
-        winnerName: player.name,
-        delta: delta,
-        time: timeStr,
-        snapshot: snapshot,
-        balanceAtTime: state.activeMode === "cash"
-          ? (curSum === 0 ? t("balanced_zero") : t("table_unbalanced", `${curSum > 0 ? "+" : ""}${curSum}`))
-          : `${t("lead")}: ${getTournamentLeadSummary()}`,
-      };
+      // Coalesce rapid consecutive single/small taps on the same player in the same direction
+      if (
+        lastLog &&
+        lastLog.playerId === playerId &&
+        lastLog.timestampMs &&
+        nowMs - lastLog.timestampMs < STREAK_WINDOW_MS &&
+        ((lastLog.delta > 0 && delta > 0) || (lastLog.delta < 0 && delta < 0))
+      ) {
+        isCoalesced = true;
+        logEntry = lastLog;
+        lastLog.delta += delta;
+        lastLog.newScore = player.score;
+        lastLog.time = timeStr;
+        lastLog.timestampMs = nowMs;
+        lastLog.snapshot = snapshot;
+        lastLog.balanceAtTime = balanceSummary;
+      } else {
+        mState.rackSeq = (Number(mState.rackSeq) || 0) + 1;
+        logEntry = {
+          seq: mState.rackSeq,
+          playerId: playerId,
+          winnerName: player.name,
+          delta: delta,
+          prevScore: prevScore,
+          newScore: player.score,
+          time: timeStr,
+          timestampMs: nowMs,
+          snapshot: snapshot,
+          balanceAtTime: balanceSummary,
+        };
+        mState.history.unshift(logEntry);
+        if (mState.history.length > 60) mState.history.pop();
+      }
 
-      mState.history.unshift(logEntry);
-      if (mState.history.length > 60) mState.history.pop();
       renderRackLog();
       resetBlurCountdown();
-
-      // Tournament Mode Race Milestone Alert
-      if (state.activeMode === "tournament" && player.score >= mState.targetRace) {
-        showToast(t("match_win_alert", player.name.toUpperCase(), mState.targetRace));
-        tactileFeedback(true);
-        stopShotClock();
-      }
     }
 
     if (!isUndoRedo) {
@@ -1277,6 +1495,7 @@
         prevScore,
         newScore: player.score,
         logEntry,
+        isCoalesced,
       });
       // Bounded history: the stack used to grow forever inside localStorage.
       if (mState.undoStack.length > 100) mState.undoStack.shift();
@@ -1302,7 +1521,17 @@
       player.score = action.prevScore;
 
       if (action.logEntry) {
-        mState.history = mState.history.filter((h) => h !== action.logEntry);
+        if (action.isCoalesced) {
+          action.logEntry.delta -= action.delta;
+          action.logEntry.newScore = action.prevScore;
+          if (action.logEntry.delta === 0) {
+            mState.history = mState.history.filter((h) => h !== action.logEntry);
+          } else {
+            action.logEntry.snapshot = mState.players.map((p) => `${p.name}: ${p.score}`).join(" · ");
+          }
+        } else {
+          mState.history = mState.history.filter((h) => h !== action.logEntry);
+        }
         renderRackLog();
         resetBlurCountdown();
       }
@@ -1324,7 +1553,18 @@
       player.score = action.newScore;
 
       if (action.logEntry) {
-        mState.history.unshift(action.logEntry);
+        if (action.isCoalesced) {
+          action.logEntry.delta += action.delta;
+          action.logEntry.newScore = action.newScore;
+          action.logEntry.snapshot = mState.players.map((p) => `${p.name}: ${p.score}`).join(" · ");
+          if (!mState.history.includes(action.logEntry)) {
+            mState.history.unshift(action.logEntry);
+          }
+        } else {
+          if (!mState.history.includes(action.logEntry)) {
+            mState.history.unshift(action.logEntry);
+          }
+        }
         renderRackLog();
         resetBlurCountdown();
       }
@@ -1347,22 +1587,11 @@
     const pct = Math.max(0, Math.min(100, (clockTimeLeft / mState.shotClockDuration) * 100));
     if (clockProgressFill) clockProgressFill.style.width = `${pct}%`;
 
-    const isCrit = isClockRunning && clockTimeLeft <= 5;
+    const isCrit = isClockRunning && clockTimeLeft <= 5 && clockTimeLeft > 0;
+    if (clockReadoutCard) clockReadoutCard.classList.toggle("crit", isCrit);
+    if (clockDigitsColumn) clockDigitsColumn.classList.toggle("crit", isCrit);
     if (clockHeroDigits) clockHeroDigits.classList.toggle("crit", isCrit);
     if (clockProgressFill) clockProgressFill.classList.toggle("crit", isCrit);
-
-    if (clockStatusChip) {
-      if (clockTimeLeft === 0) {
-        clockStatusChip.textContent = t("time_foul");
-        clockStatusChip.className = "status-chip foul";
-      } else if (isClockRunning) {
-        clockStatusChip.textContent = t("running");
-        clockStatusChip.className = "status-chip running";
-      } else {
-        clockStatusChip.textContent = t("standby");
-        clockStatusChip.className = "status-chip";
-      }
-    }
 
     const extLeft = Math.max(0, MAX_EXTENSIONS - getExtensionsUsed());
     const clockExtText = $("clockExtText");
@@ -1378,8 +1607,18 @@
     if (btnClockExt) btnClockExt.disabled = extensionsExhausted;
     if (btnCompactClockExt) btnCompactClockExt.disabled = extensionsExhausted;
 
-    if (clockBtnText) {
-      clockBtnText.textContent = isClockRunning ? t("pause_clock") : t("start_clock");
+    if (clockBtnText && clockBtnIcon) {
+      if (isClockRunning) {
+        clockBtnIcon.textContent = "refresh";
+        clockBtnText.textContent = t("restart_clock");
+      } else {
+        clockBtnIcon.textContent = "play_arrow";
+        clockBtnText.textContent = t("start_clock");
+      }
+    }
+
+    if (clockPauseIcon) {
+      clockPauseIcon.textContent = isClockRunning ? "pause" : "play_arrow";
     }
 
     const compactClockIcon = $("compactClockIcon");
@@ -1391,20 +1630,17 @@
   function startShotClock() {
     clearInterval(clockInterval);
     isClockRunning = true;
-    if (clockBtnIcon) clockBtnIcon.textContent = "pause";
-    if (clockBtnText) clockBtnText.textContent = t("pause_clock");
-    const compactClockIcon = $("compactClockIcon");
-    if (compactClockIcon) compactClockIcon.textContent = "pause";
+    renderShotClock();
 
     clockInterval = setInterval(() => {
       if (clockTimeLeft > 0) {
         clockTimeLeft--;
 
         if (clockTimeLeft <= 5 && clockTimeLeft >= 1) {
-          playTone(880, 0.08);
-          vibrateDevice(20);
+          playTone(850 + (6 - clockTimeLeft) * 70, 0.12, "triangle");
+          vibrateDevice([40, 25]);
         } else if (clockTimeLeft === 10) {
-          playTone(660, 0.06);
+          playTone(660, 0.08);
         }
 
         renderShotClock();
@@ -1423,10 +1659,8 @@
     clearInterval(clockInterval);
     clockInterval = null;
     isClockRunning = false;
-    if (clockBtnIcon) clockBtnIcon.textContent = "play_arrow";
-    if (clockBtnText) clockBtnText.textContent = t("start_clock");
-    const compactClockIcon = $("compactClockIcon");
-    if (compactClockIcon) compactClockIcon.textContent = "play_arrow";
+    if (clockReadoutCard) clockReadoutCard.classList.remove("crit");
+    if (clockDigitsColumn) clockDigitsColumn.classList.remove("crit");
     renderShotClock();
   }
 
@@ -1464,10 +1698,19 @@
   if (btnClockStart) {
     btnClockStart.addEventListener("click", () => {
       tactileFeedback();
-      if (isClockRunning) stopShotClock();
-      else {
-        const mState = getModeState();
-        if (clockTimeLeft === 0) clockTimeLeft = mState.shotClockDuration;
+      const mState = getModeState();
+      if (isClockRunning) {
+        // Tapping while running immediately restarts 45s for the next shot!
+        clockTimeLeft = mState.shotClockDuration;
+        setExtensionsUsed(0);
+        startShotClock();
+        playTone(640, 0.06);
+        showToast(t("shot_restarted"));
+      } else {
+        if (clockTimeLeft === 0) {
+          clockTimeLeft = mState.shotClockDuration;
+          setExtensionsUsed(0);
+        }
         startShotClock();
       }
     });
@@ -1480,10 +1723,21 @@
     });
   }
 
-  if (btnClockReset) {
-    btnClockReset.addEventListener("click", () => {
+  if (btnClockPause) {
+    btnClockPause.addEventListener("click", () => {
       tactileFeedback();
-      resetShotClock();
+      if (isClockRunning) {
+        stopShotClock();
+        showToast(t("pause_clock"));
+      } else {
+        const mState = getModeState();
+        if (clockTimeLeft === 0) {
+          clockTimeLeft = mState.shotClockDuration;
+          setExtensionsUsed(0);
+        }
+        startShotClock();
+        showToast(t("start_clock"));
+      }
     });
   }
 
@@ -1553,11 +1807,21 @@
       // Ledger id (monotonic). Legacy entries without one fall back to rackNum.
       const seq = Number(h.seq) || Number(h.rackNum) || 0;
       const rackDisplay = seq > 0 ? `R-${String(seq).padStart(2, "0")}` : "ACT";
+
+      const prev = Number.isFinite(h.prevScore)
+        ? h.prevScore
+        : (Number.isFinite(h.newScore) ? h.newScore - h.delta : null);
+      const transitionText = prev !== null && Number.isFinite(h.newScore)
+        ? `(${prev} → ${h.newScore})`
+        : "";
+
       row.innerHTML = `
         <div class="log-entry-main">
-          <span class="log-rack-num">${rackDisplay}</span>
-          <span class="log-winner-name">${escapeHtml(h.winnerName)}</span>
-          <span class="log-point-delta ${deltaClass}">${deltaSign}${h.delta}</span>
+          <div class="log-entry-narrative">
+            <span class="log-winner-name">${escapeHtml(h.winnerName)}</span>
+            <span class="log-point-delta ${deltaClass}">${deltaSign}${h.delta}</span>
+            ${transitionText ? `<span class="log-score-transition">${transitionText}</span>` : ""}
+          </div>
           <span class="log-timestamp">${h.time}</span>
         </div>
         <div class="log-extended-info">
@@ -1723,6 +1987,10 @@
     mState.history = [];
     mState.undoStack.length = 0;
     mState.redoStack.length = 0;
+    state.sessionStartTime = Date.now();
+    state.sessionElapsedMs = 0;
+    state.isSessionPaused = false;
+    renderSessionClock();
     resetShotClock();
     saveState();
     renderPlayers();
@@ -1751,78 +2019,23 @@
     return draftTargetRace !== null ? draftTargetRace : getModeState().targetRace;
   }
 
-  /** Single source of truth for every stake/race readout on the board. */
+  /** Single source of truth for stake rate readout on the board. */
   function refreshStakeDisplays() {
     const mState = getModeState();
-    if (metricPerRackVal) metricPerRackVal.innerHTML = `$${mState.stakeRate.toFixed(2)} <small>/ PT</small>`;
     if (cashStakeLabel) cashStakeLabel.textContent = `$${mState.stakeRate.toFixed(2)} / PT`;
-    if (metricTargetRace) metricTargetRace.textContent = `RACE ${mState.targetRace}`;
-    if (racePillTag) racePillTag.textContent = `RACE ${mState.targetRace}`;
-    if (tourneyRaceBadge) {
-      tourneyRaceBadge.innerHTML = `<span class="material-symbols-outlined" aria-hidden="true" style="font-size: 13px; vertical-align: middle;">flag</span> ${escapeHtml(t("target_race_badge", mState.targetRace))}`;
-    }
   }
 
   function renderStakesModal() {
     const rate = currentDraftRate();
-    const race = currentDraftRace();
 
     // Never rewrite the field the user is currently typing in (caret jump).
     if (document.activeElement !== stakeInputRate) {
       stakeInputRate.value = rate.toFixed(2);
     }
-    if (raceInputTarget && state.activeMode === "tournament" && document.activeElement !== raceInputTarget) {
-      raceInputTarget.value = race;
-    }
 
     document.querySelectorAll(".preset-chip:not(.race-chip)").forEach((chip) => {
       chip.classList.toggle("active", Math.abs(parseFloat(chip.dataset.v) - rate) < 0.01);
     });
-
-    if (state.activeMode === "tournament") {
-      document.querySelectorAll(".race-chip").forEach((chip) => {
-        chip.classList.toggle("active", parseInt(chip.dataset.r, 10) === race);
-      });
-    }
-
-    renderSettlementPreview(rate);
-  }
-
-  function renderSettlementPreview(rateOverride) {
-    const mState = getModeState();
-    const { netCash, transfers } = calculateSettlements(rateOverride);
-    modalSettlementRoster.innerHTML = "";
-    mState.players.forEach((p) => {
-      const val = netCash[p.id] || 0;
-      const isWin = val >= 0;
-      const row = document.createElement("div");
-      row.className = "settle-row";
-      row.innerHTML = `
-        <span>${escapeHtml(p.name)} (${escapeHtml(t("pts_suffix", p.score))})</span>
-        <strong class="${isWin ? "win" : "loss"}">${isWin ? "+" : "-"}$${Math.abs(val).toFixed(2)}</strong>
-      `;
-      modalSettlementRoster.appendChild(row);
-    });
-
-    modalTransfersLedger.innerHTML = "";
-    if (transfers.length === 0) {
-      modalTransfersLedger.innerHTML = `
-        <div class="xfer-item-row">
-          <span class="material-symbols-outlined" style="font-size: 15px;">check_circle</span>
-          <span>${t("no_transfers")}</span>
-        </div>
-      `;
-    } else {
-      transfers.forEach((tr) => {
-        const item = document.createElement("div");
-        item.className = "xfer-item-row";
-        item.innerHTML = `
-          <span class="material-symbols-outlined" style="font-size: 15px;">arrow_forward</span>
-          <span>${t("transfer_item", escapeHtml(tr.from), escapeHtml(tr.to), tr.amount)}</span>
-        `;
-        modalTransfersLedger.appendChild(item);
-      });
-    }
   }
 
   function openStakesModal() {
@@ -1837,10 +2050,7 @@
     clearStakesDraft();
   }
 
-  if (btnOpenSettlements) btnOpenSettlements.addEventListener("click", openStakesModal);
   if (btnCashRateChip) btnCashRateChip.addEventListener("click", openStakesModal);
-  if (boxPerRack) boxPerRack.addEventListener("click", openStakesModal);
-  if (boxTargetFrame) boxTargetFrame.addEventListener("click", openStakesModal);
 
   btnCloseStakesModal.addEventListener("click", closeStakesModal);
   stakesModal.addEventListener("click", (e) => {
@@ -1855,12 +2065,6 @@
     const typedRate = parseFloat(stakeInputRate.value);
     if (Number.isFinite(typedRate)) mState.stakeRate = Math.max(0, typedRate);
     else if (draftStakeRate !== null) mState.stakeRate = draftStakeRate;
-
-    if (raceInputTarget && state.activeMode === "tournament") {
-      const typedRace = parseInt(raceInputTarget.value, 10);
-      if (Number.isFinite(typedRace)) mState.targetRace = Math.max(1, Math.min(99, typedRace));
-      else if (draftTargetRace !== null) mState.targetRace = draftTargetRace;
-    }
 
     clearStakesDraft();
     refreshStakeDisplays();
@@ -1895,37 +2099,9 @@
     });
   }
 
-  if (btnRaceMinus) {
-    btnRaceMinus.addEventListener("click", () => {
-      if (state.activeMode !== "tournament") return;
-      const typed = parseInt(raceInputTarget.value, 10);
-      const base = Number.isFinite(typed) ? typed : currentDraftRace();
-      draftTargetRace = Math.max(1, base - 1);
-      renderStakesModal();
-    });
-  }
-
-  if (btnRacePlus) {
-    btnRacePlus.addEventListener("click", () => {
-      if (state.activeMode !== "tournament") return;
-      const typed = parseInt(raceInputTarget.value, 10);
-      const base = Number.isFinite(typed) ? typed : currentDraftRace();
-      draftTargetRace = Math.min(99, base + 1);
-      renderStakesModal();
-    });
-  }
-
   document.querySelectorAll(".preset-chip:not(.race-chip)").forEach((chip) => {
     chip.addEventListener("click", () => {
       draftStakeRate = parseFloat(chip.dataset.v);
-      renderStakesModal();
-    });
-  });
-
-  document.querySelectorAll(".race-chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      if (state.activeMode !== "tournament") return;
-      draftTargetRace = parseInt(chip.dataset.r, 10);
       renderStakesModal();
     });
   });
@@ -2117,7 +2293,7 @@
       if (btnClockExt) btnClockExt.click();
       else if (btnCompactClockExt) btnCompactClockExt.click();
     } else if (key === "r") {
-      if (btnClockReset) btnClockReset.click();
+      if (btnClockPause) btnClockPause.click();
       else if (btnCompactClockReset) btnCompactClockReset.click();
     } else if ((e.ctrlKey || e.metaKey) && (key === "y" || (key === "z" && e.shiftKey))) {
       e.preventDefault();
@@ -2240,6 +2416,11 @@
 
     // Request screen wake lock
     requestScreenWakeLock();
+
+    // Request persistent storage protection against browser eviction
+    if (navigator.storage && navigator.storage.persist) {
+      navigator.storage.persist().catch(() => {});
+    }
 
     soundIcon.textContent = state.soundEnabled ? "volume_up" : "volume_off";
 
