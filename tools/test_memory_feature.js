@@ -146,18 +146,17 @@ server.listen(0, '127.0.0.1', async () => {
   const defaultTitle = await evalJs(`document.getElementById('saveMatchTitleInput').value`);
   console.log(`  [+] Pre-filled default title: "${defaultTitle}"`);
 
-  // Test 4: Attach Match Graph & Fill Metadata
-  console.log('[Test 4] Attaching Match Graph & entering location...');
+  // Test 4: Fill Metadata & Check Rack Badge
+  console.log('[Test 4] Checking rack badge & entering location...');
   await evalJs(`
     document.getElementById('saveMatchTitleInput').value = "Championship Finals 2026";
     document.getElementById('saveMatchLocationInput').value = "Billiards Club 88";
     document.getElementById('saveMatchNotesInput').value = "Great break and run!";
-    document.getElementById('btnToggleAttachGraph').click();
   `);
-  await new Promise(r => setTimeout(r, 500));
+  await new Promise(r => setTimeout(r, 200));
 
-  const isGraphAttached = await evalJs(`document.getElementById('saveMatchGraphPreviewBox').style.display !== 'none'`);
-  console.log(`  [+] Match Graph attached and preview visible: ${isGraphAttached}`);
+  const hasRacksBadge = await evalJs(`document.getElementById('saveMatchRacksBadge') !== null`);
+  console.log(`  [+] Save match modal has racks badge: ${hasRacksBadge}`);
 
   // Test 5: Confirm Save Match
   console.log('[Test 5] Clicking Save to Archive...');

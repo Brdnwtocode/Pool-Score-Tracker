@@ -696,6 +696,7 @@
         <div class="save-match-summary-card" id="saveMatchSummaryCard">
           <div class="summary-mode-row">
             <span class="summary-badge" id="saveMatchModeBadge">TOURNAMENT</span>
+            <span class="summary-badge racks-count" id="saveMatchRacksBadge">0 Racks Logged</span>
             <span class="summary-timer" id="saveMatchDurationBadge">00:00:00</span>
           </div>
           <div class="summary-scores-row" id="saveMatchScoresRow">
@@ -752,39 +753,6 @@
           </div>
         </div>
 
-        <!-- Form: Optional Graph Snapshot -->
-        <div class="form-group">
-          <div class="graph-attachment-box">
-            <div class="graph-attach-header">
-              <div class="graph-attach-info">
-                <span class="material-symbols-outlined">show_chart</span>
-                <div>
-                  <strong class="graph-attach-title" id="lblAttachGraphTitle">Match Graph Snapshot</strong>
-                  <span class="graph-attach-desc" id="lblAttachGraphDesc">Capture points &amp; timeline graph</span>
-                </div>
-              </div>
-              <div class="graph-attach-actions">
-                <button class="btn-graph-save-direct" id="btnDownloadGraphSnapshot" type="button" title="Save graph image directly to device">
-                  <span class="material-symbols-outlined">download</span>
-                  <span id="lblDownloadGraphBtn">Save Image</span>
-                </button>
-                <button class="btn-pill-toggle" id="btnToggleAttachGraph" type="button">
-                  <span class="material-symbols-outlined" id="attachGraphToggleIcon">add</span>
-                  <span id="lblAttachGraphToggle">Include Graph</span>
-                </button>
-              </div>
-            </div>
-            <div class="graph-preview-box" id="saveMatchGraphPreviewBox" style="display: none;">
-              <img class="graph-preview-img" id="saveMatchGraphPreviewImg" alt="Match graph snapshot" title="Tap to view fullscreen">
-              <div class="graph-preview-controls">
-                <button class="btn-preview-tool download" id="btnDownloadPreviewGraph" type="button" title="Save graph image to device">
-                  <span class="material-symbols-outlined">download</span>
-                </button>
-                <button class="btn-preview-tool remove" id="btnRemoveGraphSnapshot" type="button" title="Remove graph snapshot">✕</button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div class="modal-foot">

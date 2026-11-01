@@ -175,39 +175,15 @@ server.listen(0, '127.0.0.1', async () => {
   await evalJs(`document.getElementById('btnSaveMatchLog').click();`);
   await new Promise(r => setTimeout(r, 300));
 
-  // Check direct download button exists in Save Match modal
-  const hasDirectDownloadBtn = await evalJs(`document.getElementById('btnDownloadGraphSnapshot') !== null`);
-  console.log(`[+] Save Match modal has direct "Save Graph Image" button: ${hasDirectDownloadBtn}`);
+  // Check Save Match modal has rack count badge
+  const racksBadgeText = await evalJs(`document.getElementById('saveMatchRacksBadge')?.textContent`);
+  console.log(`[+] Save Match modal has rack count badge: "${racksBadgeText}"`);
+  if (!racksBadgeText) throw new Error('Save match rack badge not found');
 
-  // Attach Graph
-  await evalJs(`document.getElementById('btnToggleAttachGraph').click();`);
-  await new Promise(r => setTimeout(r, 600));
-
-  const isGraphPreviewVisible = await evalJs(`document.getElementById('saveMatchGraphPreviewBox').style.display !== 'none'`);
-  console.log(`[+] Graph preview visible inside Save Match modal: ${isGraphPreviewVisible}`);
-  if (!isGraphPreviewVisible) throw new Error('Graph preview did not show up');
-
-  // Verify preview controls: download icon & remove icon
-  const hasPreviewDownload = await evalJs(`document.getElementById('btnDownloadPreviewGraph') !== null`);
-  const hasPreviewRemove = await evalJs(`document.getElementById('btnRemoveGraphSnapshot') !== null`);
-  console.log(`[+] Preview box has download tool button: ${hasPreviewDownload}`);
-  console.log(`[+] Preview box has remove tool button: ${hasPreviewRemove}`);
-
-  // Tap preview image to open Lightbox
-  await evalJs(`document.getElementById('saveMatchGraphPreviewImg').click();`);
-  await new Promise(r => setTimeout(r, 300));
-
-  const isLightboxOpen = await evalJs(`document.getElementById('mediaLightboxModal').style.display === 'flex'`);
-  const lightboxImgSrc = await evalJs(`document.getElementById('lightboxImg').src`);
-  console.log(`[+] Lightbox opened upon tapping preview image: ${isLightboxOpen}`);
-  console.log(`[+] Lightbox image source is blob URL: ${lightboxImgSrc.startsWith('blob:')}`);
-  if (!isLightboxOpen) throw new Error('Lightbox did not open on preview tap');
-
-  // Close Lightbox via Escape
-  await evalJs(`window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));`);
-  await new Promise(r => setTimeout(r, 200));
-  const isLightboxClosed = await evalJs(`document.getElementById('mediaLightboxModal').style.display === 'none'`);
-  console.log(`[+] Lightbox cleanly closed via Escape: ${isLightboxClosed}`);
+  // Verify graph attachment preview box was removed from Save Match modal
+  const hasGraphBox = await evalJs(`document.getElementById('saveMatchGraphPreviewBox') !== null`);
+  console.log(`[+] Standalone graph snapshot box cleanly removed from Save modal: ${!hasGraphBox}`);
+  if (hasGraphBox) throw new Error('saveMatchGraphPreviewBox should not exist in Save Match modal');
 
   // Confirm Save Match
   await evalJs(`
@@ -221,16 +197,13 @@ server.listen(0, '127.0.0.1', async () => {
   await new Promise(r => setTimeout(r, 500));
 
   const archiveCardCount = await evalJs(`document.querySelectorAll('.archive-match-card').length`);
-  const cardHasGraph = await evalJs(`document.querySelector('.card-media-thumb.graph-thumb') !== null`);
+  const cardHasRacksPill = await evalJs(`document.querySelector('.card-racks-pill') !== null`);
+  const cardHasAccordion = await evalJs(`document.querySelector('.card-history-accordion') !== null`);
   console.log(`[+] Matches in Archive: ${archiveCardCount}`);
-  console.log(`[+] Saved Card has Graph thumbnail: ${cardHasGraph}`);
-  if (!cardHasGraph) throw new Error('Saved match card does not have graph thumbnail');
-
-  // Open Lightbox from archive graph thumbnail
-  await evalJs(`document.querySelector('.card-media-thumb.graph-thumb').click();`);
-  await new Promise(r => setTimeout(r, 300));
-  const isArchiveLightboxOpen = await evalJs(`document.getElementById('mediaLightboxModal').style.display === 'flex'`);
-  console.log(`[+] Lightbox opened from Archive graph thumbnail: ${isArchiveLightboxOpen}`);
+  console.log(`[+] Saved Card has Racks pill: ${cardHasRacksPill}`);
+  console.log(`[+] Saved Card has History Accordion: ${cardHasAccordion}`);
+  if (!cardHasRacksPill) throw new Error('Saved match card does not have racks pill');
+  if (!cardHasAccordion) throw new Error('Saved match card does not have history accordion');
 
   console.log('\n=== ALL AUDIT CHECKS PASSED WITH 100% SUCCESS! ===\n');
 

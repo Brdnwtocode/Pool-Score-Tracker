@@ -3825,6 +3825,25 @@ html:not(.dark) .btn-score-touch:hover {
   color: var(--accent);
 }
 
+.card-racks-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.summary-badge.racks-count {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  color: var(--text-primary);
+}
+
 .card-badges-row {
   display: flex;
   align-items: center;
@@ -4001,6 +4020,152 @@ html:not(.dark) .btn-score-touch:hover {
 .btn-card-action.danger:hover {
   color: #f5222d;
   border-color: #f5222d;
+}
+
+/* ═══════════════ CARD INTERACTIVE HISTORY ACCORDION & DUAL VIEW ═══════════════ */
+.btn-card-history-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.btn-card-history-toggle:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-bold);
+}
+
+.btn-card-history-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-card-history-toggle-left .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.btn-card-history-toggle .toggle-chevron {
+  font-size: 18px;
+  color: var(--text-muted);
+  transition: transform 180ms ease;
+}
+
+.btn-card-history-toggle.expanded .toggle-chevron {
+  transform: rotate(180deg);
+}
+
+.card-history-accordion {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 4px;
+}
+
+.card-history-accordion.open {
+  display: flex;
+}
+
+.card-subview-tabs {
+  display: flex;
+  gap: 6px;
+  background: var(--bg-inset);
+  padding: 3px;
+  border: 1px solid var(--border-hairline);
+  border-radius: 4px;
+}
+
+.card-subview-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.card-subview-btn .material-symbols-outlined {
+  font-size: 15px;
+}
+
+.card-subview-btn.active {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.card-tab-log {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.card-tab-graph {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-empty-history {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.btn-card-save-graph {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 3px 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.btn-card-save-graph:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-bold);
 }
 
 /* ═══════════════ LIGHTBOX FULLSCREEN ═══════════════ */

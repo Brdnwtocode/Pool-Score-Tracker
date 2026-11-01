@@ -179,6 +179,14 @@
       archive_matches_count: "{0} Matches",
       archive_pin_on: "Match pinned (protected from auto-cleanup)",
       archive_pin_off: "Match unpinned",
+      save_match_racks_count: "{0} Racks Logged",
+      archive_racks_label: "Racks",
+      archive_view_history: "Match History",
+      archive_hide_history: "Hide History",
+      archive_tab_log: "Rack Log",
+      archive_tab_graph: "Match Graph",
+      archive_no_history: "No rack events recorded for this match",
+      archive_save_graph_btn: "Save Graph Image",
       no_graph_data: "NO SCORE DATA YET · TAP + OR − TO GRAPH",
       tap_isolate: "Tap line to isolate player",
       all_players: "ALL PLAYERS",
@@ -378,6 +386,14 @@
       archive_matches_count: "{0} Trận đấu",
       archive_pin_on: "Đã ghim trận đấu (được bảo vệ khỏi tự động dọn dẹp)",
       archive_pin_off: "Đã bỏ ghim trận đấu",
+      save_match_racks_count: "{0} ván đã ghi",
+      archive_racks_label: "Ván",
+      archive_view_history: "Lịch sử trận đấu",
+      archive_hide_history: "Ẩn lịch sử",
+      archive_tab_log: "Nhật ký ván",
+      archive_tab_graph: "Biểu đồ điểm",
+      archive_no_history: "Không có nhật ký ván nào cho trận đấu này",
+      archive_save_graph_btn: "Lưu ảnh biểu đồ",
       no_graph_data: "CHƯA CÓ DỮ LIỆU ĐIỂM · CHẠM + HOẶC − ĐỂ VẼ BIỂU ĐỒ",
       tap_isolate: "Chạm đường để xem riêng cơ thủ",
       all_players: "TẤT CẢ CƠ THỦ",
@@ -2200,18 +2216,46 @@
     return MONO_PLAYER_STYLES[index % MONO_PLAYER_STYLES.length];
   }
 
-  function renderRackHistoryGraph() {
-    if (!rackLogGraphContainer || !matchHistorySvg) return;
-    const mState = getModeState();
+  function showGraphTooltipAt(e, name, delta, score, time, tooltipElem, svgElem) {
+    if (!tooltipElem || !svgElem) return;
+    const rect = svgElem.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    const deltaSign = delta > 0 ? `+${delta}` : `${delta}`;
+    tooltipElem.innerHTML = `
+      <div class="graph-tooltip-title">${escapeHtml(name)} (${deltaSign})</div>
+      <div class="graph-tooltip-row">
+        <span>Score: ${score}</span>
+        <span>${time}</span>
+      </div>
+    `;
+    tooltipElem.style.left = `${Math.max(40, Math.min(rect.width - 40, x))}px`;
+    tooltipElem.style.top = `${Math.max(30, y)}px`;
+    tooltipElem.style.display = "block";
+  }
+
+  function renderBilliardsGraph({
+    history,
+    players,
+    svgElem,
+    legendElem,
+    tooltipElem,
+    selectedPlayerId = null,
+    onSelectPlayer = null,
+  }) {
+    if (!svgElem) return;
     const isDark = document.documentElement.classList.contains("dark");
 
     // Clear previous SVG contents
-    matchHistorySvg.innerHTML = "";
-    if (graphLegendBar) graphLegendBar.innerHTML = "";
+    svgElem.innerHTML = "";
+    if (legendElem) legendElem.innerHTML = "";
 
-    if (mState.history.length === 0) {
-      matchHistorySvg.innerHTML = `
-        <text x="400" y="140" text-anchor="middle" font-family="var(--font-mono)" font-size="12" fill="var(--text-muted)">
+    if (!history || history.length === 0 || !players || players.length === 0) {
+      svgElem.innerHTML = `
+        <text x="400" y="130" text-anchor="middle" font-family="var(--font-mono)" font-size="12" fill="var(--text-muted)">
           ${t("no_graph_data")}
         </text>
       `;
@@ -2219,8 +2263,7 @@
     }
 
     // Chronological order: from oldest to newest
-    const chronological = [...mState.history].reverse();
-    const players = mState.players;
+    const chronological = [...history].reverse();
 
     // Track running scores for each event
     const playerPoints = {};
@@ -2269,10 +2312,12 @@
     let minScore = 0;
     let maxScore = 0;
     players.forEach(p => {
-      playerPoints[p.id].forEach(pt => {
-        if (pt.score < minScore) minScore = pt.score;
-        if (pt.score > maxScore) maxScore = pt.score;
-      });
+      if (playerPoints[p.id]) {
+        playerPoints[p.id].forEach(pt => {
+          if (pt.score < minScore) minScore = pt.score;
+          if (pt.score > maxScore) maxScore = pt.score;
+        });
+      }
     });
 
     // Add padding to Y range
@@ -2311,7 +2356,7 @@
       line.setAttribute("x2", svgWidth - padRight);
       line.setAttribute("y2", yPos);
       line.setAttribute("class", lineClass);
-      matchHistorySvg.appendChild(line);
+      svgElem.appendChild(line);
 
       const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
       label.setAttribute("x", padLeft - 8);
@@ -2319,7 +2364,7 @@
       label.setAttribute("text-anchor", "end");
       label.setAttribute("class", "graph-axis-label");
       label.textContent = s > 0 ? `+${s}` : `${s}`;
-      matchHistorySvg.appendChild(label);
+      svgElem.appendChild(label);
     }
 
     // X Gridlines & Time Labels
@@ -2333,7 +2378,7 @@
       gridX.setAttribute("x2", xPos);
       gridX.setAttribute("y2", svgHeight - padBottom);
       gridX.setAttribute("class", "graph-grid-line");
-      matchHistorySvg.appendChild(gridX);
+      svgElem.appendChild(gridX);
 
       const timeLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
       timeLabel.setAttribute("x", xPos);
@@ -2341,53 +2386,56 @@
       timeLabel.setAttribute("text-anchor", "middle");
       timeLabel.setAttribute("class", "graph-axis-label");
 
-      const timeItem = e === 0 ? playerPoints[players[0].id][0] : playerPoints[players[0].id][e];
+      const firstPlayerPts = playerPoints[players[0]?.id];
+      const timeItem = e === 0 ? firstPlayerPts?.[0] : firstPlayerPts?.[e];
       timeLabel.textContent = timeItem ? timeItem.timeStr : "";
-      matchHistorySvg.appendChild(timeLabel);
+      svgElem.appendChild(timeLabel);
     }
 
-    // 2. Render Legend Bar Chips
-    const allChip = document.createElement("button");
-    allChip.type = "button";
-    allChip.className = `legend-chip ${state.selectedGraphPlayerId === null ? "active" : ""}`;
-    allChip.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px;">density_small</span> ${t("all_players")}`;
-    allChip.addEventListener("click", () => {
-      tactileFeedback();
-      state.selectedGraphPlayerId = null;
-      renderRackHistoryGraph();
-    });
-    graphLegendBar.appendChild(allChip);
-
-    // Individual Player Chips
-    players.forEach((p, idx) => {
-      const style = getPlayerStyle(idx);
-      const color = isDark ? style.strokeDark : style.strokeLight;
-      const isSelected = state.selectedGraphPlayerId === p.id;
-      const isDimmed = state.selectedGraphPlayerId !== null && !isSelected;
-
-      const chip = document.createElement("button");
-      chip.type = "button";
-      chip.className = `legend-chip ${isSelected ? "active" : ""} ${isDimmed ? "dimmed" : ""}`;
-      chip.innerHTML = `
-        <span class="legend-line-sample" style="background:${color};"></span>
-        <span>${escapeHtml(p.name)}</span>
-        <strong>(${p.score > 0 ? "+" : ""}${p.score})</strong>
-      `;
-      chip.addEventListener("click", () => {
-        tactileFeedback();
-        state.selectedGraphPlayerId = (state.selectedGraphPlayerId === p.id ? null : p.id);
-        renderRackHistoryGraph();
+    // 2. Render Legend Bar Chips (if legendElem provided)
+    if (legendElem) {
+      const allChip = document.createElement("button");
+      allChip.type = "button";
+      allChip.className = `legend-chip ${selectedPlayerId === null ? "active" : ""}`;
+      allChip.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px;">density_small</span> ${t("all_players")}`;
+      allChip.addEventListener("click", () => {
+        if (typeof onSelectPlayer === "function") {
+          onSelectPlayer(null);
+        }
       });
-      graphLegendBar.appendChild(chip);
-    });
+      legendElem.appendChild(allChip);
+
+      // Individual Player Chips
+      players.forEach((p, idx) => {
+        const style = getPlayerStyle(idx);
+        const color = isDark ? style.strokeDark : style.strokeLight;
+        const isSelected = selectedPlayerId === p.id;
+        const isDimmed = selectedPlayerId !== null && !isSelected;
+
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = `legend-chip ${isSelected ? "active" : ""} ${isDimmed ? "dimmed" : ""}`;
+        chip.innerHTML = `
+          <span class="legend-line-sample" style="background:${color};"></span>
+          <span>${escapeHtml(p.name)}</span>
+          <strong>(${p.score > 0 ? "+" : ""}${p.score})</strong>
+        `;
+        chip.addEventListener("click", () => {
+          if (typeof onSelectPlayer === "function") {
+            onSelectPlayer(selectedPlayerId === p.id ? null : p.id);
+          }
+        });
+        legendElem.appendChild(chip);
+      });
+    }
 
     // 3. Render Player Lines and Marker Dots
     players.forEach((p, idx) => {
       const style = getPlayerStyle(idx);
       const color = isDark ? style.strokeDark : style.strokeLight;
-      const isSelected = state.selectedGraphPlayerId === p.id;
-      const isDimmed = state.selectedGraphPlayerId !== null && !isSelected;
-      const pts = playerPoints[p.id];
+      const isSelected = selectedPlayerId === p.id;
+      const isDimmed = selectedPlayerId !== null && !isSelected;
+      const pts = playerPoints[p.id] || [];
 
       // Build SVG path
       let d = "";
@@ -2406,11 +2454,11 @@
       }
       path.setAttribute("class", `player-line ${isDimmed ? "is-dimmed" : ""} ${isSelected ? "is-focused" : ""}`);
       path.addEventListener("click", () => {
-        tactileFeedback();
-        state.selectedGraphPlayerId = (state.selectedGraphPlayerId === p.id ? null : p.id);
-        renderRackHistoryGraph();
+        if (typeof onSelectPlayer === "function") {
+          onSelectPlayer(selectedPlayerId === p.id ? null : p.id);
+        }
       });
-      matchHistorySvg.appendChild(path);
+      svgElem.appendChild(path);
 
       // Marker Dots: hollow dot for plus, solid smaller dot for minus
       pts.forEach((pt) => {
@@ -2437,52 +2485,53 @@
           circle.setAttribute("class", `graph-dot dot-minus ${isDimmed ? "is-dimmed" : ""} ${isSelected ? "is-focused" : ""}`);
         }
 
-        circle.addEventListener("mouseenter", (e) => showGraphTooltip(e, p.name, pt.delta, pt.score, pt.timeStr));
-        circle.addEventListener("touchstart", (e) => showGraphTooltip(e, p.name, pt.delta, pt.score, pt.timeStr), { passive: true });
-        circle.addEventListener("mouseleave", hideGraphTooltip);
+        circle.addEventListener("mouseenter", (e) => showGraphTooltipAt(e, p.name, pt.delta, pt.score, pt.timeStr, tooltipElem, svgElem));
+        circle.addEventListener("touchstart", (e) => showGraphTooltipAt(e, p.name, pt.delta, pt.score, pt.timeStr, tooltipElem, svgElem), { passive: true });
+        circle.addEventListener("mouseleave", () => {
+          if (tooltipElem) tooltipElem.style.display = "none";
+        });
 
         circle.addEventListener("click", (e) => {
           e.stopPropagation();
-          tactileFeedback();
-          state.selectedGraphPlayerId = (state.selectedGraphPlayerId === p.id ? null : p.id);
-          renderRackHistoryGraph();
+          if (typeof onSelectPlayer === "function") {
+            onSelectPlayer(selectedPlayerId === p.id ? null : p.id);
+          }
         });
 
-        matchHistorySvg.appendChild(circle);
+        svgElem.appendChild(circle);
       });
     });
 
     // Clicking empty background resets line isolation
-    matchHistorySvg.addEventListener("click", (e) => {
-      if (e.target === matchHistorySvg || e.target.tagName === "line") {
-        if (state.selectedGraphPlayerId !== null) {
-          tactileFeedback();
-          state.selectedGraphPlayerId = null;
-          renderRackHistoryGraph();
+    svgElem.addEventListener("click", (e) => {
+      if (e.target === svgElem || e.target.tagName === "line") {
+        if (selectedPlayerId !== null && typeof onSelectPlayer === "function") {
+          onSelectPlayer(null);
         }
       }
     });
   }
 
-  function showGraphTooltip(e, name, delta, score, time) {
-    if (!graphTooltip || !matchHistorySvg) return;
-    const rect = matchHistorySvg.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+  function renderRackHistoryGraph() {
+    if (!rackLogGraphContainer || !matchHistorySvg) return;
+    const mState = getModeState();
+    renderBilliardsGraph({
+      history: mState.history,
+      players: mState.players,
+      svgElem: matchHistorySvg,
+      legendElem: graphLegendBar,
+      tooltipElem: graphTooltip,
+      selectedPlayerId: state.selectedGraphPlayerId,
+      onSelectPlayer: (pId) => {
+        tactileFeedback();
+        state.selectedGraphPlayerId = pId;
+        renderRackHistoryGraph();
+      },
+    });
+  }
 
-    const deltaSign = delta > 0 ? `+${delta}` : `${delta}`;
-    graphTooltip.innerHTML = `
-      <div class="graph-tooltip-title">${escapeHtml(name)} (${deltaSign})</div>
-      <div class="graph-tooltip-row">
-        <span>Score: ${score}</span>
-        <span>${time}</span>
-      </div>
-    `;
-    graphTooltip.style.left = `${Math.max(40, Math.min(rect.width - 40, x))}px`;
-    graphTooltip.style.top = `${Math.max(30, y)}px`;
-    graphTooltip.style.display = "block";
+  function showGraphTooltip(e, name, delta, score, time) {
+    showGraphTooltipAt(e, name, delta, score, time, graphTooltip, matchHistorySvg);
   }
 
   function hideGraphTooltip() {
@@ -3584,9 +3633,7 @@
   /**
    * Match Graph Snapshot Capture (Inlined presentation styles + 2x Retina canvas)
    */
-  async function captureCurrentGraphBlob() {
-    renderRackHistoryGraph();
-    const svgElem = $("matchHistorySvg");
+  async function captureSvgBlob(svgElem) {
     if (!svgElem) return null;
 
     return new Promise((resolve) => {
@@ -3663,6 +3710,12 @@
     });
   }
 
+  async function captureCurrentGraphBlob() {
+    renderRackHistoryGraph();
+    const svgElem = $("matchHistorySvg");
+    return captureSvgBlob(svgElem);
+  }
+
   function downloadBlobAsFile(blob, filename) {
     if (!blob) return;
     const url = URL.createObjectURL(blob);
@@ -3682,10 +3735,7 @@
     const safeTitle = rawTitle.replace(/[^a-zA-Z0-9_\-\u00C0-\u024F\u1E00-\u1EFF]/g, "_").toLowerCase();
     const filename = `${safeTitle}-graph.png`;
 
-    let blob = draftGraphBlob;
-    if (!blob) {
-      blob = await captureCurrentGraphBlob();
-    }
+    const blob = await captureCurrentGraphBlob();
     if (blob) {
       downloadBlobAsFile(blob, filename);
       showToast(t("save_match_graph_downloaded"));
@@ -3766,29 +3816,6 @@
     });
   }
 
-  function updateGraphAttachmentUI() {
-    const box = $("saveMatchGraphPreviewBox");
-    const img = $("saveMatchGraphPreviewImg");
-    const btn = $("btnToggleAttachGraph");
-    const icon = $("attachGraphToggleIcon");
-    const text = $("lblAttachGraphToggle");
-
-    if (draftGraphBlob) {
-      if (draftGraphPreviewUrl) URL.revokeObjectURL(draftGraphPreviewUrl);
-      draftGraphPreviewUrl = URL.createObjectURL(draftGraphBlob);
-      if (img) img.src = draftGraphPreviewUrl;
-      if (box) box.style.display = "block";
-      if (btn) btn.classList.add("active");
-      if (icon) icon.textContent = "check";
-      if (text) text.textContent = t("save_match_graph_ready");
-    } else {
-      if (box) box.style.display = "none";
-      if (btn) btn.classList.remove("active");
-      if (icon) icon.textContent = "add";
-      if (text) text.textContent = t("save_match_include_graph");
-    }
-  }
-
   function openSaveMatchModal() {
     const modal = $("saveMatchModal");
     if (!modal) return;
@@ -3799,13 +3826,14 @@
     const isTourney = state.activeMode === "tournament";
     const modeBadge = $("saveMatchModeBadge");
     const durationBadge = $("saveMatchDurationBadge");
+    const racksBadge = $("saveMatchRacksBadge");
     const scoresRow = $("saveMatchScoresRow");
     const titleInput = $("saveMatchTitleInput");
     const dateInput = $("saveMatchDateTimeInput");
     const locInput = $("saveMatchLocationInput");
     const notesInput = $("saveMatchNotesInput");
 
-    // Mode & Duration Readout
+    // Mode, Duration & Racks Readout
     if (modeBadge) {
       modeBadge.textContent = isTourney
         ? `TOURNAMENT · ${mState.format.toUpperCase()}`
@@ -3813,6 +3841,10 @@
     }
     if (durationBadge) {
       durationBadge.textContent = formatSessionDuration(getSessionElapsedMs());
+    }
+    if (racksBadge) {
+      const rackCount = (mState.history || []).length;
+      racksBadge.textContent = t("save_match_racks_count", rackCount);
     }
 
     // Scores Summary Readout
@@ -3852,7 +3884,6 @@
 
     populateVenueDatalistAndChips("saveMatchLocationChips", "saveMatchLocationInput");
     renderSaveMatchPhotos();
-    updateGraphAttachmentUI();
 
     modal.classList.add("open");
   }
@@ -3909,8 +3940,8 @@
         mime: p.mime,
         name: p.name,
       })),
-      hasGraph: !!draftGraphBlob,
-      graphBlob: draftGraphBlob || null,
+      hasGraph: false,
+      graphBlob: null,
       isPinned: false,
     };
 
@@ -4011,6 +4042,54 @@
     });
   }
 
+  function renderArchiveLogRows(history, players) {
+    if (!Array.isArray(history) || history.length === 0) {
+      return `
+        <div class="card-empty-history">
+          <span class="material-symbols-outlined">sports_score</span>
+          <span>${t("archive_no_history")}</span>
+        </div>
+      `;
+    }
+
+    return history.map((h) => {
+      const isPositive = (h.delta || 0) > 0;
+      const deltaSign = isPositive ? "+" : "";
+      const deltaClass = isPositive ? "inc" : "dec";
+      const seq = Number(h.seq) || Number(h.rackNum) || 0;
+      const rackDisplay = seq > 0 ? `R-${String(seq).padStart(2, "0")}` : "";
+
+      const prev = Number.isFinite(h.prevScore)
+        ? h.prevScore
+        : (Number.isFinite(h.newScore) ? h.newScore - h.delta : null);
+      const transitionText = prev !== null && Number.isFinite(h.newScore)
+        ? `(${prev} → ${h.newScore})`
+        : "";
+
+      const winnerName = h.winnerName || players?.find((p) => p.id === h.playerId)?.name || "Player";
+
+      return `
+        <div class="log-entry-row">
+          <div class="log-entry-main">
+            <div class="log-entry-narrative">
+              ${rackDisplay ? `<span class="log-rack-badge">${rackDisplay}</span>` : ""}
+              <span class="log-winner-name">${escapeHtml(winnerName)}</span>
+              <span class="log-point-delta ${deltaClass}">${deltaSign}${h.delta}</span>
+              ${transitionText ? `<span class="log-score-transition">${transitionText}</span>` : ""}
+            </div>
+            <span class="log-timestamp">${h.time || ""}</span>
+          </div>
+          ${(h.snapshot || h.balanceAtTime) ? `
+            <div class="log-extended-info">
+              ${h.snapshot ? `<span>${t("snapshot")}: ${escapeHtml(h.snapshot)}</span>` : ""}
+              ${h.balanceAtTime ? `<span>${escapeHtml(h.balanceAtTime)}</span>` : ""}
+            </div>
+          ` : ""}
+        </div>
+      `;
+    }).join("");
+  }
+
   function renderArchiveMatchCard(match) {
     const card = document.createElement("article");
     card.className = `archive-match-card${match.isPinned ? " pinned" : ""}`;
@@ -4043,7 +4122,7 @@
       })
       .join("");
 
-    // Build media thumbnails
+    // Build media thumbnails (photos)
     let mediaHtml = "";
     if (Array.isArray(match.photos) && match.photos.length > 0) {
       match.photos.forEach((photo, pIdx) => {
@@ -4074,6 +4153,9 @@
       ? `<div class="card-notes-text">${escapeHtml(match.notes)}</div>`
       : "";
 
+    const rackCount = (match.history || []).length;
+    const racksPillHtml = `<span>·</span><span class="card-racks-pill">${rackCount} ${t("archive_racks_label")}</span>`;
+
     card.innerHTML = `
       <div class="card-header-line">
         <div class="card-title-group">
@@ -4084,6 +4166,7 @@
             <span class="summary-badge">${modeTag}</span>
             <span>·</span>
             <span class="summary-timer">${match.sessionDurationStr || "00:00"}</span>
+            ${racksPillHtml}
             ${locTagHtml ? "<span>·</span>" + locTagHtml : ""}
           </div>
         </div>
@@ -4101,6 +4184,49 @@
       ${notesHtml}
 
       ${mediaHtml ? `<div class="card-media-strip">${mediaHtml}</div>` : ""}
+
+      <!-- Interactive Match History Accordion & Dual View -->
+      <button class="btn-card-history-toggle" type="button" aria-expanded="false">
+        <span class="btn-card-history-toggle-left">
+          <span class="material-symbols-outlined">timeline</span>
+          <span class="btn-history-text">${t("archive_view_history")} (${rackCount})</span>
+        </span>
+        <span class="material-symbols-outlined toggle-chevron">expand_more</span>
+      </button>
+
+      <div class="card-history-accordion">
+        <div class="card-subview-tabs">
+          <button class="card-subview-btn active" data-view="log" type="button">
+            <span class="material-symbols-outlined">format_list_bulleted</span>
+            <span>${t("archive_tab_log")} (${rackCount})</span>
+          </button>
+          <button class="card-subview-btn" data-view="graph" type="button">
+            <span class="material-symbols-outlined">show_chart</span>
+            <span>${t("archive_tab_graph")}</span>
+          </button>
+        </div>
+
+        <div class="card-tab-log">
+          ${renderArchiveLogRows(match.history, match.players)}
+        </div>
+
+        <div class="card-tab-graph" style="display: none;">
+          <div class="graph-legend-bar card-graph-legend"></div>
+          <div class="graph-svg-wrapper card-graph-wrapper">
+            <svg class="match-history-svg card-graph-svg" viewBox="0 0 800 260" preserveAspectRatio="none"></svg>
+            <div class="graph-tooltip card-graph-tooltip" style="display: none;"></div>
+          </div>
+          <div class="graph-footer-hint card-graph-footer">
+            <span class="hint-item"><span class="dot-sample hollow"></span> <span>+pts (hollow)</span></span>
+            <span class="hint-item"><span class="dot-sample solid"></span> <span>−pts (solid)</span></span>
+            <span class="hint-item hint-action">${t("tap_isolate")}</span>
+            <button class="btn-card-save-graph" type="button" title="${t("archive_save_graph_btn")}">
+              <span class="material-symbols-outlined" style="font-size: 13px;">download</span>
+              <span>${t("drawer_save_graph")}</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div class="card-footer-actions">
         <button class="btn-card-action btn-edit-match" type="button">
@@ -4141,6 +4267,89 @@
         }
       });
     });
+
+    // Hook: History Accordion & Dual View
+    const btnHistoryToggle = card.querySelector(".btn-card-history-toggle");
+    const historyAccordion = card.querySelector(".card-history-accordion");
+    const tabLogBtn = card.querySelector('.card-subview-btn[data-view="log"]');
+    const tabGraphBtn = card.querySelector('.card-subview-btn[data-view="graph"]');
+    const tabLogContent = card.querySelector(".card-tab-log");
+    const tabGraphContent = card.querySelector(".card-tab-graph");
+    const cardSvg = card.querySelector(".card-graph-svg");
+    const cardLegend = card.querySelector(".card-graph-legend");
+    const cardTooltip = card.querySelector(".card-graph-tooltip");
+    const btnCardSaveGraph = card.querySelector(".btn-card-save-graph");
+
+    let cardSelectedPlayerId = null;
+    let currentView = "log";
+
+    function updateCardGraph() {
+      if (!cardSvg || !match.history) return;
+      renderBilliardsGraph({
+        history: match.history,
+        players: match.players,
+        svgElem: cardSvg,
+        legendElem: cardLegend,
+        tooltipElem: cardTooltip,
+        selectedPlayerId: cardSelectedPlayerId,
+        onSelectPlayer: (pId) => {
+          tactileFeedback();
+          cardSelectedPlayerId = pId;
+          updateCardGraph();
+        },
+      });
+    }
+
+    if (btnHistoryToggle && historyAccordion) {
+      btnHistoryToggle.addEventListener("click", () => {
+        tactileFeedback();
+        const isOpen = historyAccordion.classList.toggle("open");
+        btnHistoryToggle.classList.toggle("expanded", isOpen);
+        btnHistoryToggle.setAttribute("aria-expanded", String(isOpen));
+        const btnText = btnHistoryToggle.querySelector(".btn-history-text");
+        if (btnText) {
+          btnText.textContent = isOpen
+            ? `${t("archive_hide_history")} (${rackCount})`
+            : `${t("archive_view_history")} (${rackCount})`;
+        }
+        if (isOpen && currentView === "graph") {
+          updateCardGraph();
+        }
+      });
+    }
+
+    if (tabLogBtn && tabGraphBtn && tabLogContent && tabGraphContent) {
+      tabLogBtn.addEventListener("click", () => {
+        tactileFeedback();
+        currentView = "log";
+        tabLogBtn.classList.add("active");
+        tabGraphBtn.classList.remove("active");
+        tabLogContent.style.display = "flex";
+        tabGraphContent.style.display = "none";
+      });
+
+      tabGraphBtn.addEventListener("click", () => {
+        tactileFeedback();
+        currentView = "graph";
+        tabGraphBtn.classList.add("active");
+        tabLogBtn.classList.remove("active");
+        tabLogContent.style.display = "none";
+        tabGraphContent.style.display = "flex";
+        updateCardGraph();
+      });
+    }
+
+    if (btnCardSaveGraph && cardSvg) {
+      btnCardSaveGraph.addEventListener("click", async () => {
+        tactileFeedback();
+        const blob = await captureSvgBlob(cardSvg);
+        if (blob) {
+          const safeTitle = (match.title || "match").replace(/[^a-zA-Z0-9_\-\u00C0-\u024F\u1E00-\u1EFF]/g, "_").toLowerCase();
+          downloadBlobAsFile(blob, `${safeTitle}-graph.png`);
+          showToast(t("save_match_graph_downloaded"));
+        }
+      });
+    }
 
     // Hook: Edit
     card.querySelector(".btn-edit-match").addEventListener("click", () => {
@@ -4362,16 +4571,11 @@
     if (lblSaveMatchNotesField) lblSaveMatchNotesField.textContent = t("save_match_field_notes");
     const lblSaveMatchPhotosField = $("lblSaveMatchPhotosField");
     if (lblSaveMatchPhotosField) lblSaveMatchPhotosField.textContent = t("save_match_field_photos");
-    const lblAddPhotoBtn = $("lblAddPhotoBtn");
-    if (lblAddPhotoBtn) lblAddPhotoBtn.textContent = t("save_match_add_photo");
-    const lblAttachGraphTitle = $("lblAttachGraphTitle");
-    if (lblAttachGraphTitle) lblAttachGraphTitle.textContent = t("save_match_attach_graph");
-    const lblAttachGraphDesc = $("lblAttachGraphDesc");
-    if (lblAttachGraphDesc) lblAttachGraphDesc.textContent = t("save_match_attach_desc");
-    const lblAttachGraphToggle = $("lblAttachGraphToggle");
-    if (lblAttachGraphToggle) lblAttachGraphToggle.textContent = t("save_match_include_graph");
-    const lblDownloadGraphBtn = $("lblDownloadGraphBtn");
-    if (lblDownloadGraphBtn) lblDownloadGraphBtn.textContent = t("save_match_download_graph");
+    const saveMatchRacksBadge = $("saveMatchRacksBadge");
+    if (saveMatchRacksBadge) {
+      const mState = getModeState();
+      saveMatchRacksBadge.textContent = t("save_match_racks_count", (mState.history || []).length);
+    }
     const lblSaveGraphQuick = $("lblSaveGraphQuick");
     if (lblSaveGraphQuick) lblSaveGraphQuick.textContent = t("drawer_save_graph");
     const lblArchiveModalTitle = $("lblArchiveModalTitle");
@@ -4445,52 +4649,7 @@
       });
     }
 
-    // Optional Graph toggle, download & remove
-    const btnToggleAttachGraph = $("btnToggleAttachGraph");
-    if (btnToggleAttachGraph) {
-      btnToggleAttachGraph.addEventListener("click", async () => {
-        tactileFeedback();
-        if (draftGraphBlob) {
-          draftGraphBlob = null;
-        } else {
-          draftGraphBlob = await captureCurrentGraphBlob();
-        }
-        updateGraphAttachmentUI();
-      });
-    }
 
-    const btnDownloadGraphSnapshot = $("btnDownloadGraphSnapshot");
-    if (btnDownloadGraphSnapshot) {
-      btnDownloadGraphSnapshot.addEventListener("click", () => {
-        downloadCurrentGraphSnapshot();
-      });
-    }
-
-    const btnDownloadPreviewGraph = $("btnDownloadPreviewGraph");
-    if (btnDownloadPreviewGraph) {
-      btnDownloadPreviewGraph.addEventListener("click", (e) => {
-        e.stopPropagation();
-        downloadCurrentGraphSnapshot();
-      });
-    }
-
-    const btnRemoveGraphSnapshot = $("btnRemoveGraphSnapshot");
-    if (btnRemoveGraphSnapshot) {
-      btnRemoveGraphSnapshot.addEventListener("click", (e) => {
-        e.stopPropagation();
-        draftGraphBlob = null;
-        updateGraphAttachmentUI();
-      });
-    }
-
-    const saveMatchGraphPreviewImg = $("saveMatchGraphPreviewImg");
-    if (saveMatchGraphPreviewImg) {
-      saveMatchGraphPreviewImg.addEventListener("click", () => {
-        if (draftGraphBlob) {
-          openLightbox(draftGraphBlob, "Match Graph Snapshot", "match-graph.png");
-        }
-      });
-    }
 
     // Quick save graph from Rack Log Drawer
     const btnSaveGraphQuick = $("btnSaveGraphQuick");
