@@ -81,6 +81,9 @@
           <button class="icon-tool" id="btnResetQuick" type="button" aria-label="Reset all scores" title="Quick Reset (Clear Scores) / Đặt lại">
             <span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>
           </button>
+          <button class="icon-tool" id="btnOpenArchive" type="button" aria-label="Match Archive" title="Match Archive / Kho lưu trữ">
+            <span class="material-symbols-outlined" aria-hidden="true">folder_special</span>
+          </button>
           <button class="user-avatar-btn" id="btnInfo" type="button" aria-label="About and system information" title="About &amp; System Specifications">
             <span class="material-symbols-outlined" aria-hidden="true">person</span>
           </button>
@@ -147,8 +150,6 @@
 
       </section>
 
-      </section>
-
 
 
       <!-- ── 6. Dynamic Player Roster Array (Ultra-Clean Cards) ── -->
@@ -212,6 +213,11 @@
             <button class="btn-more-info" id="btnToggleExtendedHistory" type="button">
               <span class="material-symbols-outlined" id="moreInfoIcon" style="font-size: 14px;">unfold_more</span>
               <span id="moreInfoBtnText">DETAILS</span>
+            </button>
+
+            <!-- Save Match Snapshot (Manual Single-Icon Action) -->
+            <button class="btn-more-info btn-icon-only-action" id="btnSaveMatchLog" type="button" title="Save Match Snapshot / Lưu trận đấu" aria-label="Save Match Snapshot">
+              <span class="material-symbols-outlined" id="saveMatchLogIcon" style="font-size: 15px;">bookmark_add</span>
             </button>
 
             <div class="drawer-status">
@@ -562,6 +568,10 @@
             <span class="material-symbols-outlined" id="burgerFullscreenIcon">fullscreen</span>
             <span id="lblBurgerFullscreen">Fullscreen</span>
           </button>
+          <button class="burger-action-card highlight" id="btnBurgerArchive" type="button">
+            <span class="material-symbols-outlined">folder_special</span>
+            <span id="lblBurgerArchive">Match Archive</span>
+          </button>
           <button class="burger-action-card danger" id="btnBurgerReset" type="button">
             <span class="material-symbols-outlined">restart_alt</span>
             <span id="lblBurgerReset">Reset Match</span>
@@ -660,6 +670,249 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ MODAL: SAVE MATCH SNAPSHOT ═══════════════ -->
+  <div class="modal-backdrop" id="saveMatchModal" role="dialog" aria-modal="true" aria-labelledby="lblSaveMatchTitle">
+    <div class="modal-window save-match-window">
+      <div class="modal-head">
+        <div class="modal-title-wrap">
+          <span class="material-symbols-outlined modal-hero-icon">bookmark_add</span>
+          <span class="modal-title-text" id="lblSaveMatchTitle">SAVE MATCH SNAPSHOT</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseSaveMatch" type="button" aria-label="Close">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body save-match-body">
+        <!-- Live Match Summary Readout -->
+        <div class="save-match-summary-card" id="saveMatchSummaryCard">
+          <div class="summary-mode-row">
+            <span class="summary-badge" id="saveMatchModeBadge">TOURNAMENT</span>
+            <span class="summary-timer" id="saveMatchDurationBadge">00:00:00</span>
+          </div>
+          <div class="summary-scores-row" id="saveMatchScoresRow">
+            <!-- Player names & scores rendered here -->
+          </div>
+        </div>
+
+        <!-- Form: Title -->
+        <div class="form-group">
+          <label class="form-label" for="saveMatchTitleInput" id="lblSaveMatchTitleField">Match Title</label>
+          <input class="form-input" id="saveMatchTitleInput" type="text" placeholder="e.g. Race to 15 Championship" maxlength="60" autocomplete="off">
+        </div>
+
+        <!-- Form: Date & Time -->
+        <div class="form-group">
+          <label class="form-label" for="saveMatchDateTimeInput" id="lblSaveMatchDateField">Date &amp; Time</label>
+          <input class="form-input" id="saveMatchDateTimeInput" type="text" placeholder="YYYY-MM-DD HH:MM" autocomplete="off">
+        </div>
+
+        <!-- Form: Location with Datalist & Quick Chips -->
+        <div class="form-group">
+          <div class="form-label-row">
+            <label class="form-label" for="saveMatchLocationInput" id="lblSaveMatchLocField">Location / Venue</label>
+            <span class="form-hint" id="lblSaveMatchLocHint">Type or select venue</span>
+          </div>
+          <div class="input-with-icon">
+            <span class="material-symbols-outlined input-icon">location_on</span>
+            <input class="form-input" id="saveMatchLocationInput" list="locationDatalist" type="text" placeholder="e.g. Club 88, Table 4" maxlength="50" autocomplete="off">
+          </div>
+          <datalist id="locationDatalist"></datalist>
+          <div class="location-chips-row" id="saveMatchLocationChips"></div>
+        </div>
+
+        <!-- Form: Notes -->
+        <div class="form-group">
+          <label class="form-label" for="saveMatchNotesInput" id="lblSaveMatchNotesField">Notes &amp; Highlights</label>
+          <textarea class="form-textarea" id="saveMatchNotesInput" rows="2" placeholder="e.g. Final rack break and run, great safety battle..." maxlength="300"></textarea>
+        </div>
+
+        <!-- Form: Up to 3 Photos (Auto-compressed) -->
+        <div class="form-group">
+          <div class="form-label-row">
+            <label class="form-label" id="lblSaveMatchPhotosField">Match Photos (Max 3)</label>
+            <span class="form-counter" id="saveMatchPhotoCount">0 / 3</span>
+          </div>
+
+          <div class="photos-uploader-container">
+            <div class="photos-preview-strip" id="saveMatchPhotoPreviews"></div>
+            <button class="btn-add-photo" id="btnAddMatchPhoto" type="button">
+              <span class="material-symbols-outlined">add_a_photo</span>
+              <span id="lblAddPhotoBtn">Add Photo</span>
+            </button>
+            <input type="file" id="saveMatchFileInput" accept="image/*" multiple style="display: none;">
+          </div>
+        </div>
+
+        <!-- Form: Optional Graph Snapshot -->
+        <div class="form-group">
+          <div class="graph-attachment-box">
+            <div class="graph-attach-header">
+              <div class="graph-attach-info">
+                <span class="material-symbols-outlined">show_chart</span>
+                <div>
+                  <strong class="graph-attach-title" id="lblAttachGraphTitle">Match Graph Snapshot</strong>
+                  <span class="graph-attach-desc" id="lblAttachGraphDesc">Capture points &amp; timeline graph</span>
+                </div>
+              </div>
+              <button class="btn-pill-toggle" id="btnToggleAttachGraph" type="button">
+                <span class="material-symbols-outlined" id="attachGraphToggleIcon">add</span>
+                <span id="lblAttachGraphToggle">Include Graph</span>
+              </button>
+            </div>
+            <div class="graph-preview-box" id="saveMatchGraphPreviewBox" style="display: none;">
+              <img class="graph-preview-img" id="saveMatchGraphPreviewImg" alt="Match graph snapshot">
+              <button class="btn-remove-preview" id="btnRemoveGraphSnapshot" type="button" title="Remove graph snapshot">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn-modal-cancel" id="btnCancelSaveMatch" type="button">
+          <span id="lblCancelSaveMatch">Cancel</span>
+        </button>
+        <button class="btn-modal-action highlight" id="btnConfirmSaveMatch" type="button">
+          <span class="material-symbols-outlined">bookmark_check</span>
+          <span id="lblConfirmSaveMatch">Save to Archive</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ MODAL: MATCH ARCHIVE ═══════════════ -->
+  <div class="modal-backdrop" id="archiveModal" role="dialog" aria-modal="true" aria-labelledby="lblArchiveModalTitle">
+    <div class="modal-window archive-window">
+      <div class="modal-head">
+        <div class="modal-title-wrap">
+          <span class="material-symbols-outlined modal-hero-icon">folder_special</span>
+          <span class="modal-title-text" id="lblArchiveModalTitle">MATCH ARCHIVE</span>
+          <span class="archive-count-pill" id="archiveTotalCountPill">0 Matches</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseArchiveModal" type="button" aria-label="Close">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Storage Health & Quota Bar -->
+      <div class="archive-quota-bar" id="archiveQuotaBar">
+        <div class="quota-info-line">
+          <div class="quota-status">
+            <span class="quota-dot" id="quotaStatusDot"></span>
+            <span class="quota-text" id="archiveQuotaText">Estimating storage...</span>
+          </div>
+          <div class="quota-actions">
+            <button class="btn-quota-tool" id="btnExportArchive" type="button" title="Export complete archive as JSON backup">
+              <span class="material-symbols-outlined">download</span>
+              <span id="lblExportArchive">Export Backup</span>
+            </button>
+            <button class="btn-quota-tool" id="btnImportArchive" type="button" title="Import matches from JSON backup">
+              <span class="material-symbols-outlined">upload</span>
+              <span id="lblImportArchive">Import</span>
+            </button>
+            <input type="file" id="archiveImportFileInput" accept=".json" style="display: none;">
+          </div>
+        </div>
+        <div class="quota-meter-track">
+          <div class="quota-meter-fill" id="archiveQuotaFill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- Filter Tabs & Search Bar -->
+      <div class="archive-nav-bar">
+        <div class="archive-filter-chips">
+          <button class="archive-chip active" data-filter="all" id="btnFilterAll" type="button">ALL</button>
+          <button class="archive-chip" data-filter="tournament" id="btnFilterTourney" type="button">TOURNAMENT</button>
+          <button class="archive-chip" data-filter="cash" id="btnFilterCash" type="button">CASH</button>
+        </div>
+        <div class="archive-search-wrap">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input class="archive-search-input" id="archiveSearchInput" type="text" placeholder="Search title, venue, notes..." autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Matches Container -->
+      <div class="modal-body archive-body" id="archiveMatchesContainer">
+        <!-- Rendered dynamically -->
+        <div class="archive-empty-state" id="archiveEmptyState">
+          <span class="material-symbols-outlined empty-icon">folder_open</span>
+          <p class="empty-title" id="lblArchiveEmptyTitle">NO MATCHES SAVED YET</p>
+          <p class="empty-desc" id="lblArchiveEmptyDesc">Tap the bookmark icon in the Rack Log to save your match results.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ MODAL: EDIT SAVED MATCH ═══════════════ -->
+  <div class="modal-backdrop" id="editMatchModal" role="dialog" aria-modal="true" aria-labelledby="lblEditMatchTitle">
+    <div class="modal-window edit-match-window">
+      <div class="modal-head">
+        <div class="modal-title-wrap">
+          <span class="material-symbols-outlined modal-hero-icon">edit_note</span>
+          <span class="modal-title-text" id="lblEditMatchTitle">EDIT MATCH RECORD</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseEditMatch" type="button" aria-label="Close">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body edit-match-body">
+        <input type="hidden" id="editMatchId">
+
+        <div class="form-group">
+          <label class="form-label" for="editMatchTitleInput" id="lblEditMatchTitleField">Title</label>
+          <input class="form-input" id="editMatchTitleInput" type="text" maxlength="60">
+        </div>
+
+        <div class="form-group">
+          <div class="form-label-row">
+            <label class="form-label" for="editMatchLocationInput" id="lblEditMatchLocField">Location / Venue</label>
+          </div>
+          <div class="input-with-icon">
+            <span class="material-symbols-outlined input-icon">location_on</span>
+            <input class="form-input" id="editMatchLocationInput" list="locationDatalist" type="text" maxlength="50">
+          </div>
+          <div class="location-chips-row" id="editMatchLocationChips"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editMatchNotesInput" id="lblEditMatchNotesField">Notes</label>
+          <textarea class="form-textarea" id="editMatchNotesInput" rows="3" maxlength="300"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn-modal-cancel" id="btnCancelEditMatch" type="button">
+          <span id="lblCancelEditMatch">Cancel</span>
+        </button>
+        <button class="btn-modal-action highlight" id="btnConfirmEditMatch" type="button">
+          <span class="material-symbols-outlined">check</span>
+          <span id="lblConfirmEditMatch">Save Changes</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ MODAL: MEDIA LIGHTBOX ═══════════════ -->
+  <div class="lightbox-backdrop" id="mediaLightboxModal" role="dialog" aria-modal="true" style="display: none;">
+    <div class="lightbox-content">
+      <div class="lightbox-top-bar">
+        <span class="lightbox-caption" id="lightboxCaption">Match Image</span>
+        <div class="lightbox-actions">
+          <button class="lightbox-btn" id="btnLightboxDownload" type="button" title="Download image to device">
+            <span class="material-symbols-outlined">download</span>
+          </button>
+          <button class="lightbox-btn close" id="btnCloseLightbox" type="button" title="Close">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+      </div>
+      <div class="lightbox-img-wrap">
+        <img class="lightbox-img" id="lightboxImg" src="" alt="Fullscreen image">
       </div>
     </div>
   </div>
