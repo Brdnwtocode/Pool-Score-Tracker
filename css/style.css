@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    CHAMPIONSHIP POOL SCOREBOARD · DUAL-MODE PROTOCOL
-   Mode 1: Cash Ring Game (Zero-Sum Betting & Pairwise Settlements)
+   Mode 1: Zero-Sum Game (Zero-Sum Points Tracker)
    Mode 2: Tournament Frame (WPA Broadcast Race-to-X & Shot Clock)
    Includes 1s Hold & Drag Gesture Scrubber HUD (1 to 12 Points)
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -120,14 +120,11 @@ input:focus-visible,
   outline-offset: 2px;
 }
 
-/* Content the user legitimately needs to copy (payout lines, ledger, names) */
-.settlement-breakdown-box,
+/* Content the user legitimately needs to copy (names, ledger) */
 .rack-log-scroll,
 .modal-body,
 .player-name-field,
-.log-entry-main,
-.xfer-item-row,
-.settle-row {
+.log-entry-main {
   -webkit-user-select: text;
   user-select: text;
 }
@@ -2549,106 +2546,6 @@ html:not(.dark) .btn-score-touch:hover {
   background: var(--bg-elevated);
 }
 
-.input-rate-box {
-  flex: 1;
-  height: 42px;
-  background: var(--bg-canvas);
-  border: 1px solid var(--border-medium);
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  gap: 6px;
-}
-
-.curr-symbol {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.input-rate-box input {
-  width: 100%;
-  font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.chip-preset-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.preset-chip {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border: 1px solid var(--border-hairline);
-  background: var(--bg-inset);
-  color: var(--text-secondary);
-  cursor: pointer;
-}
-
-.preset-chip.active {
-  background: var(--text-primary);
-  color: var(--bg-surface);
-  border-color: var(--text-primary);
-}
-
-/* Settlement Breakdown */
-.settlement-breakdown-box {
-  background: var(--bg-canvas);
-  border: 1px solid var(--border-hairline);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.breakdown-header {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--text-secondary);
-}
-
-.settlement-roster-list,
-.transfers-ledger-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.settle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-hairline);
-  font-family: var(--font-mono);
-  font-size: 11px;
-}
-
-.settle-row strong.win { color: var(--text-primary); }
-.settle-row strong.loss { color: var(--text-secondary); }
-
-.xfer-item-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 10px;
-  background: var(--bg-inset);
-  border-left: 2px solid var(--text-primary);
-  font-family: var(--font-mono);
-  font-size: 11px;
-}
-
 .modal-foot {
   padding: 12px 16px;
   border-top: 1px solid var(--border-hairline);
@@ -3907,6 +3804,14 @@ html:not(.dark) .btn-score-touch:hover {
   font-family: var(--font-mono);
   font-weight: 700;
   color: var(--text-primary);
+}
+
+.card-player-score.positive {
+  color: #52c41a;
+}
+
+.card-player-score.negative {
+  color: #f5222d;
 }
 
 .card-player-balance {

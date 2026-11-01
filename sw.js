@@ -14,7 +14,7 @@
  * Bump VERSION whenever the css/js/fonts change so clients pull the new files.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-const VERSION = "3.7.2";
+const VERSION = "3.7.3";
 const SHELL_CACHE = `21n2-shell-${VERSION}`;
 const FONT_CACHE = `21n2-fonts-${VERSION}`;
 

@@ -31,7 +31,7 @@
   // ═══════════════ LOCALIZATION DICTIONARY (VI / EN) ═══════════════
   const I18N = {
     en: {
-      cash_mode: "CASH",
+      cash_mode: "ZERO-SUM",
       tourney_mode: "TOURNEY",
       reset: "RESET",
       hold_reset: "HOLD 2S",
@@ -51,13 +51,6 @@
       ext_exhausted: "Extension already used for this shot",
       clock_expired: "SHOT CLOCK EXPIRED: FOUL",
       clock_set: "Shot clock set to {0}s",
-      stakes_protocol_title: "STAKES & RACE",
-      per_rack_val: "PER RACK",
-      current_pot: "POT",
-      target_frame: "RACE",
-      shortcuts: "SHORTCUTS:",
-      shortcut_hint: "Tap to edit",
-      who_pays_whom: "SETTLEMENTS",
       balanced_zero: "ZERO-SUM (0)",
       table_unbalanced: "UNBALANCED ({0})",
       tourney_array_title: "FRAME SCORE",
@@ -81,14 +74,6 @@
       focus_restored: "History focus restored",
       extended_info_on: "Extended Details Visible",
       extended_info_off: "Compact View",
-      modal_title_cash: "STAKES CONFIG",
-      modal_title_tourney: "STAKES CONFIG",
-      rate_per_point: "RATE PER POINT",
-      target_race_label: "TARGET RACE",
-      who_pays_whom_header: "DIRECT TRANSFERS",
-      no_transfers: "SCORES BALANCED · NO CASH TRANSFERS",
-      transfer_item: "<strong>{0}</strong> pays <strong>{1}</strong>: ${2}",
-      apply_save: "APPLY",
       close: "CLOSE",
       info_modal_title: "ABOUT & SYSTEM",
       architect_tag: "ARCHITECT & LEAD DEVELOPER",
@@ -121,7 +106,6 @@
       lead_even: "EVEN (0-0)",
       lead_tied: "TIED ({0})",
       lead_named: "{0} (+{1})",
-      stake_saved: "Applied: ${0} / PT",
       pts_suffix: "{0} PTS",
       aria_inc: "Add 1 point for {0}",
       aria_dec: "Remove 1 point for {0}",
@@ -141,7 +125,6 @@
       burger_fullscreen: "Fullscreen",
       burger_reset: "Reset Match",
       burger_pool_format: "Tournament Format",
-      burger_stakes: "Stakes Rate",
       burger_lang: "Language",
       burger_sound: "Audio & Haptics",
       burger_theme: "Display Theme",
@@ -203,10 +186,10 @@
       guide_open: "HOW TO USE THIS APP",
       guide_got_it: "GOT IT · START PLAYING",
       guide_modes_header: "CHOOSE YOUR GAME MODE",
-      guide_cash_title: "CASH RING",
-      guide_cash_tag: "Points & Stakes",
-      guide_cash_b1: "Negative scores allowed (-3)",
-      guide_cash_b2: "Configurable stake rate ($/PT)",
+      guide_cash_title: "ZERO-SUM",
+      guide_cash_tag: "Points & Balance",
+      guide_cash_b1: "Negative & positive scores (-3, +4)",
+      guide_cash_b2: "Live zero-sum audit (table sum = 0)",
       guide_cash_b3: "Built-in compact shot clock",
       guide_tourney_title: "TOURNAMENT",
       guide_tourney_tag: "Match Frames & Clock",
@@ -224,9 +207,6 @@
       guide_key_undo: "CTRL + Z",
       guide_action_undo_title: "Undo / Redo",
       guide_action_undo_desc: "Revert scoring mistakes anytime",
-      guide_key_settle: "SETTLE",
-      guide_action_settle_title: "Who Pays Whom",
-      guide_action_settle_desc: "Exact pairwise cash payouts",
       guide_key_clock: "SPACE",
       guide_action_clock_title: "Shot Clock",
       guide_action_clock_desc: "Start/Restart shot · Pause button · +30s",
@@ -238,7 +218,7 @@
       guide_badge_lang: "EN / VI TOGGLE",
     },
     vi: {
-      cash_mode: "ĐÁNH ĐIỂM",
+      cash_mode: "ZERO-SUM",
       tourney_mode: "THI ĐẤU",
       reset: "ĐẶT LẠI",
       hold_reset: "GIỮ 2S",
@@ -258,13 +238,6 @@
       ext_exhausted: "Đã dùng hết lượt gia hạn cho lượt đánh này",
       clock_expired: "HẾT GIỜ ĐÁNH: PHẠM QUY",
       clock_set: "Đồng hồ đặt {0}s",
-      stakes_protocol_title: "MỨC CƯỢC & THỂ THỨC",
-      per_rack_val: "MỖI VÁN",
-      current_pot: "TỔNG QUỸ",
-      target_frame: "CHẠM",
-      shortcuts: "PHÍM TẮT:",
-      shortcut_hint: "Chạm để chỉnh",
-      who_pays_whom: "THANH TOÁN",
       balanced_zero: "CÂN BẰNG (0)",
       table_unbalanced: "LỆCH ({0})",
       tourney_array_title: "ĐIỂM TRẬN ĐẤU",
@@ -288,14 +261,6 @@
       focus_restored: "Đã mở khóa hiển thị lịch sử",
       extended_info_on: "Hiển thị chi tiết lịch sử",
       extended_info_off: "Xem gọn",
-      modal_title_cash: "CẤU HÌNH TIỀN ĐIỂM",
-      modal_title_tourney: "CẤU HÌNH TIỀN ĐIỂM",
-      rate_per_point: "MỖI ĐIỂM",
-      target_race_label: "CHẠM MỤC TIÊU",
-      who_pays_whom_header: "CHUYỂN TIỀN TRỰC TIẾP",
-      no_transfers: "ĐIỂM CÂN BẰNG · KHÔNG CẦN CHUYỂN TIỀN",
-      transfer_item: "<strong>{0}</strong> trả cho <strong>{1}</strong>: ${2}",
-      apply_save: "ÁP DỤNG",
       close: "ĐÓNG",
       info_modal_title: "THÔNG TIN HỆ THỐNG",
       architect_tag: "KIẾN TRÚC SƯ & PHÁT TRIỂN CHÍNH",
@@ -328,7 +293,6 @@
       lead_even: "CĂN BẰNG (0-0)",
       lead_tied: "HÒA ({0})",
       lead_named: "{0} (+{1})",
-      stake_saved: "Đã áp dụng: ${0}/điểm",
       pts_suffix: "{0} ĐIỂM",
       aria_inc: "Cộng 1 điểm cho {0}",
       aria_dec: "Trừ 1 điểm cho {0}",
@@ -348,7 +312,6 @@
       burger_fullscreen: "Toàn màn hình",
       burger_reset: "Đặt lại điểm",
       burger_pool_format: "Thể thức thi đấu",
-      burger_stakes: "Mức cược",
       burger_lang: "Ngôn ngữ",
       burger_sound: "Âm thanh & Rung",
       burger_theme: "Giao diện",
@@ -410,10 +373,10 @@
       guide_open: "HƯỚNG DẪN SỬ DỤNG",
       guide_got_it: "ĐÃ HIỂU · BẮT ĐẦU",
       guide_modes_header: "CHỌN CHẾ ĐỘ CHƠI",
-      guide_cash_title: "ĐÁNH ĐIỂM",
-      guide_cash_tag: "Đánh điểm & Mức cược",
-      guide_cash_b1: "Cho phép điểm âm (-3)",
-      guide_cash_b2: "Cài đặt mức tiền mỗi điểm ($/điểm)",
+      guide_cash_title: "ZERO-SUM",
+      guide_cash_tag: "Điểm & Cân bằng",
+      guide_cash_b1: "Cho phép cả điểm âm và dương (-3, +4)",
+      guide_cash_b2: "Kiểm tra bàn cân bằng (tổng điểm = 0)",
       guide_cash_b3: "Tích hợp đồng hồ shot gọn gàng",
       guide_tourney_title: "THI ĐẤU",
       guide_tourney_tag: "Điểm ván đấu & Đồng hồ",
@@ -431,9 +394,6 @@
       guide_key_undo: "CTRL + Z",
       guide_action_undo_title: "Hoàn tác / Làm lại",
       guide_action_undo_desc: "Khắc phục sai sót điểm tức thì",
-      guide_key_settle: "QUỸ TIỀN",
-      guide_action_settle_title: "Ai Trả Tiền Ai",
-      guide_action_settle_desc: "Danh sách chuyển tiền tối ưu",
       guide_key_clock: "PHÍM CÁCH",
       guide_action_clock_title: "Đồng Hồ Shot",
       guide_action_clock_desc: "Bắt đầu/Bắt đầu lại · Nút tạm dừng · +30s",
@@ -477,13 +437,12 @@
     isSessionEnded: false,
     sessionEndedAt: null,
 
-    // CASH MODE STATE (Zero-sum betting, negative scores permitted)
+    // ZERO-SUM MODE STATE (Zero-sum points, negative scores permitted)
     cash: {
       players: [
         { id: 1, name: "Johnny Archer", score: 0 },
         { id: 2, name: "Shane Van Boening", score: 0 },
       ],
-      stakeRate: 1.0,
       shotClockDuration: 45,
       extensionsUsed: 0,
       rackSeq: 0,
@@ -499,7 +458,6 @@
         { id: 102, name: "Earl Strickland", score: 0 },
       ],
       format: "american", // "american" (±1) or "chinese" (+4, +7, +10)
-      stakeRate: 1.0,
       targetRace: 15,
       shotClockDuration: 45,
       extensionsUsed: 0,
@@ -579,9 +537,6 @@
   const burgerRowPoolFormat = $("burgerRowPoolFormat");
   const btnBurgerPoolFormat = $("btnBurgerPoolFormat");
   const burgerPoolFormatText = $("burgerPoolFormatText");
-  const burgerRowStakes = $("burgerRowStakes");
-  const btnBurgerStakes = $("btnBurgerStakes");
-  const burgerStakesText = $("burgerStakesText");
   const btnBurgerLang = $("btnBurgerLang");
   const burgerLangText = $("burgerLangText");
   const btnBurgerSound = $("btnBurgerSound");
@@ -628,26 +583,7 @@
   const btnClockPause = $("btnClockPause");
   const clockPauseIcon = $("clockPauseIcon");
 
-  // Tournament Stakes Widget
-  const lblStakesProtocolTitle = $("lblStakesProtocolTitle");
-  const boxPerRack = $("boxPerRack");
-  const lblPerRackVal = $("lblPerRackVal");
-  const metricPerRackVal = $("metricPerRackVal");
-  const boxCurrentPot = $("boxCurrentPot");
-  const lblCurrentPot = $("lblCurrentPot");
-  const metricCurrentPotVal = $("metricCurrentPotVal");
-  const boxTargetFrame = $("boxTargetFrame");
-  const lblTargetFrame = $("lblTargetFrame");
-  const metricTargetRace = $("metricTargetRace");
-  const racePillTag = $("racePillTag");
-  const tourneyRaceBadge = $("tourneyRaceBadge");
-  const lblShortcutHint = $("lblShortcutHint");
-
-  // Cash Mode Telemetry Bar
-  const btnCashRateChip = $("btnCashRateChip");
-  const cashStakeLabel = $("cashStakeLabel");
-  const btnOpenSettlements = $("btnOpenSettlements");
-  const lblWhoPaysWhom = $("lblWhoPaysWhom");
+  // Compact Shot Clock Controls (Zero-Sum Mode)
   const compactClockDigits = $("compactClockDigits");
   const btnCompactClockToggle = $("btnCompactClockToggle");
   const btnCompactClockExt = $("btnCompactClockExt");
@@ -688,22 +624,6 @@
   const lblEmptyLog = $("lblEmptyLog");
 
   // Modals
-  const stakesModal = $("stakesModal");
-  const modalTitleText = $("modalTitleText");
-  const lblRatePerPoint = $("lblRatePerPoint");
-  const lblTargetMatchRace = $("lblTargetMatchRace");
-  const lblBreakdownHeader = $("lblBreakdownHeader");
-  const btnCloseStakesModal = $("btnCloseStakesModal");
-  const btnSaveStakes = $("btnSaveStakes");
-  const stakeInputRate = $("stakeInputRate");
-  const btnStakeStepMinus = $("btnStakeStepMinus");
-  const btnStakeStepPlus = $("btnStakeStepPlus");
-  const raceInputTarget = $("raceInputTarget");
-  const btnRaceMinus = $("btnRaceMinus");
-  const btnRacePlus = $("btnRacePlus");
-  const modalSettlementRoster = $("modalSettlementRoster");
-  const modalTransfersLedger = $("modalTransfersLedger");
-
   const infoModal = $("infoModal");
   const lblInfoModalTitle = $("lblInfoModalTitle");
   const lblArchitectTag = $("lblArchitectTag");
@@ -886,10 +806,6 @@
           if (parsed.players && parsed.players.length > 0) {
             state.cash.players = JSON.parse(JSON.stringify(parsed.players));
           }
-          if (parsed.stakeRate) {
-            state.cash.stakeRate = parsed.stakeRate;
-            state.tournament.stakeRate = parsed.stakeRate;
-          }
           if (parsed.history) {
             state.cash.history = JSON.parse(JSON.stringify(parsed.history));
           }
@@ -949,7 +865,6 @@
       if (!Array.isArray(m.history)) m.history = [];
       if (!Array.isArray(m.undoStack)) m.undoStack = [];
       if (!Array.isArray(m.redoStack)) m.redoStack = [];
-      if (!Number.isFinite(m.stakeRate) || m.stakeRate < 0) m.stakeRate = 1;
       if (!Number.isFinite(m.shotClockDuration) || m.shotClockDuration <= 0) m.shotClockDuration = 45;
       if (!Number.isFinite(m.extensionsUsed) || m.extensionsUsed < 0) m.extensionsUsed = 0;
       if (!Number.isFinite(m.rackSeq) || m.rackSeq < m.history.length) m.rackSeq = m.history.length;
@@ -1016,24 +931,13 @@
     if (lblModeCash) lblModeCash.textContent = t("cash_mode");
     if (lblModeTourney) lblModeTourney.textContent = t("tourney_mode");
     if (lblClockExtBtn) lblClockExtBtn.textContent = t("ext_btn");
-    if (lblStakesProtocolTitle) lblStakesProtocolTitle.textContent = t("stakes_protocol_title");
-    if (lblPerRackVal) lblPerRackVal.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">sell</span> ${t("per_rack_val")}`;
-    if (lblCurrentPot) lblCurrentPot.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">savings</span> ${t("current_pot")}`;
-    if (lblTargetFrame) lblTargetFrame.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px; vertical-align: middle;">flag</span> ${t("target_frame")}`;
-    if (lblShortcutHint) lblShortcutHint.innerHTML = `<span class="material-symbols-outlined" style="font-size: 12px; vertical-align: middle;">touch_app</span> ${t("shortcut_hint")}`;
-    if (lblWhoPaysWhom) lblWhoPaysWhom.textContent = t("who_pays_whom");
     if (lblTourneyArrayTitle) lblTourneyArrayTitle.textContent = t("tourney_array_title");
     if (btnRemovePlayer) btnRemovePlayer.title = t("remove_player");
     if (holdResetLabel) holdResetLabel.textContent = t("hold_reset");
     if (lblRackLogBtn) lblRackLogBtn.textContent = t("rack_log");
     if (lblChronDrawerTitle) lblChronDrawerTitle.textContent = t("chron_drawer_title");
     if (lblEmptyLog) lblEmptyLog.textContent = t("empty_log");
-    if (lblRatePerPoint) lblRatePerPoint.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">payments</span> ${t("rate_per_point")}`;
-    if (lblTargetMatchRace) lblTargetMatchRace.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px; vertical-align: middle;">flag</span> ${t("target_race_label")}`;
-    if (lblBreakdownHeader) lblBreakdownHeader.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">sync_alt</span> <span>${t("who_pays_whom_header")}</span>`;
     
-    const lblSaveBtnText = $("lblSaveBtnText");
-    if (lblSaveBtnText) lblSaveBtnText.textContent = t("apply_save");
     if (lblInfoModalTitle) lblInfoModalTitle.textContent = t("info_modal_title");
     if (lblArchitectTag) lblArchitectTag.textContent = t("architect_tag");
     if (lblSpecsSummaryTag) lblSpecsSummaryTag.textContent = t("dual_mode_tag");
@@ -1064,8 +968,6 @@
     if (lblBurgerReset) lblBurgerReset.textContent = t("burger_reset");
     const lblBurgerPoolFormat = $("lblBurgerPoolFormat");
     if (lblBurgerPoolFormat) lblBurgerPoolFormat.textContent = t("burger_pool_format");
-    const lblBurgerStakes = $("lblBurgerStakes");
-    if (lblBurgerStakes) lblBurgerStakes.textContent = t("burger_stakes");
     const lblBurgerLanguage = $("lblBurgerLanguage");
     if (lblBurgerLanguage) lblBurgerLanguage.textContent = t("burger_lang");
     const lblBurgerSound = $("lblBurgerSound");
@@ -1368,16 +1270,10 @@
     renderSessionClock();
     updatePoolFormatUI();
 
-    refreshStakeDisplays();
-
     // Update active clock chip for current mode
     document.querySelectorAll(".clock-mode-btn").forEach((chip) => {
       chip.classList.toggle("active", parseInt(chip.dataset.sec, 10) === mState.shotClockDuration);
     });
-
-    if (modalTitleText) {
-      modalTitleText.textContent = mode === "tournament" ? t("modal_title_tourney") : t("modal_title_cash");
-    }
 
     tactileFeedback();
     saveState();
@@ -1391,7 +1287,7 @@
     } else {
       updateTournamentHUD();
     }
-    showToast(mode === "tournament" ? "🏆 " + t("tourney_mode") : "💰 " + t("cash_mode"));
+    showToast(mode === "tournament" ? "🏆 " + t("tourney_mode") : "⚖️ " + t("cash_mode"));
   }
 
   btnModeCash.addEventListener("click", () => setGameMode("cash"));
@@ -1410,11 +1306,6 @@
 
     const cards = document.querySelectorAll(".player-championship-card");
     cards.forEach((c) => c.classList.toggle("hotcell", !isBalanced));
-  }
-
-  // ═══════════════ SETTLEMENTS ═══════════════
-  function calculateSettlements() {
-    return { netCash: {}, transfers: [] };
   }
 
   // ═══════════════ ULTRA-CLEAN PLAYER CARD RENDERING ═══════════════
@@ -1494,7 +1385,6 @@
       nameInput.addEventListener("change", (e) => {
         p.name = e.target.value.trim() || t("player_placeholder", index + 1);
         saveState();
-        renderStakesModal();
       });
 
       nameInput.addEventListener("keydown", (e) => {
@@ -1538,7 +1428,6 @@
 
     // Telemetry Sync
     if (isCashMode) {
-      if (cashStakeLabel) cashStakeLabel.textContent = `$${mState.stakeRate.toFixed(2)} / PT`;
       updateZeroSumAudit();
     } else {
       updateTournamentHUD();
@@ -1567,7 +1456,6 @@
     if (playerCountVal) playerCountVal.textContent = players.length;
 
     if (state.activeMode === "cash") {
-      if (cashStakeLabel) cashStakeLabel.textContent = `$${mState.stakeRate.toFixed(2)} / PT`;
       updateZeroSumAudit();
     } else {
       updateTournamentHUD();
@@ -2676,15 +2564,6 @@
       burgerPoolFormatText.textContent = state.tournament.format === "chinese" ? t("burger_format_cn") : t("burger_format_us");
     }
 
-    const burgerRowStakes = $("burgerRowStakes");
-    if (burgerRowStakes) {
-      burgerRowStakes.style.display = state.activeMode === "cash" ? "flex" : "none";
-    }
-    const burgerStakesText = $("burgerStakesText");
-    if (burgerStakesText) {
-      burgerStakesText.textContent = `$${state.cash.stakeRate.toFixed(2)} / pt`;
-    }
-
     const burgerLangText = $("burgerLangText");
     if (burgerLangText) {
       burgerLangText.textContent = state.lang === "vi" ? "Tiếng Việt (VI)" : "English (EN)";
@@ -2752,12 +2631,6 @@
     btnBurgerPoolFormat.addEventListener("click", () => {
       togglePoolFormat();
       syncBurgerMenuState();
-    });
-  }
-  if (btnBurgerStakes) {
-    btnBurgerStakes.addEventListener("click", () => {
-      closeBurgerMenu(true);
-      openStakesModal();
     });
   }
   if (btnBurgerLang) {
@@ -2962,112 +2835,6 @@
     showToast(t("reset_done"));
   }
 
-  // ═══════════════ STAKES & SETTLEMENT MODAL ═══════════════
-  // Edits are held as drafts and only committed by APPLY, so closing with the X
-  // can no longer leave the board showing one rate while the state holds another.
-  let draftStakeRate = null;
-  let draftTargetRace = null;
-
-  function clearStakesDraft() {
-    draftStakeRate = null;
-    draftTargetRace = null;
-  }
-
-  function currentDraftRate() {
-    return draftStakeRate !== null ? draftStakeRate : getModeState().stakeRate;
-  }
-
-  function currentDraftRace() {
-    return draftTargetRace !== null ? draftTargetRace : getModeState().targetRace;
-  }
-
-  /** Single source of truth for stake rate readout on the board. */
-  function refreshStakeDisplays() {
-    const mState = getModeState();
-    if (cashStakeLabel) cashStakeLabel.textContent = `$${mState.stakeRate.toFixed(2)} / PT`;
-  }
-
-  function renderStakesModal() {
-    const rate = currentDraftRate();
-
-    // Never rewrite the field the user is currently typing in (caret jump).
-    if (document.activeElement !== stakeInputRate) {
-      stakeInputRate.value = rate.toFixed(2);
-    }
-
-    document.querySelectorAll(".preset-chip:not(.race-chip)").forEach((chip) => {
-      chip.classList.toggle("active", Math.abs(parseFloat(chip.dataset.v) - rate) < 0.01);
-    });
-  }
-
-  function openStakesModal() {
-    tactileFeedback();
-    clearStakesDraft();
-    renderStakesModal();
-    stakesModal.classList.add("open");
-  }
-
-  function closeStakesModal() {
-    stakesModal.classList.remove("open");
-    clearStakesDraft();
-  }
-
-  if (btnCashRateChip) btnCashRateChip.addEventListener("click", openStakesModal);
-
-  btnCloseStakesModal.addEventListener("click", closeStakesModal);
-  stakesModal.addEventListener("click", (e) => {
-    if (e.target === stakesModal) closeStakesModal();
-  });
-
-  btnSaveStakes.addEventListener("click", () => {
-    tactileFeedback();
-    const mState = getModeState();
-
-    // Commit whatever is in the fields (typed or draft-driven).
-    const typedRate = parseFloat(stakeInputRate.value);
-    if (Number.isFinite(typedRate)) mState.stakeRate = Math.max(0, typedRate);
-    else if (draftStakeRate !== null) mState.stakeRate = draftStakeRate;
-
-    clearStakesDraft();
-    refreshStakeDisplays();
-    saveState();
-    renderPlayers();
-    stakesModal.classList.remove("open");
-    showToast(t("stake_saved", mState.stakeRate.toFixed(2)));
-  });
-
-  btnStakeStepMinus.addEventListener("click", () => {
-    const typed = parseFloat(stakeInputRate.value);
-    const base = Number.isFinite(typed) ? typed : currentDraftRate();
-    draftStakeRate = Math.max(0, Math.round((base - 0.5) * 100) / 100);
-    renderStakesModal();
-  });
-
-  btnStakeStepPlus.addEventListener("click", () => {
-    const typed = parseFloat(stakeInputRate.value);
-    const base = Number.isFinite(typed) ? typed : currentDraftRate();
-    draftStakeRate = Math.max(0, Math.round((base + 0.5) * 100) / 100);
-    renderStakesModal();
-  });
-
-  // Live preview while typing a custom rate.
-  if (stakeInputRate) {
-    stakeInputRate.addEventListener("input", () => {
-      const typed = parseFloat(stakeInputRate.value);
-      if (Number.isFinite(typed)) {
-        draftStakeRate = Math.max(0, typed);
-        renderStakesModal();
-      }
-    });
-  }
-
-  document.querySelectorAll(".preset-chip:not(.race-chip)").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      draftStakeRate = parseFloat(chip.dataset.v);
-      renderStakesModal();
-    });
-  });
-
   // ═══════════════ INFO MODAL ═══════════════
   btnInfo.addEventListener("click", () => {
     tactileFeedback();
@@ -3118,10 +2885,6 @@
     s("lblGuideKeyUndo", "guide_key_undo");
     s("lblGuideActionUndoTitle", "guide_action_undo_title");
     s("lblGuideActionUndoDesc", "guide_action_undo_desc");
-
-    s("lblGuideKeySettle", "guide_key_settle");
-    s("lblGuideActionSettleTitle", "guide_action_settle_title");
-    s("lblGuideActionSettleDesc", "guide_action_settle_desc");
 
     s("lblGuideKeyClock", "guide_key_clock");
     s("lblGuideActionClockTitle", "guide_action_clock_title");
@@ -3209,7 +2972,6 @@
       $("saveMatchModal"),
       $("archiveModal"),
       burgerMenuBackdrop,
-      stakesModal,
       infoModal,
       tutorialModal,
     ];
@@ -3244,10 +3006,6 @@
     }
     if (tutorialModal && tutorialModal.classList.contains("open")) {
       closeTutorial();
-      return true;
-    }
-    if (stakesModal && stakesModal.classList.contains("open")) {
-      closeStakesModal();
       return true;
     }
     if (infoModal && infoModal.classList.contains("open")) {
@@ -3303,7 +3061,7 @@
   // ═══════════════ OFFLINE / INSTALLABLE APP (PWA) ═══════════════
   /**
    * Registers the service worker so the scoreboard boots, scores a full match
-   * and settles debts with no network at all.
+   * and tracks history with no network at all.
    *
    * The UI never claims "offline ready" until a worker is genuinely
    * controlling the page - the previous build showed that badge permanently
@@ -3837,7 +3595,7 @@
     if (modeBadge) {
       modeBadge.textContent = isTourney
         ? `TOURNAMENT · ${mState.format.toUpperCase()}`
-        : `CASH RING · $${mState.stakeRate.toFixed(2)}/PT`;
+        : "ZERO-SUM";
     }
     if (durationBadge) {
       durationBadge.textContent = formatSessionDuration(getSessionElapsedMs());
@@ -3873,7 +3631,7 @@
       const pNames = mState.players.slice(0, 2).map((p) => p.name).join(" vs ");
       defaultTitle = `Race to ${mState.targetRace} (${pNames || "Match"})`;
     } else {
-      defaultTitle = `Cash Ring Session · ${dateStr}`;
+      defaultTitle = `Zero-Sum Session · ${dateStr}`;
     }
 
     if (titleInput) titleInput.value = defaultTitle;
@@ -3924,7 +3682,7 @@
       mode: state.activeMode,
       format: mState.format || "american",
       targetRace: isTourney ? mState.targetRace || 15 : null,
-      stakeRate: !isTourney ? mState.stakeRate || 1.0 : null,
+      stakeRate: null,
       sessionElapsedMs: elapsedMs,
       sessionDurationStr: formatSessionDuration(elapsedMs),
       players: mState.players.map((p) => ({
@@ -3932,7 +3690,6 @@
         name: p.name,
         score: p.score,
         isWinner: isTourney ? p.score > 0 && p.score === maxScore : false,
-        balance: !isTourney ? (p.score * (mState.stakeRate || 1.0)) : 0,
       })),
       history: JSON.parse(JSON.stringify(mState.history || [])),
       photos: draftMatchPhotos.map((p) => ({
@@ -4098,7 +3855,7 @@
     const isTourney = match.mode === "tournament";
     const modeTag = isTourney
       ? `TOURNAMENT · ${match.format?.toUpperCase() || "US"}`
-      : `CASH RING · $${(match.stakeRate || 1).toFixed(2)}`;
+      : "ZERO-SUM";
 
     // Build player cells
     const playerCellsHtml = (match.players || [])
@@ -4108,10 +3865,10 @@
         if (isTourney) {
           valDisplay = `<span class="card-player-score">${p.score}</span>`;
         } else {
-          const bal = p.balance || 0;
-          const sign = bal > 0 ? "+" : "";
-          const cls = bal > 0 ? "positive" : bal < 0 ? "negative" : "";
-          valDisplay = `<span class="card-player-balance ${cls}">${sign}$${bal.toFixed(2)} (${p.score > 0 ? "+" : ""}${p.score})</span>`;
+          const scoreVal = p.score || 0;
+          const sign = scoreVal > 0 ? "+" : "";
+          const cls = scoreVal > 0 ? "positive" : scoreVal < 0 ? "negative" : "";
+          valDisplay = `<span class="card-player-score ${cls}">${sign}${scoreVal}</span>`;
         }
         return `
           <div class="card-player-cell">

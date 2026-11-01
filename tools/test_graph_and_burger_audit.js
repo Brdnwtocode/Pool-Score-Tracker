@@ -108,6 +108,14 @@ server.listen(0, '127.0.0.1', async () => {
   console.log(`[+] Burger Theme text (VI): "${themeText}" (expected: "Giao diện tối")`);
   if (!themeText.includes('Giao diện')) throw new Error('Theme text not properly localized');
 
+  // Check 3b: Money/stakes row cleanly removed from Burger Menu and DOM
+  const hasStakesRow = await evalJs(`document.getElementById('burgerRowStakes') !== null`);
+  const hasStakesModal = await evalJs(`document.getElementById('stakesModal') !== null`);
+  console.log(`[+] Money/Stakes row cleanly removed from Burger Menu: ${!hasStakesRow}`);
+  console.log(`[+] Stakes Config modal cleanly removed from DOM: ${!hasStakesModal}`);
+  if (hasStakesRow) throw new Error('burgerRowStakes should not exist');
+  if (hasStakesModal) throw new Error('stakesModal should not exist');
+
   // Check 4: Reopen race condition test (quick close and reopen)
   await evalJs(`
     // Simulate rapid close and reopen
