@@ -1,7 +1,42 @@
+const http = require('http');
+const path = require('path');
 const { spawn } = require('child_process');
 const fs = require('fs');
 
+const MIME = {
+  '.html': 'text/html',
+  '.css': 'text/css',
+  '.js': 'application/javascript',
+  '.json': 'application/json',
+  '.webmanifest': 'application/manifest+json',
+  '.png': 'image/png',
+  '.woff2': 'font/woff2',
+};
+
 async function test() {
+  const server = http.createServer((req, res) => {
+    let reqPath = req.url.split('?')[0];
+    if (reqPath === '/') reqPath = '/index.html';
+    const filePath = path.join(__dirname, '..', reqPath);
+
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        res.writeHead(404);
+        res.end('Not found');
+        return;
+      }
+      const ext = path.extname(filePath).toLowerCase();
+      res.writeHead(200, {
+        'Content-Type': MIME[ext] || 'application/octet-stream',
+        'Cache-Control': 'no-store, no-cache',
+      });
+      res.end(data);
+    });
+  });
+
+  await new Promise(r => server.listen(8000, '127.0.0.1', r));
+  console.log('[*] Local server listening on http://127.0.0.1:8000/');
+
   console.log('[*] Launching headless Chrome...');
   const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
   const debugPort = 9333;
@@ -33,6 +68,7 @@ async function test() {
   if (!pageTarget) {
     console.error('[!] Failed to connect to Chrome debugging target');
     chrome.kill();
+    server.close();
     process.exit(1);
   }
 
@@ -249,6 +285,7 @@ async function test() {
 
   ws.close();
   chrome.kill();
+  server.close();
   try { fs.rmSync(tempDir, { recursive: true, force: true }); } catch {}
 }
 

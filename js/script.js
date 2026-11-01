@@ -102,6 +102,11 @@
       session_paused: "Session Paused",
       session_resumed: "Session Resumed",
       session_reset_toast: "Session Clock Reset",
+      session_ended_tag: "ENDED",
+      session_ended_tooltip: "Match ended at {0} (20m inactivity) · Tap or score to start new match",
+      session_active_tooltip: "Tap to Pause/Resume · Hold 2s to Reset",
+      session_started_fresh: "New match session started",
+      session_auto_ended_toast: "Match session ended at {0} (20m inactivity)",
       shot_restarted: "Shot Clock Restarted",
       format_us_toast: "🎱 Format: American Pool (±1)",
       format_cn_toast: "🎱 Format: Chinese Pool (+4, +7, +10)",
@@ -143,6 +148,37 @@
       burger_zoom: "UI Zoom Scale",
       burger_guide: "How to Play & Rules",
       burger_info: "About & System Specs",
+      burger_archive: "Match Archive",
+      save_match_log_title: "Save Match Snapshot",
+      save_match_title: "SAVE MATCH SNAPSHOT",
+      save_match_btn: "Save to Archive",
+      save_match_success: "Match snapshot saved to Archive",
+      save_match_field_title: "Match Title",
+      save_match_field_date: "Date & Time",
+      save_match_field_loc: "Location / Venue",
+      save_match_field_loc_hint: "Type or select venue",
+      save_match_field_notes: "Notes & Highlights",
+      save_match_field_photos: "Match Photos (Max 3)",
+      save_match_add_photo: "Add Photo",
+      save_match_attach_graph: "Match Graph Snapshot",
+      save_match_attach_desc: "Capture points & timeline graph",
+      save_match_include_graph: "Include Graph",
+      save_match_graph_ready: "Graph Attached",
+      archive_title: "MATCH ARCHIVE",
+      archive_empty_title: "NO MATCHES SAVED YET",
+      archive_empty_desc: "Tap the bookmark icon in the Rack Log to save your match results.",
+      archive_export: "Export Backup",
+      archive_import: "Import",
+      archive_import_success: "Successfully imported {0} matches into Archive",
+      archive_import_err: "Invalid backup file or import failed",
+      archive_edit_title: "EDIT MATCH RECORD",
+      archive_delete_confirm: "Are you sure you want to delete this match record? This frees local storage.",
+      archive_storage_healthy: "{0} used · Storage Healthy",
+      archive_storage_warning: "{0} used ({1}%) · Storage approaching limit",
+      archive_storage_danger: "{0} used ({1}%) · Critical: Auto-recycling oldest matches",
+      archive_matches_count: "{0} Matches",
+      archive_pin_on: "Match pinned (protected from auto-cleanup)",
+      archive_pin_off: "Match unpinned",
       no_graph_data: "NO SCORE DATA YET · TAP + OR − TO GRAPH",
       tap_isolate: "Tap line to isolate player",
       all_players: "ALL PLAYERS",
@@ -257,6 +293,11 @@
       session_paused: "Đã tạm dừng thời gian trận",
       session_resumed: "Tiếp tục tính giờ trận",
       session_reset_toast: "Đã đặt lại thời gian trận về 00:00:00",
+      session_ended_tag: "KẾT THÚC",
+      session_ended_tooltip: "Trận đấu kết thúc lúc {0} (sau 20p không có điểm) · Chạm hoặc cộng điểm để bắt đầu trận mới",
+      session_active_tooltip: "Chạm để Tạm dừng/Tiếp tục · Giữ 2s để Đặt lại",
+      session_started_fresh: "Đã bắt đầu phiên trận đấu mới",
+      session_auto_ended_toast: "Trận đấu tự kết thúc lúc {0} (sau 20p không có điểm)",
       shot_restarted: "Đã bắt đầu lại lượt đánh mới",
       format_us_toast: "🎱 Thể thức: Bida Mỹ (±1)",
       format_cn_toast: "🎱 Thể thức: Bida Lỗ Tàu (+4, +7, +10)",
@@ -298,6 +339,37 @@
       burger_zoom: "Thu phóng giao diện",
       burger_guide: "Hướng dẫn & Luật chơi",
       burger_info: "Thông số hệ thống",
+      burger_archive: "Kho lưu trữ",
+      save_match_log_title: "Lưu trận đấu",
+      save_match_title: "LƯU TRẬN ĐẤU",
+      save_match_btn: "Lưu vào kho",
+      save_match_success: "Đã lưu trận đấu vào Kho lưu trữ",
+      save_match_field_title: "Tiêu đề trận",
+      save_match_field_date: "Ngày giờ",
+      save_match_field_loc: "Địa điểm / CLB",
+      save_match_field_loc_hint: "Nhập hoặc chọn địa điểm",
+      save_match_field_notes: "Ghi chú & Diễn biến",
+      save_match_field_photos: "Ảnh trận đấu (Tối đa 3)",
+      save_match_add_photo: "Thêm ảnh",
+      save_match_attach_graph: "Ảnh chụp biểu đồ điểm",
+      save_match_attach_desc: "Chụp lại đồ thị điểm số theo thời gian",
+      save_match_include_graph: "Đính kèm biểu đồ",
+      save_match_graph_ready: "Đã đính kèm biểu đồ",
+      archive_title: "KHO LƯU TRỮ TRẬN ĐẤU",
+      archive_empty_title: "CHƯA CÓ TRẬN ĐẤU NÀO ĐƯỢC LƯU",
+      archive_empty_desc: "Chạm biểu tượng lưu ở mục Nhật ký ván để lưu lại kết quả trận đấu.",
+      archive_export: "Xuất dữ liệu",
+      archive_import: "Nhập dữ liệu",
+      archive_import_success: "Đã nhập thành công {0} trận đấu vào Kho lưu trữ",
+      archive_import_err: "Tệp sao lưu không hợp lệ hoặc lỗi nhập",
+      archive_edit_title: "CHỈNH SỬA THÔNG TIN TRẬN",
+      archive_delete_confirm: "Bạn có chắc muốn xóa bản ghi trận đấu này? Hành động này sẽ giải phóng bộ nhớ.",
+      archive_storage_healthy: "{0} đã dùng · Bộ nhớ an toàn",
+      archive_storage_warning: "{0} đã dùng ({1}%) · Sắp chạm ngưỡng dung lượng",
+      archive_storage_danger: "{0} đã dùng ({1}%) · Cảnh báo: Tự động dọn dẹp trận cũ",
+      archive_matches_count: "{0} Trận đấu",
+      archive_pin_on: "Đã ghim trận đấu (được bảo vệ khỏi tự động dọn dẹp)",
+      archive_pin_off: "Đã bỏ ghim trận đấu",
       no_graph_data: "CHƯA CÓ DỮ LIỆU ĐIỂM · CHẠM + HOẶC − ĐỂ VẼ BIỂU ĐỒ",
       tap_isolate: "Chạm đường để xem riêng cơ thủ",
       all_players: "TẤT CẢ CƠ THỦ",
@@ -368,6 +440,10 @@
     sessionStartTime: Date.now(),
     sessionElapsedMs: 0,
     isSessionPaused: false,
+    lastActivityTime: Date.now(),
+    lastActivityElapsedMs: 0,
+    isSessionEnded: false,
+    sessionEndedAt: null,
 
     // CASH MODE STATE (Zero-sum betting, negative scores permitted)
     cash: {
@@ -511,6 +587,7 @@
   const sessionTimerDigits = $("sessionTimerDigits");
   const sessionClockIcon = $("sessionClockIcon");
   const sessionHoldBar = $("sessionHoldBar");
+  const sessionEndedTag = $("sessionEndedTag");
   const btnClockStart = $("btnClockStart");
   const clockBtnIcon = $("clockBtnIcon");
   const clockBtnText = $("clockBtnText");
@@ -654,6 +731,7 @@
           }
         }
       }
+      checkSessionInactivity();
       renderSessionClock();
     }
   });
@@ -863,6 +941,25 @@
       state.sessionElapsedMs = Number.isFinite(state.tournament?.sessionElapsedMs) ? state.tournament.sessionElapsedMs : 0;
     }
     state.isSessionPaused = state.isSessionPaused !== undefined ? !!state.isSessionPaused : !!state.tournament?.isSessionPaused;
+
+    // Inactivity and match auto-end hydration
+    const allLogs = [...(state.cash?.history || []), ...(state.tournament?.history || [])];
+    const latestLogMs = allLogs.reduce((max, h) => Math.max(max, Number(h?.timestampMs) || 0), 0);
+
+    if (!Number.isFinite(state.lastActivityTime) || state.lastActivityTime <= 0) {
+      state.lastActivityTime = latestLogMs > 0 ? latestLogMs : (state.sessionStartTime || Date.now());
+    }
+    if (!Number.isFinite(state.lastActivityElapsedMs) || state.lastActivityElapsedMs < 0) {
+      state.lastActivityElapsedMs = state.sessionElapsedMs || 0;
+    }
+    state.isSessionEnded = !!state.isSessionEnded;
+    if (state.sessionEndedAt !== null && !Number.isFinite(state.sessionEndedAt)) {
+      state.sessionEndedAt = state.isSessionEnded ? state.lastActivityTime : null;
+    }
+
+    // Check immediately upon startup if 20m inactivity already elapsed while app was closed
+    checkSessionInactivity(true);
+
     if (state.lang !== "vi" && state.lang !== "en") state.lang = "vi";
     if (state.activeMode !== "cash" && state.activeMode !== "tournament") state.activeMode = "cash";
   }
@@ -955,6 +1052,9 @@
     // Tutorial / Guide localization
     updateTutorialText();
 
+    // Memory & Archive localization
+    updateMemoryLocalizedTexts();
+
     updatePoolFormatUI();
     renderShotClock();
     renderSessionClock();
@@ -999,6 +1099,50 @@
     });
   }
 
+  const SESSION_INACTIVITY_LIMIT_MS = 20 * 60 * 1000; // 20 minutes without score adjustments
+
+  function formatTimeOfDay(dateOrMs) {
+    if (!dateOrMs) return "--:--";
+    const d = dateOrMs instanceof Date ? dateOrMs : new Date(dateOrMs);
+    if (isNaN(d.getTime())) return "--:--";
+    return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  }
+
+  function checkSessionInactivity(silent = false) {
+    if (state.isSessionEnded) return true;
+
+    const lastActive = Number(state.lastActivityTime) || state.sessionStartTime || Date.now();
+    const inactivityMs = Date.now() - lastActive;
+
+    if (inactivityMs >= SESSION_INACTIVITY_LIMIT_MS) {
+      state.isSessionEnded = true;
+      state.sessionEndedAt = lastActive;
+
+      // Freeze session elapsed duration to the exact moment of the last score adjustment
+      if (Number.isFinite(state.lastActivityElapsedMs) && state.lastActivityElapsedMs >= 0) {
+        state.sessionElapsedMs = state.lastActivityElapsedMs;
+      } else {
+        const baseElapsed = Number(state.sessionElapsedMs) || 0;
+        const runningPortion = state.isSessionPaused ? 0 : Math.max(0, lastActive - (state.sessionStartTime || lastActive));
+        state.sessionElapsedMs = baseElapsed + runningPortion;
+      }
+
+      state.isSessionPaused = false;
+      saveState();
+
+      if (!silent) {
+        try {
+          const timeStr = formatTimeOfDay(state.sessionEndedAt);
+          showToast("⏱️ " + t("session_auto_ended_toast", timeStr));
+          playTone(440, 0.12, "sine");
+        } catch {}
+      }
+      return true;
+    }
+
+    return false;
+  }
+
   function formatSessionDuration(ms) {
     const totalSec = Math.floor(Math.max(0, ms) / 1000);
     const hrs = Math.floor(totalSec / 3600);
@@ -1008,6 +1152,12 @@
   }
 
   function getSessionElapsedMs() {
+    if (state.isSessionEnded) {
+      return state.sessionElapsedMs || 0;
+    }
+    if (checkSessionInactivity(true)) {
+      return state.sessionElapsedMs || 0;
+    }
     if (!state.sessionStartTime) state.sessionStartTime = Date.now();
     let total = state.sessionElapsedMs || 0;
     if (!state.isSessionPaused) {
@@ -1021,12 +1171,33 @@
     const elapsed = getSessionElapsedMs();
     sessionTimerDigits.textContent = formatSessionDuration(elapsed);
     if (sessionTimerBadge) {
-      sessionTimerBadge.classList.toggle("is-paused", !!state.isSessionPaused);
+      sessionTimerBadge.classList.toggle("is-paused", !state.isSessionEnded && !!state.isSessionPaused);
+      sessionTimerBadge.classList.toggle("is-ended", !!state.isSessionEnded);
+
+      if (sessionClockIcon) {
+        sessionClockIcon.textContent = state.isSessionEnded ? "flag" : (state.isSessionPaused ? "pause" : "schedule");
+      }
+
+      if (sessionEndedTag) {
+        sessionEndedTag.style.display = state.isSessionEnded ? "inline-flex" : "none";
+        sessionEndedTag.textContent = t("session_ended_tag");
+      }
+
+      if (state.isSessionEnded) {
+        const timeStr = formatTimeOfDay(state.sessionEndedAt);
+        sessionTimerBadge.title = t("session_ended_tooltip", timeStr);
+      } else {
+        sessionTimerBadge.title = t("session_active_tooltip");
+      }
     }
   }
 
   function toggleSessionPause() {
     tactileFeedback();
+    if (state.isSessionEnded) {
+      resetSessionClock();
+      return;
+    }
     if (state.isSessionPaused) {
       state.isSessionPaused = false;
       state.sessionStartTime = Date.now();
@@ -1046,15 +1217,44 @@
     state.sessionStartTime = Date.now();
     state.sessionElapsedMs = 0;
     state.isSessionPaused = false;
+    state.isSessionEnded = false;
+    state.sessionEndedAt = null;
+    state.lastActivityTime = Date.now();
+    state.lastActivityElapsedMs = 0;
     if (sessionHoldBar) sessionHoldBar.style.width = "0%";
     saveState();
     renderSessionClock();
     showToast("⏱️ " + t("session_reset_toast"));
   }
 
-  setInterval(() => {
-    if (!isPageHidden && !state.isSessionPaused) {
+  function ensureActiveSessionOnScoring() {
+    checkSessionInactivity(true);
+    if (state.isSessionEnded) {
+      state.isSessionEnded = false;
+      state.sessionEndedAt = null;
+      state.sessionStartTime = Date.now();
+      state.sessionElapsedMs = 0;
+      state.isSessionPaused = false;
+      state.lastActivityTime = Date.now();
+      state.lastActivityElapsedMs = 0;
       renderSessionClock();
+      showToast("⏱️ " + t("session_started_fresh"));
+    }
+  }
+
+  function recordScoreActivity() {
+    state.lastActivityTime = Date.now();
+    if (!state.isSessionEnded) {
+      state.lastActivityElapsedMs = getSessionElapsedMs();
+    }
+  }
+
+  setInterval(() => {
+    if (!isPageHidden) {
+      checkSessionInactivity();
+      if (!state.isSessionPaused || state.isSessionEnded) {
+        renderSessionClock();
+      }
     }
   }, 1000);
 
@@ -1544,8 +1744,13 @@
     const player = mState.players.find((p) => p.id === playerId);
     if (!player) return;
 
+    if (!isUndoRedo) {
+      ensureActiveSessionOnScoring();
+    }
+
     const prevScore = player.score;
     player.score = player.score + delta;
+    recordScoreActivity();
 
     tactileFeedback();
 
@@ -1646,6 +1851,7 @@
     const player = mState.players.find((p) => p.id === action.playerId);
     if (player) {
       player.score = action.prevScore;
+      recordScoreActivity();
 
       if (action.logEntry) {
         if (action.isCoalesced) {
@@ -1678,6 +1884,7 @@
     const player = mState.players.find((p) => p.id === action.playerId);
     if (player) {
       player.score = action.newScore;
+      recordScoreActivity();
 
       if (action.logEntry) {
         if (action.isCoalesced) {
@@ -2656,6 +2863,10 @@
     state.sessionStartTime = Date.now();
     state.sessionElapsedMs = 0;
     state.isSessionPaused = false;
+    state.isSessionEnded = false;
+    state.sessionEndedAt = null;
+    state.lastActivityTime = Date.now();
+    state.lastActivityElapsedMs = 0;
     renderSessionClock();
     resetShotClock();
     saveState();
@@ -3072,6 +3283,1193 @@
     });
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // MEMORY SYSTEM, LOCAL ARCHIVE (IndexedDB) & MATCH SNAPSHOTS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const DB_NAME = "billiards_memory_db";
+  const DB_VERSION = 1;
+  const STORE_MATCHES = "matches";
+  const VENUES_STORAGE_KEY = "21n2_remembered_venues_v1";
+
+  let memoryDbInstance = null;
+
+  function openMemoryDB() {
+    if (memoryDbInstance) return Promise.resolve(memoryDbInstance);
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_MATCHES)) {
+          const store = db.createObjectStore(STORE_MATCHES, { keyPath: "id" });
+          store.createIndex("timestamp", "timestamp", { unique: false });
+          store.createIndex("mode", "mode", { unique: false });
+          store.createIndex("isPinned", "isPinned", { unique: false });
+        }
+      };
+      req.onsuccess = () => {
+        memoryDbInstance = req.result;
+        resolve(memoryDbInstance);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function dbSaveMatch(record) {
+    const db = await openMemoryDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_MATCHES, "readwrite");
+      const store = tx.objectStore(STORE_MATCHES);
+      const req = store.put(record);
+      req.onsuccess = () => resolve(record);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function dbGetAllMatches() {
+    const db = await openMemoryDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_MATCHES, "readonly");
+      const store = tx.objectStore(STORE_MATCHES);
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const list = req.result || [];
+        list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        resolve(list);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function dbGetMatch(id) {
+    const db = await openMemoryDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_MATCHES, "readonly");
+      const store = tx.objectStore(STORE_MATCHES);
+      const req = store.get(id);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function dbDeleteMatch(id) {
+    const db = await openMemoryDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_MATCHES, "readwrite");
+      const store = tx.objectStore(STORE_MATCHES);
+      const req = store.delete(id);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function dbTogglePin(id) {
+    const record = await dbGetMatch(id);
+    if (!record) return null;
+    record.isPinned = !record.isPinned;
+    await dbSaveMatch(record);
+    return record.isPinned;
+  }
+
+  async function dbUpdateMatchMeta(id, { title, location, notes }) {
+    const record = await dbGetMatch(id);
+    if (!record) return null;
+    if (typeof title === "string") record.title = title.trim();
+    if (typeof location === "string") record.location = location.trim();
+    if (typeof notes === "string") record.notes = notes.trim();
+    await dbSaveMatch(record);
+    return record;
+  }
+
+  /**
+   * Quota Management & 80% Threshold Auto-Recycling
+   */
+  async function dbCheckAndEnforceQuota() {
+    try {
+      if (!navigator.storage || !navigator.storage.estimate) return;
+      const { usage, quota } = await navigator.storage.estimate();
+      if (!quota || quota === 0) return;
+
+      const percent = usage / quota;
+      if (percent >= 0.8) {
+        // Recycle oldest unpinned matches until usage is below 78%
+        const matches = await dbGetAllMatches();
+        matches.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0)); // oldest first
+        for (const m of matches) {
+          if (!m.isPinned) {
+            await dbDeleteMatch(m.id);
+            const est = await navigator.storage.estimate();
+            if ((est.usage / est.quota) < 0.78) break;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Quota enforcement check skipped:", err);
+    }
+  }
+
+  async function getStorageInfo() {
+    try {
+      if (navigator.storage && navigator.storage.estimate) {
+        const { usage, quota } = await navigator.storage.estimate();
+        const usedMb = ((usage || 0) / (1024 * 1024)).toFixed(1);
+        const totalMb = ((quota || 0) / (1024 * 1024)).toFixed(0);
+        const percent = quota > 0 ? Math.min(100, Math.round(((usage || 0) / quota) * 100)) : 0;
+        return { usedMb, totalMb, percent, isAvailable: true };
+      }
+    } catch {}
+    return { usedMb: "0.0", totalMb: "N/A", percent: 0, isAvailable: false };
+  }
+
+  /**
+   * Location Memory & Autocomplete
+   */
+  function getRememberedVenues() {
+    try {
+      const raw = localStorage.getItem(VENUES_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed.filter((v) => typeof v === "string" && v.trim().length > 0);
+      }
+    } catch {}
+    return [];
+  }
+
+  function saveRememberedVenue(venue) {
+    if (!venue || typeof venue !== "string") return;
+    const trimmed = venue.trim();
+    if (!trimmed) return;
+    let list = getRememberedVenues();
+    list = list.filter((v) => v.toLowerCase() !== trimmed.toLowerCase());
+    list.unshift(trimmed);
+    if (list.length > 25) list = list.slice(0, 25);
+    localStorage.setItem(VENUES_STORAGE_KEY, JSON.stringify(list));
+  }
+
+  function populateVenueDatalistAndChips(chipsContainerId, inputId) {
+    const datalist = $("locationDatalist");
+    const chipsContainer = $(chipsContainerId);
+    const input = $(inputId);
+    const venues = getRememberedVenues();
+
+    if (datalist) {
+      datalist.innerHTML = venues.map((v) => `<option value="${escapeHtml(v)}">`).join("");
+    }
+
+    if (chipsContainer) {
+      chipsContainer.innerHTML = "";
+      venues.slice(0, 4).forEach((v) => {
+        const chip = document.createElement("button");
+        chip.className = "loc-chip";
+        chip.type = "button";
+        chip.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px;">location_on</span><span>${escapeHtml(v)}</span>`;
+        chip.addEventListener("click", () => {
+          if (input) {
+            input.value = v;
+            input.focus();
+          }
+        });
+        chipsContainer.appendChild(chip);
+      });
+    }
+  }
+
+  /**
+   * Photo Compression Helper
+   */
+  function compressImageFile(file, maxDim = 1280, quality = 0.8) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => {
+              if (blob) resolve(blob);
+              else reject(new Error("Image compression failed"));
+            },
+            "image/jpeg",
+            quality
+          );
+        };
+        img.onerror = () => reject(new Error("Image decode failed"));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error("File read failed"));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /**
+   * Match Graph Snapshot Capture
+   */
+  async function captureCurrentGraphBlob() {
+    renderRackHistoryGraph();
+    const svgElem = $("matchHistorySvg");
+    if (!svgElem) return null;
+
+    return new Promise((resolve) => {
+      try {
+        const clonedSvg = svgElem.cloneNode(true);
+        clonedSvg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        const width = 800;
+        const height = 260;
+        clonedSvg.setAttribute("width", width.toString());
+        clonedSvg.setAttribute("height", height.toString());
+
+        const xml = new XMLSerializer().serializeToString(clonedSvg);
+        const svgBlob = new Blob([xml], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(svgBlob);
+
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#0d0f12";
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0);
+          URL.revokeObjectURL(url);
+          canvas.toBlob((blob) => {
+            resolve(blob || svgBlob);
+          }, "image/png");
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          resolve(svgBlob);
+        };
+        img.src = url;
+      } catch (err) {
+        console.warn("Graph snapshot capture failed:", err);
+        resolve(null);
+      }
+    });
+  }
+
+  /**
+   * Binary Blob <-> Base64 Serialization for Backup Export/Import
+   */
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function base64ToBlob(base64, defaultMime = "image/jpeg") {
+    const parts = base64.split(",");
+    const raw = parts.length > 1 ? parts[1] : parts[0];
+    const mimeMatch = parts.length > 1 ? parts[0].match(/:(.*?);/) : null;
+    const contentType = mimeMatch ? mimeMatch[1] : defaultMime;
+    const byteChars = atob(raw);
+    const byteNums = new Array(byteChars.length);
+    for (let i = 0; i < byteChars.length; i++) {
+      byteNums[i] = byteChars.charCodeAt(i);
+    }
+    return new Blob([new Uint8Array(byteNums)], { type: contentType });
+  }
+
+  // ═══════════════ SAVE MATCH MODAL STATE & ACTIONS ═══════════════
+  let draftMatchPhotos = []; // Array of { blob, mime, previewUrl, name }
+  let draftGraphBlob = null;
+  let draftGraphPreviewUrl = null;
+
+  function clearSaveMatchDraft() {
+    draftMatchPhotos.forEach((p) => {
+      if (p.previewUrl) URL.revokeObjectURL(p.previewUrl);
+    });
+    draftMatchPhotos = [];
+    if (draftGraphPreviewUrl) {
+      URL.revokeObjectURL(draftGraphPreviewUrl);
+      draftGraphPreviewUrl = null;
+    }
+    draftGraphBlob = null;
+  }
+
+  function renderSaveMatchPhotos() {
+    const previewStrip = $("saveMatchPhotoPreviews");
+    const countDisplay = $("saveMatchPhotoCount");
+    const btnAdd = $("btnAddMatchPhoto");
+    if (!previewStrip || !countDisplay) return;
+
+    countDisplay.textContent = `${draftMatchPhotos.length} / 3`;
+    if (btnAdd) btnAdd.disabled = draftMatchPhotos.length >= 3;
+
+    previewStrip.innerHTML = "";
+    draftMatchPhotos.forEach((p, idx) => {
+      const item = document.createElement("div");
+      item.className = "photo-preview-item";
+      item.innerHTML = `
+        <img src="${p.previewUrl}" alt="Photo ${idx + 1}">
+        <button class="btn-remove-photo" type="button" data-idx="${idx}" title="Remove photo">✕</button>
+      `;
+      item.querySelector(".btn-remove-photo").addEventListener("click", (e) => {
+        e.stopPropagation();
+        const removeIdx = parseInt(e.currentTarget.dataset.idx, 10);
+        if (draftMatchPhotos[removeIdx]?.previewUrl) {
+          URL.revokeObjectURL(draftMatchPhotos[removeIdx].previewUrl);
+        }
+        draftMatchPhotos.splice(removeIdx, 1);
+        renderSaveMatchPhotos();
+      });
+      previewStrip.appendChild(item);
+    });
+  }
+
+  function updateGraphAttachmentUI() {
+    const box = $("saveMatchGraphPreviewBox");
+    const img = $("saveMatchGraphPreviewImg");
+    const btn = $("btnToggleAttachGraph");
+    const icon = $("attachGraphToggleIcon");
+    const text = $("lblAttachGraphToggle");
+
+    if (draftGraphBlob) {
+      if (draftGraphPreviewUrl) URL.revokeObjectURL(draftGraphPreviewUrl);
+      draftGraphPreviewUrl = URL.createObjectURL(draftGraphBlob);
+      if (img) img.src = draftGraphPreviewUrl;
+      if (box) box.style.display = "block";
+      if (btn) btn.classList.add("active");
+      if (icon) icon.textContent = "check";
+      if (text) text.textContent = t("save_match_graph_ready");
+    } else {
+      if (box) box.style.display = "none";
+      if (btn) btn.classList.remove("active");
+      if (icon) icon.textContent = "add";
+      if (text) text.textContent = t("save_match_include_graph");
+    }
+  }
+
+  function openSaveMatchModal() {
+    const modal = $("saveMatchModal");
+    if (!modal) return;
+
+    clearSaveMatchDraft();
+
+    const mState = getModeState();
+    const isTourney = state.activeMode === "tournament";
+    const modeBadge = $("saveMatchModeBadge");
+    const durationBadge = $("saveMatchDurationBadge");
+    const scoresRow = $("saveMatchScoresRow");
+    const titleInput = $("saveMatchTitleInput");
+    const dateInput = $("saveMatchDateTimeInput");
+    const locInput = $("saveMatchLocationInput");
+    const notesInput = $("saveMatchNotesInput");
+
+    // Mode & Duration Readout
+    if (modeBadge) {
+      modeBadge.textContent = isTourney
+        ? `TOURNAMENT · ${mState.format.toUpperCase()}`
+        : `CASH RING · $${mState.stakeRate.toFixed(2)}/PT`;
+    }
+    if (durationBadge) {
+      durationBadge.textContent = formatSessionDuration(getSessionElapsedMs());
+    }
+
+    // Scores Summary Readout
+    if (scoresRow) {
+      scoresRow.innerHTML = "";
+      const maxScore = Math.max(...mState.players.map((p) => p.score), 0);
+      mState.players.forEach((p) => {
+        const isWinner = isTourney && p.score > 0 && p.score === maxScore;
+        const chip = document.createElement("div");
+        chip.className = `summary-player-chip${isWinner ? " winner" : ""}`;
+        chip.innerHTML = `
+          ${isWinner ? '<span class="material-symbols-outlined" style="font-size: 13px;">emoji_events</span>' : ""}
+          <span>${escapeHtml(p.name)}</span>
+          <span class="score-val">${p.score > 0 ? "+" + p.score : p.score}</span>
+        `;
+        scoresRow.appendChild(chip);
+      });
+    }
+
+    // Smart default title
+    const now = new Date();
+    const dateStr = now.toLocaleDateString([], { month: "short", day: "numeric" });
+    const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    let defaultTitle = "";
+    if (isTourney) {
+      const pNames = mState.players.slice(0, 2).map((p) => p.name).join(" vs ");
+      defaultTitle = `Race to ${mState.targetRace} (${pNames || "Match"})`;
+    } else {
+      defaultTitle = `Cash Ring Session · ${dateStr}`;
+    }
+
+    if (titleInput) titleInput.value = defaultTitle;
+    if (dateInput) dateInput.value = `${dateStr}, ${timeStr}`;
+    const recentVenues = getRememberedVenues();
+    if (locInput) locInput.value = recentVenues.length > 0 ? recentVenues[0] : "";
+    if (notesInput) notesInput.value = "";
+
+    populateVenueDatalistAndChips("saveMatchLocationChips", "saveMatchLocationInput");
+    renderSaveMatchPhotos();
+    updateGraphAttachmentUI();
+
+    modal.classList.add("open");
+  }
+
+  function closeSaveMatchModal() {
+    const modal = $("saveMatchModal");
+    if (modal) modal.classList.remove("open");
+    clearSaveMatchDraft();
+  }
+
+  async function handleConfirmSaveMatch() {
+    const titleInput = $("saveMatchTitleInput");
+    const dateInput = $("saveMatchDateTimeInput");
+    const locInput = $("saveMatchLocationInput");
+    const notesInput = $("saveMatchNotesInput");
+    const mState = getModeState();
+    const isTourney = state.activeMode === "tournament";
+
+    const title = titleInput?.value.trim() || "Match Snapshot";
+    const dateFormatted = dateInput?.value.trim() || new Date().toLocaleString();
+    const location = locInput?.value.trim() || "";
+    const notes = notesInput?.value.trim() || "";
+
+    if (location) {
+      saveRememberedVenue(location);
+    }
+
+    const elapsedMs = getSessionElapsedMs();
+    const maxScore = Math.max(...mState.players.map((p) => p.score), 0);
+
+    const matchRecord = {
+      id: "match_" + Date.now(),
+      timestamp: Date.now(),
+      dateFormatted,
+      title,
+      location,
+      notes,
+      mode: state.activeMode,
+      format: mState.format || "american",
+      targetRace: isTourney ? mState.targetRace || 15 : null,
+      stakeRate: !isTourney ? mState.stakeRate || 1.0 : null,
+      sessionElapsedMs: elapsedMs,
+      sessionDurationStr: formatSessionDuration(elapsedMs),
+      players: mState.players.map((p) => ({
+        id: p.id,
+        name: p.name,
+        score: p.score,
+        isWinner: isTourney ? p.score > 0 && p.score === maxScore : false,
+        balance: !isTourney ? (p.score * (mState.stakeRate || 1.0)) : 0,
+      })),
+      history: JSON.parse(JSON.stringify(mState.history || [])),
+      photos: draftMatchPhotos.map((p) => ({
+        blob: p.blob,
+        mime: p.mime,
+        name: p.name,
+      })),
+      hasGraph: !!draftGraphBlob,
+      graphBlob: draftGraphBlob || null,
+      isPinned: false,
+    };
+
+    try {
+      await dbCheckAndEnforceQuota();
+      await dbSaveMatch(matchRecord);
+      showToast(t("save_match_success"));
+      closeSaveMatchModal();
+    } catch (err) {
+      console.error("Failed to save match to IndexedDB:", err);
+      showToast("Error saving match record");
+    }
+  }
+
+  // ═══════════════ ARCHIVE MODAL STATE & ACTIONS ═══════════════
+  let activeArchiveFilter = "all"; // "all" | "tournament" | "cash"
+  let archiveSearchQuery = "";
+
+  async function openArchiveModal() {
+    const modal = $("archiveModal");
+    if (!modal) return;
+    modal.classList.add("open");
+    await refreshArchiveView();
+  }
+
+  function closeArchiveModal() {
+    const modal = $("archiveModal");
+    if (modal) modal.classList.remove("open");
+  }
+
+  async function refreshArchiveView() {
+    const matchesContainer = $("archiveMatchesContainer");
+    const emptyState = $("archiveEmptyState");
+    const totalCountPill = $("archiveTotalCountPill");
+    const quotaText = $("archiveQuotaText");
+    const quotaFill = $("archiveQuotaFill");
+    const quotaDot = $("quotaStatusDot");
+    if (!matchesContainer) return;
+
+    // 1. Quota status update
+    const storage = await getStorageInfo();
+    if (quotaText && quotaFill && quotaDot) {
+      if (storage.isAvailable) {
+        if (storage.percent >= 80) {
+          quotaText.textContent = t("archive_storage_danger", storage.usedMb + " MB", storage.percent);
+          quotaDot.className = "quota-dot danger";
+          quotaFill.className = "quota-meter-fill danger";
+        } else if (storage.percent >= 60) {
+          quotaText.textContent = t("archive_storage_warning", storage.usedMb + " MB", storage.percent);
+          quotaDot.className = "quota-dot warning";
+          quotaFill.className = "quota-meter-fill warning";
+        } else {
+          quotaText.textContent = t("archive_storage_healthy", storage.usedMb + " MB");
+          quotaDot.className = "quota-dot";
+          quotaFill.className = "quota-meter-fill";
+        }
+        quotaFill.style.width = `${Math.min(100, Math.max(3, storage.percent))}%`;
+      } else {
+        quotaText.textContent = `${storage.usedMb} MB used`;
+        quotaFill.style.width = "5%";
+      }
+    }
+
+    // 2. Fetch matches
+    const allMatches = await dbGetAllMatches();
+    if (totalCountPill) {
+      totalCountPill.textContent = t("archive_matches_count", allMatches.length);
+    }
+
+    // 3. Filter matches
+    let filtered = allMatches.filter((m) => {
+      if (activeArchiveFilter === "tournament" && m.mode !== "tournament") return false;
+      if (activeArchiveFilter === "cash" && m.mode !== "cash") return false;
+      if (archiveSearchQuery) {
+        const q = archiveSearchQuery.toLowerCase();
+        const titleMatch = (m.title || "").toLowerCase().includes(q);
+        const locMatch = (m.location || "").toLowerCase().includes(q);
+        const notesMatch = (m.notes || "").toLowerCase().includes(q);
+        const playersMatch = (m.players || []).some((p) => p.name.toLowerCase().includes(q));
+        if (!titleMatch && !locMatch && !notesMatch && !playersMatch) return false;
+      }
+      return true;
+    });
+
+    // Clear dynamic cards
+    matchesContainer.querySelectorAll(".archive-match-card").forEach((c) => c.remove());
+
+    if (filtered.length === 0) {
+      if (emptyState) emptyState.style.display = "flex";
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = "none";
+
+    filtered.forEach((match) => {
+      const card = renderArchiveMatchCard(match);
+      matchesContainer.appendChild(card);
+    });
+  }
+
+  function renderArchiveMatchCard(match) {
+    const card = document.createElement("article");
+    card.className = `archive-match-card${match.isPinned ? " pinned" : ""}`;
+    card.dataset.id = match.id;
+
+    const isTourney = match.mode === "tournament";
+    const modeTag = isTourney
+      ? `TOURNAMENT · ${match.format?.toUpperCase() || "US"}`
+      : `CASH RING · $${(match.stakeRate || 1).toFixed(2)}`;
+
+    // Build player cells
+    const playerCellsHtml = (match.players || [])
+      .map((p) => {
+        const winCrown = p.isWinner ? '<span class="material-symbols-outlined crown-icon">emoji_events</span>' : "";
+        let valDisplay = "";
+        if (isTourney) {
+          valDisplay = `<span class="card-player-score">${p.score}</span>`;
+        } else {
+          const bal = p.balance || 0;
+          const sign = bal > 0 ? "+" : "";
+          const cls = bal > 0 ? "positive" : bal < 0 ? "negative" : "";
+          valDisplay = `<span class="card-player-balance ${cls}">${sign}$${bal.toFixed(2)} (${p.score > 0 ? "+" : ""}${p.score})</span>`;
+        }
+        return `
+          <div class="card-player-cell">
+            <span class="card-player-name">${winCrown}<span>${escapeHtml(p.name)}</span></span>
+            ${valDisplay}
+          </div>
+        `;
+      })
+      .join("");
+
+    // Build media thumbnails
+    let mediaHtml = "";
+    if (Array.isArray(match.photos) && match.photos.length > 0) {
+      match.photos.forEach((photo, pIdx) => {
+        const photoUrl = URL.createObjectURL(photo.blob);
+        mediaHtml += `
+          <div class="card-media-thumb" data-media-type="photo" data-photo-idx="${pIdx}">
+            <img src="${photoUrl}" alt="Match Photo ${pIdx + 1}" loading="lazy">
+          </div>
+        `;
+      });
+    }
+
+    if (match.hasGraph && match.graphBlob) {
+      const graphUrl = URL.createObjectURL(match.graphBlob);
+      mediaHtml += `
+        <div class="card-media-thumb graph-thumb" data-media-type="graph">
+          <img src="${graphUrl}" alt="Graph Snapshot" loading="lazy">
+          <span class="thumb-tag">📈 GRAPH</span>
+        </div>
+      `;
+    }
+
+    const locTagHtml = match.location
+      ? `<span class="card-loc-tag"><span class="material-symbols-outlined">location_on</span><span>${escapeHtml(match.location)}</span></span>`
+      : "";
+
+    const notesHtml = match.notes
+      ? `<div class="card-notes-text">${escapeHtml(match.notes)}</div>`
+      : "";
+
+    card.innerHTML = `
+      <div class="card-header-line">
+        <div class="card-title-group">
+          <div class="card-title">${escapeHtml(match.title || "Match")}</div>
+          <div class="card-meta-row">
+            <span>${escapeHtml(match.dateFormatted || "")}</span>
+            <span>·</span>
+            <span class="summary-badge">${modeTag}</span>
+            <span>·</span>
+            <span class="summary-timer">${match.sessionDurationStr || "00:00"}</span>
+            ${locTagHtml ? "<span>·</span>" + locTagHtml : ""}
+          </div>
+        </div>
+        <div class="card-badges-row">
+          <button class="btn-card-pin${match.isPinned ? " active" : ""}" type="button" title="Pin / Protect from auto-cleanup">
+            <span class="material-symbols-outlined">${match.isPinned ? "star" : "star_border"}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card-scores-grid">
+        ${playerCellsHtml}
+      </div>
+
+      ${notesHtml}
+
+      ${mediaHtml ? `<div class="card-media-strip">${mediaHtml}</div>` : ""}
+
+      <div class="card-footer-actions">
+        <button class="btn-card-action btn-edit-match" type="button">
+          <span class="material-symbols-outlined" style="font-size: 14px;">edit</span>
+          <span>Edit</span>
+        </button>
+        <button class="btn-card-action danger btn-delete-match" type="button">
+          <span class="material-symbols-outlined" style="font-size: 14px;">delete</span>
+          <span>Delete</span>
+        </button>
+      </div>
+    `;
+
+    // Hook: Pin toggle
+    card.querySelector(".btn-card-pin").addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const newPinned = await dbTogglePin(match.id);
+      match.isPinned = newPinned;
+      card.classList.toggle("pinned", !!newPinned);
+      const icon = card.querySelector(".btn-card-pin .material-symbols-outlined");
+      if (icon) icon.textContent = newPinned ? "star" : "star_border";
+      card.querySelector(".btn-card-pin").classList.toggle("active", !!newPinned);
+      showToast(newPinned ? t("archive_pin_on") : t("archive_pin_off"));
+    });
+
+    // Hook: Media click (lightbox)
+    card.querySelectorAll(".card-media-thumb").forEach((thumb) => {
+      thumb.addEventListener("click", () => {
+        const type = thumb.dataset.mediaType;
+        if (type === "graph" && match.graphBlob) {
+          openLightbox(match.graphBlob, `${match.title} - Performance Graph`, `${match.title}-graph.png`);
+        } else if (type === "photo") {
+          const idx = parseInt(thumb.dataset.photoIdx, 10);
+          const p = match.photos[idx];
+          if (p?.blob) {
+            openLightbox(p.blob, `${match.title} - Photo ${idx + 1}`, `${match.title}-photo-${idx + 1}.jpg`);
+          }
+        }
+      });
+    });
+
+    // Hook: Edit
+    card.querySelector(".btn-edit-match").addEventListener("click", () => {
+      openEditMatchModal(match);
+    });
+
+    // Hook: Delete
+    card.querySelector(".btn-delete-match").addEventListener("click", async () => {
+      if (confirm(t("archive_delete_confirm"))) {
+        await dbDeleteMatch(match.id);
+        card.remove();
+        await refreshArchiveView();
+      }
+    });
+
+    return card;
+  }
+
+  // ═══════════════ EDIT MATCH MODAL ═══════════════
+  let currentEditingMatchId = null;
+
+  function openEditMatchModal(match) {
+    const modal = $("editMatchModal");
+    if (!modal) return;
+    currentEditingMatchId = match.id;
+
+    const titleInput = $("editMatchTitleInput");
+    const locInput = $("editMatchLocationInput");
+    const notesInput = $("editMatchNotesInput");
+    const idInput = $("editMatchId");
+
+    if (idInput) idInput.value = match.id;
+    if (titleInput) titleInput.value = match.title || "";
+    if (locInput) locInput.value = match.location || "";
+    if (notesInput) notesInput.value = match.notes || "";
+
+    populateVenueDatalistAndChips("editMatchLocationChips", "editMatchLocationInput");
+    modal.classList.add("open");
+  }
+
+  function closeEditMatchModal() {
+    const modal = $("editMatchModal");
+    if (modal) modal.classList.remove("open");
+    currentEditingMatchId = null;
+  }
+
+  async function handleConfirmEditMatch() {
+    if (!currentEditingMatchId) return;
+    const titleInput = $("editMatchTitleInput");
+    const locInput = $("editMatchLocationInput");
+    const notesInput = $("editMatchNotesInput");
+
+    const title = titleInput?.value.trim() || "Match";
+    const location = locInput?.value.trim() || "";
+    const notes = notesInput?.value.trim() || "";
+
+    if (location) {
+      saveRememberedVenue(location);
+    }
+
+    await dbUpdateMatchMeta(currentEditingMatchId, { title, location, notes });
+    closeEditMatchModal();
+    await refreshArchiveView();
+  }
+
+  // ═══════════════ LIGHTBOX FULLSCREEN ═══════════════
+  let currentLightboxBlob = null;
+  let currentLightboxFilename = "image.png";
+  let currentLightboxObjectUrl = null;
+
+  function openLightbox(blob, captionText = "Match Image", filename = "image.png") {
+    const modal = $("mediaLightboxModal");
+    const img = $("lightboxImg");
+    const caption = $("lightboxCaption");
+    if (!modal || !img) return;
+
+    if (currentLightboxObjectUrl) {
+      URL.revokeObjectURL(currentLightboxObjectUrl);
+    }
+    currentLightboxBlob = blob;
+    currentLightboxFilename = filename;
+    currentLightboxObjectUrl = URL.createObjectURL(blob);
+
+    img.src = currentLightboxObjectUrl;
+    if (caption) caption.textContent = captionText;
+    modal.style.display = "flex";
+  }
+
+  function closeLightbox() {
+    const modal = $("mediaLightboxModal");
+    if (modal) modal.style.display = "none";
+    if (currentLightboxObjectUrl) {
+      URL.revokeObjectURL(currentLightboxObjectUrl);
+      currentLightboxObjectUrl = null;
+    }
+    currentLightboxBlob = null;
+  }
+
+  // ═══════════════ EXPORT & IMPORT BACKUP ═══════════════
+  async function handleExportArchiveBackup() {
+    try {
+      const matches = await dbGetAllMatches();
+      if (matches.length === 0) {
+        showToast(t("archive_empty_title"));
+        return;
+      }
+
+      // Convert Blobs to Base64
+      const serialized = [];
+      for (const m of matches) {
+        const item = { ...m };
+        if (Array.isArray(m.photos)) {
+          item.photos = [];
+          for (const p of m.photos) {
+            if (p.blob) {
+              const b64 = await blobToBase64(p.blob);
+              item.photos.push({ base64: b64, mime: p.mime, name: p.name });
+            }
+          }
+        }
+        if (m.hasGraph && m.graphBlob) {
+          item.graphBase64 = await blobToBase64(m.graphBlob);
+          delete item.graphBlob;
+        }
+        serialized.push(item);
+      }
+
+      const backupObj = {
+        app: "21n2-billiards-scoreboard",
+        version: "1.0",
+        exportedAt: new Date().toISOString(),
+        totalMatches: serialized.length,
+        matches: serialized,
+      };
+
+      const jsonStr = JSON.stringify(backupObj, null, 2);
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const datePart = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `21n2_match_archive_backup_${datePart}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export backup failed:", err);
+      showToast("Export failed");
+    }
+  }
+
+  async function handleImportArchiveBackup(file) {
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!data || !Array.isArray(data.matches)) {
+        showToast(t("archive_import_err"));
+        return;
+      }
+
+      let count = 0;
+      for (const item of data.matches) {
+        // Rehydrate photos
+        const photos = [];
+        if (Array.isArray(item.photos)) {
+          for (const p of item.photos) {
+            if (p.base64) {
+              photos.push({
+                blob: base64ToBlob(p.base64, p.mime || "image/jpeg"),
+                mime: p.mime || "image/jpeg",
+                name: p.name || "photo.jpg",
+              });
+            }
+          }
+        }
+        item.photos = photos;
+
+        // Rehydrate graph
+        if (item.hasGraph && item.graphBase64) {
+          item.graphBlob = base64ToBlob(item.graphBase64, "image/png");
+          delete item.graphBase64;
+        }
+
+        await dbSaveMatch(item);
+        count++;
+      }
+
+      showToast(t("archive_import_success", count));
+      await refreshArchiveView();
+    } catch (err) {
+      console.error("Import backup failed:", err);
+      showToast(t("archive_import_err"));
+    }
+  }
+
+  /**
+   * Localization bindings for Memory & Archive
+   */
+  function updateMemoryLocalizedTexts() {
+    const lblBurgerArchive = $("lblBurgerArchive");
+    if (lblBurgerArchive) lblBurgerArchive.textContent = t("burger_archive");
+    const btnSaveMatchLog = $("btnSaveMatchLog");
+    if (btnSaveMatchLog) btnSaveMatchLog.title = t("save_match_log_title");
+    const lblSaveMatchTitle = $("lblSaveMatchTitle");
+    if (lblSaveMatchTitle) lblSaveMatchTitle.textContent = t("save_match_title");
+    const lblConfirmSaveMatch = $("lblConfirmSaveMatch");
+    if (lblConfirmSaveMatch) lblConfirmSaveMatch.textContent = t("save_match_btn");
+    const lblSaveMatchTitleField = $("lblSaveMatchTitleField");
+    if (lblSaveMatchTitleField) lblSaveMatchTitleField.textContent = t("save_match_field_title");
+    const lblSaveMatchDateField = $("lblSaveMatchDateField");
+    if (lblSaveMatchDateField) lblSaveMatchDateField.textContent = t("save_match_field_date");
+    const lblSaveMatchLocField = $("lblSaveMatchLocField");
+    if (lblSaveMatchLocField) lblSaveMatchLocField.textContent = t("save_match_field_loc");
+    const lblSaveMatchLocHint = $("lblSaveMatchLocHint");
+    if (lblSaveMatchLocHint) lblSaveMatchLocHint.textContent = t("save_match_field_loc_hint");
+    const lblSaveMatchNotesField = $("lblSaveMatchNotesField");
+    if (lblSaveMatchNotesField) lblSaveMatchNotesField.textContent = t("save_match_field_notes");
+    const lblSaveMatchPhotosField = $("lblSaveMatchPhotosField");
+    if (lblSaveMatchPhotosField) lblSaveMatchPhotosField.textContent = t("save_match_field_photos");
+    const lblAddPhotoBtn = $("lblAddPhotoBtn");
+    if (lblAddPhotoBtn) lblAddPhotoBtn.textContent = t("save_match_add_photo");
+    const lblAttachGraphTitle = $("lblAttachGraphTitle");
+    if (lblAttachGraphTitle) lblAttachGraphTitle.textContent = t("save_match_attach_graph");
+    const lblAttachGraphDesc = $("lblAttachGraphDesc");
+    if (lblAttachGraphDesc) lblAttachGraphDesc.textContent = t("save_match_attach_desc");
+    const lblAttachGraphToggle = $("lblAttachGraphToggle");
+    if (lblAttachGraphToggle) lblAttachGraphToggle.textContent = t("save_match_include_graph");
+    const lblArchiveModalTitle = $("lblArchiveModalTitle");
+    if (lblArchiveModalTitle) lblArchiveModalTitle.textContent = t("archive_title");
+    const lblArchiveEmptyTitle = $("lblArchiveEmptyTitle");
+    if (lblArchiveEmptyTitle) lblArchiveEmptyTitle.textContent = t("archive_empty_title");
+    const lblArchiveEmptyDesc = $("lblArchiveEmptyDesc");
+    if (lblArchiveEmptyDesc) lblArchiveEmptyDesc.textContent = t("archive_empty_desc");
+    const lblExportArchive = $("lblExportArchive");
+    if (lblExportArchive) lblExportArchive.textContent = t("archive_export");
+    const lblImportArchive = $("lblImportArchive");
+    if (lblImportArchive) lblImportArchive.textContent = t("archive_import");
+    const lblEditMatchTitle = $("lblEditMatchTitle");
+    if (lblEditMatchTitle) lblEditMatchTitle.textContent = t("archive_edit_title");
+  }
+
+  function initMemoryModule() {
+    // 1. Single-icon Save Match button in Rack Log Drawer
+    const btnSaveMatchLog = $("btnSaveMatchLog");
+    if (btnSaveMatchLog) {
+      btnSaveMatchLog.addEventListener("click", () => {
+        tactileFeedback();
+        openSaveMatchModal();
+      });
+    }
+
+    // Save Match Modal buttons
+    const btnCloseSaveMatch = $("btnCloseSaveMatch");
+    if (btnCloseSaveMatch) btnCloseSaveMatch.addEventListener("click", closeSaveMatchModal);
+
+    const btnCancelSaveMatch = $("btnCancelSaveMatch");
+    if (btnCancelSaveMatch) btnCancelSaveMatch.addEventListener("click", closeSaveMatchModal);
+
+    const btnConfirmSaveMatch = $("btnConfirmSaveMatch");
+    if (btnConfirmSaveMatch) {
+      btnConfirmSaveMatch.addEventListener("click", () => {
+        tactileFeedback();
+        handleConfirmSaveMatch();
+      });
+    }
+
+    // Photo input
+    const btnAddMatchPhoto = $("btnAddMatchPhoto");
+    const saveMatchFileInput = $("saveMatchFileInput");
+    if (btnAddMatchPhoto && saveMatchFileInput) {
+      btnAddMatchPhoto.addEventListener("click", () => {
+        saveMatchFileInput.click();
+      });
+      saveMatchFileInput.addEventListener("change", async (e) => {
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0) return;
+        const availableSlots = 3 - draftMatchPhotos.length;
+        const toProcess = files.slice(0, availableSlots);
+
+        for (const file of toProcess) {
+          try {
+            const compressedBlob = await compressImageFile(file, 1280, 0.8);
+            const previewUrl = URL.createObjectURL(compressedBlob);
+            draftMatchPhotos.push({
+              blob: compressedBlob,
+              mime: "image/jpeg",
+              previewUrl,
+              name: file.name,
+            });
+          } catch (err) {
+            console.warn("Failed to compress image:", err);
+          }
+        }
+        saveMatchFileInput.value = "";
+        renderSaveMatchPhotos();
+      });
+    }
+
+    // Optional Graph toggle & remove
+    const btnToggleAttachGraph = $("btnToggleAttachGraph");
+    if (btnToggleAttachGraph) {
+      btnToggleAttachGraph.addEventListener("click", async () => {
+        tactileFeedback();
+        if (draftGraphBlob) {
+          draftGraphBlob = null;
+        } else {
+          draftGraphBlob = await captureCurrentGraphBlob();
+        }
+        updateGraphAttachmentUI();
+      });
+    }
+
+    const btnRemoveGraphSnapshot = $("btnRemoveGraphSnapshot");
+    if (btnRemoveGraphSnapshot) {
+      btnRemoveGraphSnapshot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        draftGraphBlob = null;
+        updateGraphAttachmentUI();
+      });
+    }
+
+    // 2. Open Archive triggers
+    const btnOpenArchive = $("btnOpenArchive");
+    if (btnOpenArchive) {
+      btnOpenArchive.addEventListener("click", () => {
+        tactileFeedback();
+        openArchiveModal();
+      });
+    }
+
+    const btnBurgerArchive = $("btnBurgerArchive");
+    if (btnBurgerArchive) {
+      btnBurgerArchive.addEventListener("click", () => {
+        tactileFeedback();
+        closeBurgerMenu();
+        openArchiveModal();
+      });
+    }
+
+    const btnCloseArchiveModal = $("btnCloseArchiveModal");
+    if (btnCloseArchiveModal) {
+      btnCloseArchiveModal.addEventListener("click", closeArchiveModal);
+    }
+
+    // Filter Chips in Archive
+    const filterChips = document.querySelectorAll(".archive-chip");
+    filterChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        tactileFeedback();
+        filterChips.forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        activeArchiveFilter = chip.dataset.filter || "all";
+        refreshArchiveView();
+      });
+    });
+
+    // Search Input in Archive
+    const searchInput = $("archiveSearchInput");
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        archiveSearchQuery = e.target.value.trim();
+        refreshArchiveView();
+      });
+    }
+
+    // Export & Import Backup
+    const btnExportArchive = $("btnExportArchive");
+    if (btnExportArchive) {
+      btnExportArchive.addEventListener("click", () => {
+        tactileFeedback();
+        handleExportArchiveBackup();
+      });
+    }
+
+    const btnImportArchive = $("btnImportArchive");
+    const archiveImportFileInput = $("archiveImportFileInput");
+    if (btnImportArchive && archiveImportFileInput) {
+      btnImportArchive.addEventListener("click", () => {
+        archiveImportFileInput.click();
+      });
+      archiveImportFileInput.addEventListener("change", (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+          handleImportArchiveBackup(file);
+          archiveImportFileInput.value = "";
+        }
+      });
+    }
+
+    // 3. Edit Match Modal
+    const btnCloseEditMatch = $("btnCloseEditMatch");
+    if (btnCloseEditMatch) btnCloseEditMatch.addEventListener("click", closeEditMatchModal);
+
+    const btnCancelEditMatch = $("btnCancelEditMatch");
+    if (btnCancelEditMatch) btnCancelEditMatch.addEventListener("click", closeEditMatchModal);
+
+    const btnConfirmEditMatch = $("btnConfirmEditMatch");
+    if (btnConfirmEditMatch) {
+      btnConfirmEditMatch.addEventListener("click", () => {
+        tactileFeedback();
+        handleConfirmEditMatch();
+      });
+    }
+
+    // 4. Lightbox Handlers
+    const btnCloseLightbox = $("btnCloseLightbox");
+    if (btnCloseLightbox) btnCloseLightbox.addEventListener("click", closeLightbox);
+
+    const mediaLightboxModal = $("mediaLightboxModal");
+    if (mediaLightboxModal) {
+      mediaLightboxModal.addEventListener("click", (e) => {
+        if (e.target === mediaLightboxModal) closeLightbox();
+      });
+    }
+
+    const btnLightboxDownload = $("btnLightboxDownload");
+    if (btnLightboxDownload) {
+      btnLightboxDownload.addEventListener("click", () => {
+        if (!currentLightboxBlob) return;
+        const url = URL.createObjectURL(currentLightboxBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = currentLightboxFilename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    // Escape Key handling for new modals
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (mediaLightboxModal && mediaLightboxModal.style.display !== "none") {
+          closeLightbox();
+          return;
+        }
+        const editModal = $("editMatchModal");
+        if (editModal && editModal.classList.contains("open")) {
+          closeEditMatchModal();
+          return;
+        }
+        const archiveModal = $("archiveModal");
+        if (archiveModal && archiveModal.classList.contains("open")) {
+          closeArchiveModal();
+          return;
+        }
+        const saveModal = $("saveMatchModal");
+        if (saveModal && saveModal.classList.contains("open")) {
+          closeSaveMatchModal();
+          return;
+        }
+      }
+    });
+
+    // Check quota on boot
+    dbCheckAndEnforceQuota();
+  }
+
   // ═══════════════ INITIALIZATION ═══════════════
   function init() {
     loadState();
@@ -3113,6 +4511,7 @@
     }
     syncGraphViewState();
     syncBurgerMenuState();
+    initMemoryModule();
 
     resetBlurCountdown();
 

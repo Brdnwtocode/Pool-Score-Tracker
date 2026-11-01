@@ -1255,6 +1255,33 @@ html:not(.dark) .graph-tooltip {
   animation: pausePulse 1s infinite alternate;
 }
 
+.session-timer-badge.is-ended {
+  border-color: rgba(239, 68, 68, 0.55);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.session-timer-badge.is-ended .session-icon {
+  color: var(--accent-red);
+}
+
+.session-timer-badge.is-ended .session-digits {
+  color: var(--accent-red);
+}
+
+.session-ended-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 1px 5px;
+  border-radius: 2px;
+  background: rgba(239, 68, 68, 0.18);
+  color: var(--accent-red);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  line-height: 1.2;
+  user-select: none;
+}
+
 @keyframes pausePulse {
   from { opacity: 0.45; }
   to { opacity: 1; }
