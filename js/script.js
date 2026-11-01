@@ -3257,22 +3257,61 @@
   /**
    * Quota Management & 80% Threshold Auto-Recycling
    */
+  const ARCHIVE_STORAGE_BUDGET_BYTES = 50 * 1024 * 1024; // 50 MB soft quota for Match Archive
+
+  function formatStorageSize(bytes) {
+    if (!Number.isFinite(bytes) || bytes <= 0) return "0 KB";
+    if (bytes < 1024 * 1024) {
+      return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  }
+
+  function calculateArchiveBytes(matches) {
+    if (!Array.isArray(matches) || matches.length === 0) return 0;
+    let total = 0;
+    for (const m of matches) {
+      if (!m) continue;
+      if (Array.isArray(m.photos)) {
+        for (const p of m.photos) {
+          if (p && p.blob && typeof p.blob.size === "number") {
+            total += p.blob.size;
+          }
+        }
+      }
+      if (m.graphBlob && typeof m.graphBlob.size === "number") {
+        total += m.graphBlob.size;
+      }
+      try {
+        const clone = { ...m, photos: undefined, graphBlob: undefined };
+        const str = JSON.stringify(clone);
+        if (str) total += str.length * 2; // rough UTF-16 byte estimation
+      } catch {}
+    }
+    return total;
+  }
+
   async function dbCheckAndEnforceQuota() {
     try {
-      if (!navigator.storage || !navigator.storage.estimate) return;
-      const { usage, quota } = await navigator.storage.estimate();
-      if (!quota || quota === 0) return;
+      const matches = await dbGetAllMatches();
+      let archiveBytes = calculateArchiveBytes(matches);
 
-      const percent = usage / quota;
-      if (percent >= 0.8) {
-        // Recycle oldest unpinned matches until usage is below 78%
-        const matches = await dbGetAllMatches();
+      let needsCleanup = archiveBytes >= (ARCHIVE_STORAGE_BUDGET_BYTES * 0.8);
+      if (!needsCleanup && navigator.storage && navigator.storage.estimate) {
+        const est = await navigator.storage.estimate();
+        if (est.quota && est.quota > 0 && (est.usage / est.quota) >= 0.8) {
+          needsCleanup = true;
+        }
+      }
+
+      if (needsCleanup) {
         matches.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0)); // oldest first
         for (const m of matches) {
           if (!m.isPinned) {
             await dbDeleteMatch(m.id);
-            const est = await navigator.storage.estimate();
-            if ((est.usage / est.quota) < 0.78) break;
+            const remaining = await dbGetAllMatches();
+            archiveBytes = calculateArchiveBytes(remaining);
+            if (archiveBytes < (ARCHIVE_STORAGE_BUDGET_BYTES * 0.75)) break;
           }
         }
       }
@@ -3281,17 +3320,42 @@
     }
   }
 
-  async function getStorageInfo() {
+  async function getStorageInfo(matches) {
     try {
+      const archiveMatches = Array.isArray(matches) ? matches : await dbGetAllMatches();
+      const archiveBytes = calculateArchiveBytes(archiveMatches);
+      const usedFormatted = formatStorageSize(archiveBytes);
+      const usedMb = ((archiveBytes || 0) / (1024 * 1024)).toFixed(1);
+      let percent = Math.min(100, Math.round((archiveBytes / ARCHIVE_STORAGE_BUDGET_BYTES) * 100));
+
       if (navigator.storage && navigator.storage.estimate) {
-        const { usage, quota } = await navigator.storage.estimate();
-        const usedMb = ((usage || 0) / (1024 * 1024)).toFixed(1);
-        const totalMb = ((quota || 0) / (1024 * 1024)).toFixed(0);
-        const percent = quota > 0 ? Math.min(100, Math.round(((usage || 0) / quota) * 100)) : 0;
-        return { usedMb, totalMb, percent, isAvailable: true };
+        try {
+          const est = await navigator.storage.estimate();
+          if (est.quota && est.quota > 0) {
+            const globalPercent = Math.round(((est.usage || 0) / est.quota) * 100);
+            if (globalPercent > percent) {
+              percent = Math.min(100, globalPercent);
+            }
+          }
+        } catch {}
       }
-    } catch {}
-    return { usedMb: "0.0", totalMb: "N/A", percent: 0, isAvailable: false };
+
+      return {
+        bytes: archiveBytes,
+        usedFormatted,
+        usedMb,
+        percent,
+        isAvailable: true,
+      };
+    } catch {
+      return {
+        bytes: 0,
+        usedFormatted: "0 KB",
+        usedMb: "0.0",
+        percent: 0,
+        isAvailable: false,
+      };
+    }
   }
 
   /**
@@ -3738,34 +3802,34 @@
     const quotaDot = $("quotaStatusDot");
     if (!matchesContainer) return;
 
-    // 1. Quota status update
-    const storage = await getStorageInfo();
-    if (quotaText && quotaFill && quotaDot) {
-      if (storage.isAvailable) {
-        if (storage.percent >= 80) {
-          quotaText.textContent = t("archive_storage_danger", storage.usedMb + " MB", storage.percent);
-          quotaDot.className = "quota-dot danger";
-          quotaFill.className = "quota-meter-fill danger";
-        } else if (storage.percent >= 60) {
-          quotaText.textContent = t("archive_storage_warning", storage.usedMb + " MB", storage.percent);
-          quotaDot.className = "quota-dot warning";
-          quotaFill.className = "quota-meter-fill warning";
-        } else {
-          quotaText.textContent = t("archive_storage_healthy", storage.usedMb + " MB");
-          quotaDot.className = "quota-dot";
-          quotaFill.className = "quota-meter-fill";
-        }
-        quotaFill.style.width = `${Math.min(100, Math.max(3, storage.percent))}%`;
-      } else {
-        quotaText.textContent = `${storage.usedMb} MB used`;
-        quotaFill.style.width = "5%";
-      }
-    }
-
-    // 2. Fetch matches
+    // 1. Fetch matches
     const allMatches = await dbGetAllMatches();
     if (totalCountPill) {
       totalCountPill.textContent = t("archive_matches_count", allMatches.length);
+    }
+
+    // 2. Quota status update
+    const storage = await getStorageInfo(allMatches);
+    if (quotaText && quotaFill && quotaDot) {
+      if (storage.isAvailable) {
+        if (storage.percent >= 80) {
+          quotaText.textContent = t("archive_storage_danger", storage.usedFormatted, storage.percent);
+          quotaDot.className = "quota-dot danger";
+          quotaFill.className = "quota-meter-fill danger";
+        } else if (storage.percent >= 60) {
+          quotaText.textContent = t("archive_storage_warning", storage.usedFormatted, storage.percent);
+          quotaDot.className = "quota-dot warning";
+          quotaFill.className = "quota-meter-fill warning";
+        } else {
+          quotaText.textContent = t("archive_storage_healthy", storage.usedFormatted);
+          quotaDot.className = "quota-dot";
+          quotaFill.className = "quota-meter-fill";
+        }
+        quotaFill.style.width = storage.bytes === 0 ? "0%" : `${Math.min(100, Math.max(2, storage.percent))}%`;
+      } else {
+        quotaText.textContent = `${storage.usedFormatted} used`;
+        quotaFill.style.width = "0%";
+      }
     }
 
     // 3. Filter matches

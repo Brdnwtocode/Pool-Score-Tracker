@@ -298,8 +298,9 @@ html.mode-tournament .cash-only {
   gap: 4px;
 }
 
-.burger-menu-btn {
-  display: none;
+.burger-menu-btn,
+button.burger-menu-btn {
+  display: none !important;
   width: 34px;
   height: 34px;
   color: var(--text-primary);
@@ -436,7 +437,8 @@ html.mode-tournament .cash-only {
     display: none !important;
   }
 
-  .burger-menu-btn {
+  .burger-menu-btn,
+  button.burger-menu-btn {
     display: flex !important;
   }
 }
@@ -452,7 +454,8 @@ html.is-zoomed-in .masthead-desktop-tools {
   display: none !important;
 }
 
-html.is-zoomed-in .burger-menu-btn {
+html.is-zoomed-in .burger-menu-btn,
+html.is-zoomed-in button.burger-menu-btn {
   display: flex !important;
 }
 

@@ -31,6 +31,7 @@ server.listen(0, '127.0.0.1', async () => {
     '--remote-debugging-port=9495',
     '--disable-gpu',
     '--no-first-run',
+    '--window-size=1280,800',
     '--user-data-dir=C:\\Users\\DELL\\AppData\\Local\\Temp\\chrome-audit-' + Date.now(),
     `http://127.0.0.1:${port}/`
   ]);
@@ -89,6 +90,26 @@ server.listen(0, '127.0.0.1', async () => {
   await new Promise(r => setTimeout(r, 200));
 
   console.log('\n--- AUDIT 1: BURGER MENU VERIFICATION ---');
+
+  // Check 0: Burger menu visibility vs desktop tools strip
+  const desktopBurgerDisplay = await evalJs(`getComputedStyle(document.getElementById('btnBurgerMenu')).display`);
+  const desktopToolsDisplay = await evalJs(`getComputedStyle(document.querySelector('.masthead-desktop-tools')).display`);
+  console.log(`[+] Desktop (>768px, normal zoom) Burger Button display: "${desktopBurgerDisplay}" (expected: "none")`);
+  console.log(`[+] Desktop (>768px, normal zoom) Tools Strip display: "${desktopToolsDisplay}" (expected: "flex")`);
+  if (desktopBurgerDisplay !== 'none') throw new Error(`Burger menu should be hidden on desktop, got ${desktopBurgerDisplay}`);
+  if (desktopToolsDisplay !== 'flex') throw new Error(`Desktop tools strip should be visible on desktop, got ${desktopToolsDisplay}`);
+
+  // When zoomed in or space constrained, burger button appears and desktop strip hides
+  await evalJs(`document.documentElement.classList.add('is-zoomed-in');`);
+  const zoomedBurgerDisplay = await evalJs(`getComputedStyle(document.getElementById('btnBurgerMenu')).display`);
+  const zoomedToolsDisplay = await evalJs(`getComputedStyle(document.querySelector('.masthead-desktop-tools')).display`);
+  console.log(`[+] Space constrained / Zoomed Burger Button display: "${zoomedBurgerDisplay}" (expected: "flex")`);
+  console.log(`[+] Space constrained / Zoomed Tools Strip display: "${zoomedToolsDisplay}" (expected: "none")`);
+  if (zoomedBurgerDisplay !== 'flex') throw new Error(`Burger menu should be flex when space constrained, got ${zoomedBurgerDisplay}`);
+  if (zoomedToolsDisplay !== 'none') throw new Error(`Desktop tools strip should be hidden when space constrained, got ${zoomedToolsDisplay}`);
+
+  // Restore normal desktop zoom for remainder of tests
+  await evalJs(`document.documentElement.classList.remove('is-zoomed-in');`);
 
   // Check 1: Open Burger Menu
   await evalJs(`document.getElementById('btnBurgerMenu').click();`);
@@ -212,6 +233,32 @@ server.listen(0, '127.0.0.1', async () => {
   console.log(`[+] Saved Card has History Accordion: ${cardHasAccordion}`);
   if (!cardHasRacksPill) throw new Error('Saved match card does not have racks pill');
   if (!cardHasAccordion) throw new Error('Saved match card does not have history accordion');
+
+  console.log('\n--- AUDIT 3: DYNAMIC STORAGE QUOTA REFRESH ON DELETE ---');
+  // Check quota text with 1 match present
+  const quotaBeforeDelete = await evalJs(`document.getElementById('archiveQuotaText').textContent.trim()`);
+  const meterWidthBeforeDelete = await evalJs(`document.getElementById('archiveQuotaFill').style.width`);
+  console.log(`[+] Storage quota before delete: "${quotaBeforeDelete}" (fill: ${meterWidthBeforeDelete})`);
+  if (!quotaBeforeDelete.includes('KB') && !quotaBeforeDelete.includes('MB')) {
+    throw new Error('Quota text should report storage size with KB/MB');
+  }
+
+  // Delete the match
+  await evalJs(`
+    window.confirm = () => true;
+    const deleteBtn = document.querySelector('.archive-match-card .btn-delete-match');
+    if (deleteBtn) deleteBtn.click();
+  `);
+  await new Promise(r => setTimeout(r, 600));
+
+  const countAfterDelete = await evalJs(`document.querySelectorAll('.archive-match-card').length`);
+  const quotaAfterDelete = await evalJs(`document.getElementById('archiveQuotaText').textContent.trim()`);
+  const meterWidthAfterDelete = await evalJs(`document.getElementById('archiveQuotaFill').style.width`);
+  console.log(`[+] Matches remaining after delete: ${countAfterDelete}`);
+  console.log(`[+] Storage quota after delete: "${quotaAfterDelete}" (fill: ${meterWidthAfterDelete})`);
+  if (countAfterDelete !== 0) throw new Error('Match card was not removed');
+  if (!quotaAfterDelete.includes('0 KB')) throw new Error(`Quota should be 0 KB after deleting all matches, got: ${quotaAfterDelete}`);
+  if (meterWidthAfterDelete !== '0%') throw new Error(`Meter fill should be 0% when empty, got: ${meterWidthAfterDelete}`);
 
   console.log('\n=== ALL AUDIT CHECKS PASSED WITH 100% SUCCESS! ===\n');
 
