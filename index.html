@@ -249,6 +249,10 @@
             <span class="hint-item"><span class="dot-sample hollow"></span> <span id="lblHintPlus">+pts (hollow)</span></span>
             <span class="hint-item"><span class="dot-sample solid"></span> <span id="lblHintMinus">−pts (solid)</span></span>
             <span class="hint-item hint-action" id="lblHintIsolate">Tap line to isolate player</span>
+            <button class="btn-graph-save-quick" id="btnSaveGraphQuick" type="button" title="Save graph snapshot image to downloads">
+              <span class="material-symbols-outlined" style="font-size: 13px;">download</span>
+              <span id="lblSaveGraphQuick">Save Graph</span>
+            </button>
           </div>
         </div>
       </section>
@@ -759,14 +763,25 @@
                   <span class="graph-attach-desc" id="lblAttachGraphDesc">Capture points &amp; timeline graph</span>
                 </div>
               </div>
-              <button class="btn-pill-toggle" id="btnToggleAttachGraph" type="button">
-                <span class="material-symbols-outlined" id="attachGraphToggleIcon">add</span>
-                <span id="lblAttachGraphToggle">Include Graph</span>
-              </button>
+              <div class="graph-attach-actions">
+                <button class="btn-graph-save-direct" id="btnDownloadGraphSnapshot" type="button" title="Save graph image directly to device">
+                  <span class="material-symbols-outlined">download</span>
+                  <span id="lblDownloadGraphBtn">Save Image</span>
+                </button>
+                <button class="btn-pill-toggle" id="btnToggleAttachGraph" type="button">
+                  <span class="material-symbols-outlined" id="attachGraphToggleIcon">add</span>
+                  <span id="lblAttachGraphToggle">Include Graph</span>
+                </button>
+              </div>
             </div>
             <div class="graph-preview-box" id="saveMatchGraphPreviewBox" style="display: none;">
-              <img class="graph-preview-img" id="saveMatchGraphPreviewImg" alt="Match graph snapshot">
-              <button class="btn-remove-preview" id="btnRemoveGraphSnapshot" type="button" title="Remove graph snapshot">✕</button>
+              <img class="graph-preview-img" id="saveMatchGraphPreviewImg" alt="Match graph snapshot" title="Tap to view fullscreen">
+              <div class="graph-preview-controls">
+                <button class="btn-preview-tool download" id="btnDownloadPreviewGraph" type="button" title="Save graph image to device">
+                  <span class="material-symbols-outlined">download</span>
+                </button>
+                <button class="btn-preview-tool remove" id="btnRemoveGraphSnapshot" type="button" title="Remove graph snapshot">✕</button>
+              </div>
             </div>
           </div>
         </div>

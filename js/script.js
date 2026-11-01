@@ -182,6 +182,14 @@
       no_graph_data: "NO SCORE DATA YET · TAP + OR − TO GRAPH",
       tap_isolate: "Tap line to isolate player",
       all_players: "ALL PLAYERS",
+      save_match_download_graph: "Save Image",
+      save_match_graph_downloaded: "Graph snapshot saved to device",
+      drawer_save_graph: "Save Graph",
+      burger_theme_dark: "Dark Theme",
+      burger_theme_light: "Light Theme",
+      burger_fullscreen_exit: "Exit Fullscreen",
+      burger_format_us: "American (±1)",
+      burger_format_cn: "Chinese (+4/+7/+10)",
       // Tutorial / Quick Reference Guide
       guide_title: "QUICK REFERENCE GUIDE",
       guide_open: "HOW TO USE THIS APP",
@@ -373,6 +381,14 @@
       no_graph_data: "CHƯA CÓ DỮ LIỆU ĐIỂM · CHẠM + HOẶC − ĐỂ VẼ BIỂU ĐỒ",
       tap_isolate: "Chạm đường để xem riêng cơ thủ",
       all_players: "TẤT CẢ CƠ THỦ",
+      save_match_download_graph: "Lưu ảnh",
+      save_match_graph_downloaded: "Đã lưu ảnh biểu đồ vào máy",
+      drawer_save_graph: "Lưu biểu đồ",
+      burger_theme_dark: "Giao diện tối",
+      burger_theme_light: "Giao diện sáng",
+      burger_fullscreen_exit: "Thoát toàn màn hình",
+      burger_format_us: "American (±1)",
+      burger_format_cn: "Chinese (+4/+7/+10)",
       // Tutorial / Quick Reference Guide
       guide_title: "HƯỚNG DẪN NHANH",
       guide_open: "HƯỚNG DẪN SỬ DỤNG",
@@ -2551,8 +2567,14 @@
   if (btnBurgerZoomIn) btnBurgerZoomIn.addEventListener("click", () => stepZoom(1));
 
   // ═══════════════ BURGER CONTROLS MENU ENGINE ═══════════════
+  let burgerCloseTimer = null;
+
   function openBurgerMenu() {
     tactileFeedback();
+    if (burgerCloseTimer) {
+      clearTimeout(burgerCloseTimer);
+      burgerCloseTimer = null;
+    }
     syncBurgerMenuState();
     const burgerMenuBackdrop = $("burgerMenuBackdrop");
     if (!burgerMenuBackdrop) return;
@@ -2561,13 +2583,22 @@
     burgerMenuBackdrop.classList.add("open");
   }
 
-  function closeBurgerMenu() {
+  function closeBurgerMenu(immediate = false) {
     const burgerMenuBackdrop = $("burgerMenuBackdrop");
     if (!burgerMenuBackdrop) return;
     burgerMenuBackdrop.classList.remove("open");
-    setTimeout(() => {
+    if (burgerCloseTimer) {
+      clearTimeout(burgerCloseTimer);
+      burgerCloseTimer = null;
+    }
+    if (immediate) {
       burgerMenuBackdrop.style.display = "none";
-    }, 200);
+    } else {
+      burgerCloseTimer = setTimeout(() => {
+        burgerMenuBackdrop.style.display = "none";
+        burgerCloseTimer = null;
+      }, 200);
+    }
   }
 
   function syncBurgerMenuState() {
@@ -2577,9 +2608,14 @@
     if (btnBurgerUndo) btnBurgerUndo.disabled = mState.undoStack.length === 0;
     if (btnBurgerRedo) btnBurgerRedo.disabled = mState.redoStack.length === 0;
 
+    const lblBurgerFullscreen = $("lblBurgerFullscreen");
     const burgerFullscreenIcon = $("burgerFullscreenIcon");
+    const isFs = !!document.fullscreenElement;
     if (burgerFullscreenIcon) {
-      burgerFullscreenIcon.textContent = document.fullscreenElement ? "fullscreen_exit" : "fullscreen";
+      burgerFullscreenIcon.textContent = isFs ? "fullscreen_exit" : "fullscreen";
+    }
+    if (lblBurgerFullscreen) {
+      lblBurgerFullscreen.textContent = isFs ? t("burger_fullscreen_exit") : t("burger_fullscreen");
     }
 
     const burgerRowPoolFormat = $("burgerRowPoolFormat");
@@ -2588,7 +2624,7 @@
     }
     const burgerPoolFormatText = $("burgerPoolFormatText");
     if (burgerPoolFormatText) {
-      burgerPoolFormatText.textContent = state.tournament.format === "chinese" ? "Chinese (+4/+7/+10)" : "American (±1)";
+      burgerPoolFormatText.textContent = state.tournament.format === "chinese" ? t("burger_format_cn") : t("burger_format_us");
     }
 
     const burgerRowStakes = $("burgerRowStakes");
@@ -2619,7 +2655,7 @@
     const burgerThemeIcon = $("burgerThemeIcon");
     const isDark = document.documentElement.classList.contains("dark");
     if (burgerThemeText) {
-      burgerThemeText.textContent = isDark ? "Dark Theme" : "Light Theme";
+      burgerThemeText.textContent = isDark ? t("burger_theme_dark") : t("burger_theme_light");
     }
     if (burgerThemeIcon) {
       burgerThemeIcon.textContent = isDark ? "dark_mode" : "light_mode";
@@ -2659,7 +2695,7 @@
   }
   if (btnBurgerReset) {
     btnBurgerReset.addEventListener("click", () => {
-      closeBurgerMenu();
+      closeBurgerMenu(true);
       resetAllScoresQuick();
     });
   }
@@ -2671,7 +2707,7 @@
   }
   if (btnBurgerStakes) {
     btnBurgerStakes.addEventListener("click", () => {
-      closeBurgerMenu();
+      closeBurgerMenu(true);
       openStakesModal();
     });
   }
@@ -2695,13 +2731,13 @@
   }
   if (btnBurgerGuide) {
     btnBurgerGuide.addEventListener("click", () => {
-      closeBurgerMenu();
+      closeBurgerMenu(true);
       openTutorial();
     });
   }
   if (btnBurgerInfo) {
     btnBurgerInfo.addEventListener("click", () => {
-      closeBurgerMenu();
+      closeBurgerMenu(true);
       openInfoModal();
     });
   }
@@ -3118,12 +3154,42 @@
 
   // ═══════════════ KEYBOARD SHORTCUTS ═══════════════
   function anyModalOpen() {
-    return [burgerMenuBackdrop, stakesModal, infoModal, tutorialModal].some((m) => m && (m.classList.contains("open") || m.style.display === "flex"));
+    const list = [
+      $("mediaLightboxModal"),
+      $("editMatchModal"),
+      $("saveMatchModal"),
+      $("archiveModal"),
+      burgerMenuBackdrop,
+      stakesModal,
+      infoModal,
+      tutorialModal,
+    ];
+    return list.some((m) => m && (m.classList.contains("open") || (m.style.display && m.style.display !== "none")));
   }
 
   /** Closes the topmost overlay. @returns {boolean} true when something closed */
   function closeTopModal() {
-    if (burgerMenuBackdrop && burgerMenuBackdrop.classList.contains("open")) {
+    const lightbox = $("mediaLightboxModal");
+    if (lightbox && lightbox.style.display && lightbox.style.display !== "none") {
+      closeLightbox();
+      return true;
+    }
+    const editModal = $("editMatchModal");
+    if (editModal && editModal.classList.contains("open")) {
+      closeEditMatchModal();
+      return true;
+    }
+    const saveModal = $("saveMatchModal");
+    if (saveModal && saveModal.classList.contains("open")) {
+      closeSaveMatchModal();
+      return true;
+    }
+    const archiveModal = $("archiveModal");
+    if (archiveModal && archiveModal.classList.contains("open")) {
+      closeArchiveModal();
+      return true;
+    }
+    if (burgerMenuBackdrop && (burgerMenuBackdrop.classList.contains("open") || burgerMenuBackdrop.style.display === "flex")) {
       closeBurgerMenu();
       return true;
     }
@@ -3516,7 +3582,7 @@
   }
 
   /**
-   * Match Graph Snapshot Capture
+   * Match Graph Snapshot Capture (Inlined presentation styles + 2x Retina canvas)
    */
   async function captureCurrentGraphBlob() {
     renderRackHistoryGraph();
@@ -3527,10 +3593,44 @@
       try {
         const clonedSvg = svgElem.cloneNode(true);
         clonedSvg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        const width = 800;
-        const height = 260;
-        clonedSvg.setAttribute("width", width.toString());
-        clonedSvg.setAttribute("height", height.toString());
+        clonedSvg.setAttribute("viewBox", "0 0 800 260");
+        clonedSvg.setAttribute("width", "800");
+        clonedSvg.setAttribute("height", "260");
+
+        // Add sleek solid dark background rect
+        const bgRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        bgRect.setAttribute("width", "100%");
+        bgRect.setAttribute("height", "100%");
+        bgRect.setAttribute("fill", "#0d0f12");
+        clonedSvg.insertBefore(bgRect, clonedSvg.firstChild);
+
+        // Explicitly inline presentation attributes on paths, lines, and text
+        // (prevents SVG default black fill glitch on player paths!)
+        clonedSvg.querySelectorAll("path").forEach((p) => {
+          p.setAttribute("fill", "none");
+          p.setAttribute("stroke-linecap", "round");
+          p.setAttribute("stroke-linejoin", "round");
+        });
+        clonedSvg.querySelectorAll("line.graph-grid-line").forEach((l) => {
+          l.setAttribute("stroke", "#282c34");
+          l.setAttribute("stroke-width", "1");
+          l.setAttribute("stroke-dasharray", "2 3");
+        });
+        clonedSvg.querySelectorAll("line.graph-zero-line").forEach((l) => {
+          l.setAttribute("stroke", "#4b5263");
+          l.setAttribute("stroke-width", "1.5");
+          l.setAttribute("stroke-dasharray", "4 3");
+        });
+        clonedSvg.querySelectorAll("text.graph-axis-label").forEach((t) => {
+          t.setAttribute("fill", "#8b949e");
+          t.setAttribute("font-family", "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace");
+          t.setAttribute("font-size", "10px");
+          t.setAttribute("font-weight", "500");
+        });
+        clonedSvg.querySelectorAll("text").forEach((t) => {
+          if (!t.getAttribute("fill")) t.setAttribute("fill", "#8b949e");
+          if (!t.getAttribute("font-family")) t.setAttribute("font-family", "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace");
+        });
 
         const xml = new XMLSerializer().serializeToString(clonedSvg);
         const svgBlob = new Blob([xml], { type: "image/svg+xml;charset=utf-8" });
@@ -3539,12 +3639,13 @@
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement("canvas");
-          canvas.width = width;
-          canvas.height = height;
+          // 2x Retina resolution for sharp, crystal-clear export
+          canvas.width = 1600;
+          canvas.height = 520;
           const ctx = canvas.getContext("2d");
           ctx.fillStyle = "#0d0f12";
-          ctx.fillRect(0, 0, width, height);
-          ctx.drawImage(img, 0, 0);
+          ctx.fillRect(0, 0, 1600, 520);
+          ctx.drawImage(img, 0, 0, 1600, 520);
           URL.revokeObjectURL(url);
           canvas.toBlob((blob) => {
             resolve(blob || svgBlob);
@@ -3560,6 +3661,37 @@
         resolve(null);
       }
     });
+  }
+
+  function downloadBlobAsFile(blob, filename) {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  async function downloadCurrentGraphSnapshot() {
+    tactileFeedback();
+    const titleInput = $("saveMatchTitleInput");
+    const rawTitle = titleInput?.value.trim() || (state.activeMode === "tournament" ? "tournament_match" : "cash_session");
+    const safeTitle = rawTitle.replace(/[^a-zA-Z0-9_\-\u00C0-\u024F\u1E00-\u1EFF]/g, "_").toLowerCase();
+    const filename = `${safeTitle}-graph.png`;
+
+    let blob = draftGraphBlob;
+    if (!blob) {
+      blob = await captureCurrentGraphBlob();
+    }
+    if (blob) {
+      downloadBlobAsFile(blob, filename);
+      showToast(t("save_match_graph_downloaded"));
+    } else {
+      showToast("Failed to save graph image");
+    }
   }
 
   /**
@@ -4238,6 +4370,10 @@
     if (lblAttachGraphDesc) lblAttachGraphDesc.textContent = t("save_match_attach_desc");
     const lblAttachGraphToggle = $("lblAttachGraphToggle");
     if (lblAttachGraphToggle) lblAttachGraphToggle.textContent = t("save_match_include_graph");
+    const lblDownloadGraphBtn = $("lblDownloadGraphBtn");
+    if (lblDownloadGraphBtn) lblDownloadGraphBtn.textContent = t("save_match_download_graph");
+    const lblSaveGraphQuick = $("lblSaveGraphQuick");
+    if (lblSaveGraphQuick) lblSaveGraphQuick.textContent = t("drawer_save_graph");
     const lblArchiveModalTitle = $("lblArchiveModalTitle");
     if (lblArchiveModalTitle) lblArchiveModalTitle.textContent = t("archive_title");
     const lblArchiveEmptyTitle = $("lblArchiveEmptyTitle");
@@ -4309,7 +4445,7 @@
       });
     }
 
-    // Optional Graph toggle & remove
+    // Optional Graph toggle, download & remove
     const btnToggleAttachGraph = $("btnToggleAttachGraph");
     if (btnToggleAttachGraph) {
       btnToggleAttachGraph.addEventListener("click", async () => {
@@ -4323,12 +4459,44 @@
       });
     }
 
+    const btnDownloadGraphSnapshot = $("btnDownloadGraphSnapshot");
+    if (btnDownloadGraphSnapshot) {
+      btnDownloadGraphSnapshot.addEventListener("click", () => {
+        downloadCurrentGraphSnapshot();
+      });
+    }
+
+    const btnDownloadPreviewGraph = $("btnDownloadPreviewGraph");
+    if (btnDownloadPreviewGraph) {
+      btnDownloadPreviewGraph.addEventListener("click", (e) => {
+        e.stopPropagation();
+        downloadCurrentGraphSnapshot();
+      });
+    }
+
     const btnRemoveGraphSnapshot = $("btnRemoveGraphSnapshot");
     if (btnRemoveGraphSnapshot) {
       btnRemoveGraphSnapshot.addEventListener("click", (e) => {
         e.stopPropagation();
         draftGraphBlob = null;
         updateGraphAttachmentUI();
+      });
+    }
+
+    const saveMatchGraphPreviewImg = $("saveMatchGraphPreviewImg");
+    if (saveMatchGraphPreviewImg) {
+      saveMatchGraphPreviewImg.addEventListener("click", () => {
+        if (draftGraphBlob) {
+          openLightbox(draftGraphBlob, "Match Graph Snapshot", "match-graph.png");
+        }
+      });
+    }
+
+    // Quick save graph from Rack Log Drawer
+    const btnSaveGraphQuick = $("btnSaveGraphQuick");
+    if (btnSaveGraphQuick) {
+      btnSaveGraphQuick.addEventListener("click", () => {
+        downloadCurrentGraphSnapshot();
       });
     }
 
@@ -4345,7 +4513,7 @@
     if (btnBurgerArchive) {
       btnBurgerArchive.addEventListener("click", () => {
         tactileFeedback();
-        closeBurgerMenu();
+        closeBurgerMenu(true);
         openArchiveModal();
       });
     }
@@ -4440,31 +4608,6 @@
         URL.revokeObjectURL(url);
       });
     }
-
-    // Escape Key handling for new modals
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        if (mediaLightboxModal && mediaLightboxModal.style.display !== "none") {
-          closeLightbox();
-          return;
-        }
-        const editModal = $("editMatchModal");
-        if (editModal && editModal.classList.contains("open")) {
-          closeEditMatchModal();
-          return;
-        }
-        const archiveModal = $("archiveModal");
-        if (archiveModal && archiveModal.classList.contains("open")) {
-          closeArchiveModal();
-          return;
-        }
-        const saveModal = $("saveMatchModal");
-        if (saveModal && saveModal.classList.contains("open")) {
-          closeSaveMatchModal();
-          return;
-        }
-      }
-    });
 
     // Check quota on boot
     dbCheckAndEnforceQuota();

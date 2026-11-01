@@ -556,6 +556,7 @@ html.is-zoomed-in .burger-menu-btn {
   flex-direction: column;
   gap: 18px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .burger-actions-grid {
@@ -594,6 +595,7 @@ html.is-zoomed-in .burger-menu-btn {
 
 .burger-action-card.danger {
   color: var(--accent-red);
+  grid-column: 1 / -1;
 }
 
 .burger-action-card.danger:hover {
@@ -3412,6 +3414,38 @@ html:not(.dark) .btn-score-touch:hover {
   color: var(--text-muted);
 }
 
+.graph-attach-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-graph-save-direct {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.btn-graph-save-direct:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--bg-elevated);
+}
+
+.btn-graph-save-direct .material-symbols-outlined {
+  font-size: 14px;
+}
+
 .btn-pill-toggle {
   display: inline-flex;
   align-items: center;
@@ -3449,23 +3483,81 @@ html:not(.dark) .btn-score-touch:hover {
   max-height: 140px;
   object-fit: contain;
   display: block;
+  cursor: pointer;
+  transition: opacity 120ms ease;
 }
 
-.btn-remove-preview {
+.graph-preview-img:hover {
+  opacity: 0.9;
+}
+
+.graph-preview-controls {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 22px;
-  height: 22px;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+}
+
+.btn-preview-tool {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(13, 15, 18, 0.85);
+  backdrop-filter: blur(4px);
   color: #fff;
-  border: 1px solid #444;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 12px;
+  transition: all 120ms ease;
+}
+
+.btn-preview-tool:hover {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+}
+
+.btn-preview-tool.remove:hover {
+  background: var(--accent-red);
+  color: #fff;
+  border-color: var(--accent-red);
+}
+
+.btn-preview-tool .material-symbols-outlined {
+  font-size: 15px;
+}
+
+.btn-graph-save-quick {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 120ms;
+  margin-left: auto;
+}
+
+.btn-graph-save-quick:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--bg-elevated);
+}
+
+.btn-remove-preview {
+  display: none;
 }
 
 /* ═══════════════ ARCHIVE WINDOW & CARDS ═══════════════ */
