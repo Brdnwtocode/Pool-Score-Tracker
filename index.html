@@ -43,38 +43,52 @@
             <span id="lblModeTourney">TOURNEY</span>
           </button>
         </div>
+        <!-- Zoom Pill Stepper (75% to 150%) -->
+        <div class="zoom-pill-group" id="zoomPillGroup" title="UI Zoom · Click % to reset 100%">
+          <button class="zoom-btn" id="btnZoomOut" type="button" aria-label="Zoom out">−</button>
+          <span class="zoom-level-text" id="zoomLevelDisplay">100%</span>
+          <button class="zoom-btn" id="btnZoomIn" type="button" aria-label="Zoom in">+</button>
+        </div>
       </div>
 
       <div class="masthead-right">
-        <!-- Tournament Pool Format Toggle (American ±1 / Chinese +4,+7,+10) -->
-        <button class="icon-tool tournament-only" id="btnPoolFormat" type="button" aria-label="Toggle American / Chinese Pool Format" title="American Pool Format · Tap to switch to Chinese Pool">
-          <span class="pool-format-badge" id="poolFormatIcon">US</span>
-        </button>
-        <!-- Language Switcher (VI / EN) -->
-        <button class="lang-toggle-btn" id="btnLang" type="button" aria-label="Switch language: English / Vietnamese" title="Switch Language / Đổi ngôn ngữ (VI / EN)">
-          <span class="material-symbols-outlined" aria-hidden="true" style="font-size: 15px;">language</span>
-          <span id="langDisplayText">EN</span>
-        </button>
-        <button class="icon-tool" id="btnFullscreen" type="button" aria-label="Toggle fullscreen" title="Toggle Fullscreen">
-          <span class="material-symbols-outlined" aria-hidden="true" id="fullscreenIcon">fullscreen</span>
-        </button>
-        <button class="icon-tool" id="btnUndo" type="button" aria-label="Undo last score" title="Undo Last Score" disabled>
-          <span class="material-symbols-outlined" aria-hidden="true">undo</span>
-        </button>
-        <button class="icon-tool" id="btnRedo" type="button" aria-label="Redo score" title="Redo Score" disabled>
-          <span class="material-symbols-outlined" aria-hidden="true">redo</span>
-        </button>
-        <button class="icon-tool" id="btnSound" type="button" aria-label="Toggle sound and haptics" title="Toggle Ball Strike Sound &amp; Haptics">
-          <span class="material-symbols-outlined" aria-hidden="true" id="soundIcon">volume_up</span>
-        </button>
-        <button class="icon-tool" id="btnTheme" type="button" aria-label="Toggle dark or light theme" title="Toggle Dark / Light Theme">
-          <span class="material-symbols-outlined" aria-hidden="true" id="themeIcon">contrast</span>
-        </button>
-        <button class="icon-tool" id="btnResetQuick" type="button" aria-label="Reset all scores" title="Quick Reset (Clear Scores) / Đặt lại">
-          <span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>
-        </button>
-        <button class="user-avatar-btn" id="btnInfo" type="button" aria-label="About and system information" title="About &amp; System Specifications">
-          <span class="material-symbols-outlined" aria-hidden="true">person</span>
+        <!-- Desktop tools (visible on wide screens when not zoomed in) -->
+        <div class="masthead-desktop-tools" id="mastheadDesktopTools">
+          <!-- Tournament Pool Format Toggle (American ±1 / Chinese +4,+7,+10) -->
+          <button class="icon-tool tournament-only" id="btnPoolFormat" type="button" aria-label="Toggle American / Chinese Pool Format" title="American Pool Format · Tap to switch to Chinese Pool">
+            <span class="pool-format-badge" id="poolFormatIcon">US</span>
+          </button>
+          <!-- Language Switcher (VI / EN) -->
+          <button class="lang-toggle-btn" id="btnLang" type="button" aria-label="Switch language: English / Vietnamese" title="Switch Language / Đổi ngôn ngữ (VI / EN)">
+            <span class="material-symbols-outlined" aria-hidden="true" style="font-size: 15px;">language</span>
+            <span id="langDisplayText">EN</span>
+          </button>
+          <button class="icon-tool" id="btnFullscreen" type="button" aria-label="Toggle fullscreen" title="Toggle Fullscreen">
+            <span class="material-symbols-outlined" aria-hidden="true" id="fullscreenIcon">fullscreen</span>
+          </button>
+          <button class="icon-tool" id="btnUndo" type="button" aria-label="Undo last score" title="Undo Last Score" disabled>
+            <span class="material-symbols-outlined" aria-hidden="true">undo</span>
+          </button>
+          <button class="icon-tool" id="btnRedo" type="button" aria-label="Redo score" title="Redo Score" disabled>
+            <span class="material-symbols-outlined" aria-hidden="true">redo</span>
+          </button>
+          <button class="icon-tool" id="btnSound" type="button" aria-label="Toggle sound and haptics" title="Toggle Ball Strike Sound &amp; Haptics">
+            <span class="material-symbols-outlined" aria-hidden="true" id="soundIcon">volume_up</span>
+          </button>
+          <button class="icon-tool" id="btnTheme" type="button" aria-label="Toggle dark or light theme" title="Toggle Dark / Light Theme">
+            <span class="material-symbols-outlined" aria-hidden="true" id="themeIcon">contrast</span>
+          </button>
+          <button class="icon-tool" id="btnResetQuick" type="button" aria-label="Reset all scores" title="Quick Reset (Clear Scores) / Đặt lại">
+            <span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>
+          </button>
+          <button class="user-avatar-btn" id="btnInfo" type="button" aria-label="About and system information" title="About &amp; System Specifications">
+            <span class="material-symbols-outlined" aria-hidden="true">person</span>
+          </button>
+        </div>
+
+        <!-- Burger Menu Toggle (shown on compact/zoomed screens, or always accessible) -->
+        <button class="icon-tool burger-menu-btn" id="btnBurgerMenu" type="button" aria-label="Open system menu" title="System Controls Menu">
+          <span class="material-symbols-outlined" aria-hidden="true" id="burgerMenuIcon">menu</span>
         </button>
       </div>
     </header>
@@ -188,6 +202,12 @@
           </div>
 
           <div class="drawer-controls">
+            <!-- Toggle between List View and Points-Time Graph View -->
+            <button class="btn-more-info" id="btnToggleGraphView" type="button" title="Toggle between List View and Points-Time Graph">
+              <span class="material-symbols-outlined" id="graphToggleIcon" style="font-size: 14px;">show_chart</span>
+              <span id="graphToggleBtnText">GRAPH</span>
+            </button>
+
             <button class="btn-more-info" id="btnToggleExtendedHistory" type="button">
               <span class="material-symbols-outlined" id="moreInfoIcon" style="font-size: 14px;">unfold_more</span>
               <span id="moreInfoBtnText">DETAILS</span>
@@ -203,10 +223,25 @@
           </div>
         </div>
 
+        <!-- 8A. Chronological List View -->
         <div class="rack-log-scroll" id="rackLogScrollList">
           <div class="empty-log-state" id="emptyLogState">
             <span class="material-symbols-outlined">sports_score</span>
             <p id="lblEmptyLog">NO RACKS RECORDED · TAP + TO LOG</p>
+          </div>
+        </div>
+
+        <!-- 8B. Interactive Match History Graph View -->
+        <div class="rack-log-graph-container" id="rackLogGraphContainer" style="display: none;">
+          <div class="graph-legend-bar" id="graphLegendBar"></div>
+          <div class="graph-svg-wrapper" id="graphSvgWrapper">
+            <svg class="match-history-svg" id="matchHistorySvg" viewBox="0 0 800 280" preserveAspectRatio="none"></svg>
+            <div class="graph-tooltip" id="graphTooltip" style="display: none;"></div>
+          </div>
+          <div class="graph-footer-hint">
+            <span class="hint-item"><span class="dot-sample hollow"></span> <span id="lblHintPlus">+pts (hollow)</span></span>
+            <span class="hint-item"><span class="dot-sample solid"></span> <span id="lblHintMinus">−pts (solid)</span></span>
+            <span class="hint-item hint-action" id="lblHintIsolate">Tap line to isolate player</span>
           </div>
         </div>
       </section>
@@ -494,6 +529,136 @@
           <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">check</span>
           <span id="lblGotIt">GOT IT · START PLAYING</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ BURGER SYSTEM CONTROLS DRAWER ══════════ -->
+  <div class="burger-menu-backdrop" id="burgerMenuBackdrop" role="dialog" aria-modal="true" aria-labelledby="lblBurgerMenuTitle" style="display: none;">
+    <div class="burger-menu-panel" id="burgerMenuPanel">
+      <div class="burger-menu-header">
+        <div class="burger-menu-title">
+          <span class="material-symbols-outlined">tune</span>
+          <span id="lblBurgerMenuTitle">SYSTEM CONTROLS</span>
+        </div>
+        <button class="btn-burger-close" id="btnCloseBurgerMenu" type="button" aria-label="Close menu">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="burger-menu-body">
+        <!-- Quick Action Grid: Undo, Redo, Fullscreen, Quick Reset -->
+        <div class="burger-actions-grid">
+          <button class="burger-action-card" id="btnBurgerUndo" type="button" disabled>
+            <span class="material-symbols-outlined">undo</span>
+            <span id="lblBurgerUndo">Undo</span>
+          </button>
+          <button class="burger-action-card" id="btnBurgerRedo" type="button" disabled>
+            <span class="material-symbols-outlined">redo</span>
+            <span id="lblBurgerRedo">Redo</span>
+          </button>
+          <button class="burger-action-card" id="btnBurgerFullscreen" type="button">
+            <span class="material-symbols-outlined" id="burgerFullscreenIcon">fullscreen</span>
+            <span id="lblBurgerFullscreen">Fullscreen</span>
+          </button>
+          <button class="burger-action-card danger" id="btnBurgerReset" type="button">
+            <span class="material-symbols-outlined">restart_alt</span>
+            <span id="lblBurgerReset">Reset Match</span>
+          </button>
+        </div>
+
+        <!-- Settings Rows List -->
+        <div class="burger-settings-list">
+          <!-- Pool Format (Tournament Mode Only) -->
+          <div class="burger-setting-row tournament-only" id="burgerRowPoolFormat">
+            <div class="burger-setting-info">
+              <span class="material-symbols-outlined">sports_score</span>
+              <span id="lblBurgerPoolFormat">Tournament Format</span>
+            </div>
+            <button class="burger-pill-btn" id="btnBurgerPoolFormat" type="button">
+              <span id="burgerPoolFormatText">American (US)</span>
+            </button>
+          </div>
+
+          <!-- Cash Stakes (Cash Mode Only) -->
+          <div class="burger-setting-row cash-only" id="burgerRowStakes">
+            <div class="burger-setting-info">
+              <span class="material-symbols-outlined">payments</span>
+              <span id="lblBurgerStakes">Stakes Rate</span>
+            </div>
+            <button class="burger-pill-btn" id="btnBurgerStakes" type="button">
+              <span id="burgerStakesText">$1.00 / pt</span>
+            </button>
+          </div>
+
+          <!-- Language (EN / VI) -->
+          <div class="burger-setting-row">
+            <div class="burger-setting-info">
+              <span class="material-symbols-outlined">language</span>
+              <span id="lblBurgerLanguage">Language</span>
+            </div>
+            <button class="burger-pill-btn" id="btnBurgerLang" type="button">
+              <span id="burgerLangText">English (EN)</span>
+            </button>
+          </div>
+
+          <!-- Sound & Haptics -->
+          <div class="burger-setting-row">
+            <div class="burger-setting-info">
+              <span class="material-symbols-outlined" id="burgerSoundIcon">volume_up</span>
+              <span id="lblBurgerSound">Audio &amp; Haptics</span>
+            </div>
+            <button class="burger-toggle-switch active" id="btnBurgerSound" type="button" aria-pressed="true">
+              <span class="switch-knob"></span>
+            </button>
+          </div>
+
+          <!-- Display Theme (Dark / Light) -->
+          <div class="burger-setting-row">
+            <div class="burger-setting-info">
+              <span class="material-symbols-outlined" id="burgerThemeIcon">contrast</span>
+              <span id="lblBurgerTheme">Display Theme</span>
+            </div>
+            <button class="burger-pill-btn" id="btnBurgerTheme" type="button">
+              <span id="burgerThemeText">Dark Mode</span>
+            </button>
+          </div>
+
+          <!-- Zoom UI Scale Stepper inside Menu -->
+          <div class="burger-setting-row">
+            <div class="burger-setting-info">
+              <span class="material-symbols-outlined">zoom_in</span>
+              <span id="lblBurgerZoom">UI Zoom Scale</span>
+            </div>
+            <div class="burger-zoom-controls">
+              <button class="btn-step-mini" id="btnBurgerZoomOut" type="button">−</button>
+              <span class="burger-zoom-display" id="burgerZoomDisplay">100%</span>
+              <button class="btn-step-mini" id="btnBurgerZoomIn" type="button">+</button>
+            </div>
+          </div>
+
+          <!-- About / User Guide -->
+          <div class="burger-setting-row">
+            <div class="burger-setting-info">
+              <span class="material-symbols-outlined">help</span>
+              <span id="lblBurgerGuide">How to Play &amp; Rules</span>
+            </div>
+            <button class="burger-pill-btn" id="btnBurgerGuide" type="button">
+              <span class="material-symbols-outlined" style="font-size: 15px;">chevron_right</span>
+            </button>
+          </div>
+
+          <!-- System Specs / Info -->
+          <div class="burger-setting-row">
+            <div class="burger-setting-info">
+              <span class="material-symbols-outlined">info</span>
+              <span id="lblBurgerInfo">About &amp; System Specs</span>
+            </div>
+            <button class="burger-pill-btn" id="btnBurgerInfo" type="button">
+              <span class="material-symbols-outlined" style="font-size: 15px;">chevron_right</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

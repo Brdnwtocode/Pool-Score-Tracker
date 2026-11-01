@@ -126,6 +126,26 @@
       update_ready: "New version ready · reopen the app to update",
       install_app: "INSTALL ON THIS DEVICE",
       install_done: "App installed · launch it from your home screen",
+      graph_view: "GRAPH",
+      list_view: "LIST",
+      graph_view_on: "Graph View Enabled",
+      graph_view_off: "List View Enabled",
+      burger_menu_title: "SYSTEM CONTROLS",
+      burger_undo: "Undo",
+      burger_redo: "Redo",
+      burger_fullscreen: "Fullscreen",
+      burger_reset: "Reset Match",
+      burger_pool_format: "Tournament Format",
+      burger_stakes: "Stakes Rate",
+      burger_lang: "Language",
+      burger_sound: "Audio & Haptics",
+      burger_theme: "Display Theme",
+      burger_zoom: "UI Zoom Scale",
+      burger_guide: "How to Play & Rules",
+      burger_info: "About & System Specs",
+      no_graph_data: "NO SCORE DATA YET · TAP + OR − TO GRAPH",
+      tap_isolate: "Tap line to isolate player",
+      all_players: "ALL PLAYERS",
       // Tutorial / Quick Reference Guide
       guide_title: "QUICK REFERENCE GUIDE",
       guide_open: "HOW TO USE THIS APP",
@@ -261,6 +281,26 @@
       update_ready: "Có bản mới · mở lại ứng dụng để cập nhật",
       install_app: "CÀI ĐẶT LÊN THIẾT BỊ NÀY",
       install_done: "Đã cài ứng dụng · mở từ màn hình chính",
+      graph_view: "BIỂU ĐỒ",
+      list_view: "DANH SÁCH",
+      graph_view_on: "Đã bật xem biểu đồ",
+      graph_view_off: "Đã bật xem danh sách",
+      burger_menu_title: "ĐIỀU KHIỂN HỆ THỐNG",
+      burger_undo: "Hoàn tác",
+      burger_redo: "Làm lại",
+      burger_fullscreen: "Toàn màn hình",
+      burger_reset: "Đặt lại điểm",
+      burger_pool_format: "Thể thức thi đấu",
+      burger_stakes: "Mức cược",
+      burger_lang: "Ngôn ngữ",
+      burger_sound: "Âm thanh & Rung",
+      burger_theme: "Giao diện",
+      burger_zoom: "Thu phóng giao diện",
+      burger_guide: "Hướng dẫn & Luật chơi",
+      burger_info: "Thông số hệ thống",
+      no_graph_data: "CHƯA CÓ DỮ LIỆU ĐIỂM · CHẠM + HOẶC − ĐỂ VẼ BIỂU ĐỒ",
+      tap_isolate: "Chạm đường để xem riêng cơ thủ",
+      all_players: "TẤT CẢ CƠ THỦ",
       // Tutorial / Quick Reference Guide
       guide_title: "HƯỚNG DẪN NHANH",
       guide_open: "HƯỚNG DẪN SỬ DỤNG",
@@ -321,6 +361,9 @@
     soundEnabled: true,
     theme: "dark",      // "dark" or "light"
     showExtendedHistory: false,
+    viewGraphHistory: false,
+    selectedGraphPlayerId: null,
+    zoomScale: 1.0,
     tutorialSeen: false,
     sessionStartTime: Date.now(),
     sessionElapsedMs: 0,
@@ -408,6 +451,51 @@
   // Masthead localized spans
   const lblModeCash = $("lblModeCash");
   const lblModeTourney = $("lblModeTourney");
+
+  // Zoom Stepper Controls
+  const zoomPillGroup = $("zoomPillGroup");
+  const btnZoomOut = $("btnZoomOut");
+  const btnZoomIn = $("btnZoomIn");
+  const zoomLevelDisplay = $("zoomLevelDisplay");
+
+  // Burger Menu Drawer Elements
+  const btnBurgerMenu = $("btnBurgerMenu");
+  const burgerMenuBackdrop = $("burgerMenuBackdrop");
+  const burgerMenuPanel = $("burgerMenuPanel");
+  const btnCloseBurgerMenu = $("btnCloseBurgerMenu");
+  const btnBurgerUndo = $("btnBurgerUndo");
+  const btnBurgerRedo = $("btnBurgerRedo");
+  const btnBurgerFullscreen = $("btnBurgerFullscreen");
+  const burgerFullscreenIcon = $("burgerFullscreenIcon");
+  const btnBurgerReset = $("btnBurgerReset");
+  const burgerRowPoolFormat = $("burgerRowPoolFormat");
+  const btnBurgerPoolFormat = $("btnBurgerPoolFormat");
+  const burgerPoolFormatText = $("burgerPoolFormatText");
+  const burgerRowStakes = $("burgerRowStakes");
+  const btnBurgerStakes = $("btnBurgerStakes");
+  const burgerStakesText = $("burgerStakesText");
+  const btnBurgerLang = $("btnBurgerLang");
+  const burgerLangText = $("burgerLangText");
+  const btnBurgerSound = $("btnBurgerSound");
+  const burgerSoundIcon = $("burgerSoundIcon");
+  const btnBurgerTheme = $("btnBurgerTheme");
+  const burgerThemeText = $("burgerThemeText");
+  const burgerThemeIcon = $("burgerThemeIcon");
+  const btnBurgerZoomOut = $("btnBurgerZoomOut");
+  const btnBurgerZoomIn = $("btnBurgerZoomIn");
+  const burgerZoomDisplay = $("burgerZoomDisplay");
+  const btnBurgerGuide = $("btnBurgerGuide");
+  const btnBurgerInfo = $("btnBurgerInfo");
+
+  // Graph View in Rack Log Drawer
+  const btnToggleGraphView = $("btnToggleGraphView");
+  const graphToggleIcon = $("graphToggleIcon");
+  const graphToggleBtnText = $("graphToggleBtnText");
+  const rackLogGraphContainer = $("rackLogGraphContainer");
+  const graphLegendBar = $("graphLegendBar");
+  const graphSvgWrapper = $("graphSvgWrapper");
+  const matchHistorySvg = $("matchHistorySvg");
+  const graphTooltip = $("graphTooltip");
 
   // Tournament HUD Strip
   const hudLeadStat = $("hudLeadStat");
@@ -831,6 +919,39 @@
       moreInfoBtnText.textContent = state.showExtendedHistory ? t("less_info") : t("more_info");
     }
 
+    if (graphToggleBtnText) {
+      graphToggleBtnText.textContent = state.viewGraphHistory ? t("list_view") : t("graph_view");
+    }
+
+    const lblBurgerMenuTitle = $("lblBurgerMenuTitle");
+    if (lblBurgerMenuTitle) lblBurgerMenuTitle.textContent = t("burger_menu_title");
+    const lblBurgerUndo = $("lblBurgerUndo");
+    if (lblBurgerUndo) lblBurgerUndo.textContent = t("burger_undo");
+    const lblBurgerRedo = $("lblBurgerRedo");
+    if (lblBurgerRedo) lblBurgerRedo.textContent = t("burger_redo");
+    const lblBurgerFullscreen = $("lblBurgerFullscreen");
+    if (lblBurgerFullscreen) lblBurgerFullscreen.textContent = t("burger_fullscreen");
+    const lblBurgerReset = $("lblBurgerReset");
+    if (lblBurgerReset) lblBurgerReset.textContent = t("burger_reset");
+    const lblBurgerPoolFormat = $("lblBurgerPoolFormat");
+    if (lblBurgerPoolFormat) lblBurgerPoolFormat.textContent = t("burger_pool_format");
+    const lblBurgerStakes = $("lblBurgerStakes");
+    if (lblBurgerStakes) lblBurgerStakes.textContent = t("burger_stakes");
+    const lblBurgerLanguage = $("lblBurgerLanguage");
+    if (lblBurgerLanguage) lblBurgerLanguage.textContent = t("burger_lang");
+    const lblBurgerSound = $("lblBurgerSound");
+    if (lblBurgerSound) lblBurgerSound.textContent = t("burger_sound");
+    const lblBurgerTheme = $("lblBurgerTheme");
+    if (lblBurgerTheme) lblBurgerTheme.textContent = t("burger_theme");
+    const lblBurgerZoom = $("lblBurgerZoom");
+    if (lblBurgerZoom) lblBurgerZoom.textContent = t("burger_zoom");
+    const lblBurgerGuide = $("lblBurgerGuide");
+    if (lblBurgerGuide) lblBurgerGuide.textContent = t("burger_guide");
+    const lblBurgerInfo = $("lblBurgerInfo");
+    if (lblBurgerInfo) lblBurgerInfo.textContent = t("burger_info");
+
+    syncBurgerMenuState();
+
     // Tutorial / Guide localization
     updateTutorialText();
 
@@ -1031,6 +1152,8 @@
     renderPlayers();
     renderRackLog();
     updateUndoRedoUI();
+    syncBurgerMenuState();
+    syncGraphViewState();
     if (mode === "cash") {
       updateZeroSumAudit();
     } else {
@@ -1466,6 +1589,7 @@
         lastLog.timestampMs = nowMs;
         lastLog.snapshot = snapshot;
         lastLog.balanceAtTime = balanceSummary;
+        lastLog.scoresSnapshot = mState.players.map((p) => ({ id: p.id, name: p.name, score: p.score }));
       } else {
         mState.rackSeq = (Number(mState.rackSeq) || 0) + 1;
         logEntry = {
@@ -1479,6 +1603,7 @@
           timestampMs: nowMs,
           snapshot: snapshot,
           balanceAtTime: balanceSummary,
+          scoresSnapshot: mState.players.map((p) => ({ id: p.id, name: p.name, score: p.score })),
         };
         mState.history.unshift(logEntry);
         if (mState.history.length > 60) mState.history.pop();
@@ -1510,6 +1635,8 @@
     const mState = getModeState();
     if (btnUndo) btnUndo.disabled = mState.undoStack.length === 0;
     if (btnRedo) btnRedo.disabled = mState.redoStack.length === 0;
+    if (btnBurgerUndo) btnBurgerUndo.disabled = mState.undoStack.length === 0;
+    if (btnBurgerRedo) btnBurgerRedo.disabled = mState.redoStack.length === 0;
   }
 
   function handleUndoAction() {
@@ -1785,6 +1912,11 @@
 
   // ═══════════════ RACK LOG & EXTENDED INFO (FULL LOGGING) ═══════════════
   function renderRackLog() {
+    if (state.viewGraphHistory) {
+      renderRackHistoryGraph();
+      return;
+    }
+
     if (!rackLogScrollList) return;
     rackLogScrollList.innerHTML = "";
     const mState = getModeState();
@@ -1830,6 +1962,540 @@
         </div>
       `;
       rackLogScrollList.appendChild(row);
+    });
+  }
+
+  // ═══════════════ INTERACTIVE GRAPH VIEW ENGINE ═══════════════
+  const MONO_PLAYER_STYLES = [
+    { strokeDark: "#f8fafc", strokeLight: "#0f172a", dash: "none", label: "Solid Silver" },
+    { strokeDark: "#cbd5e1", strokeLight: "#334155", dash: "6 4", label: "Dashed Slate" },
+    { strokeDark: "#94a3b8", strokeLight: "#64748b", dash: "2 3", label: "Dotted Stone" },
+    { strokeDark: "#64748b", strokeLight: "#94a3b8", dash: "8 3 2 3", label: "Dash-Dot Graphite" },
+  ];
+
+  function getPlayerStyle(index) {
+    return MONO_PLAYER_STYLES[index % MONO_PLAYER_STYLES.length];
+  }
+
+  function renderRackHistoryGraph() {
+    if (!rackLogGraphContainer || !matchHistorySvg) return;
+    const mState = getModeState();
+    const isDark = document.documentElement.classList.contains("dark");
+
+    // Clear previous SVG contents
+    matchHistorySvg.innerHTML = "";
+    if (graphLegendBar) graphLegendBar.innerHTML = "";
+
+    if (mState.history.length === 0) {
+      matchHistorySvg.innerHTML = `
+        <text x="400" y="140" text-anchor="middle" font-family="var(--font-mono)" font-size="12" fill="var(--text-muted)">
+          ${t("no_graph_data")}
+        </text>
+      `;
+      return;
+    }
+
+    // Chronological order: from oldest to newest
+    const chronological = [...mState.history].reverse();
+    const players = mState.players;
+
+    // Track running scores for each event
+    const playerPoints = {};
+    players.forEach((p) => {
+      playerPoints[p.id] = [{
+        eventIdx: 0,
+        score: 0,
+        delta: 0,
+        isAction: false,
+        timeStr: chronological[0].time || "00:00",
+        timestampMs: (chronological[0].timestampMs || Date.now()) - 1000,
+      }];
+    });
+
+    const runningScores = {};
+    players.forEach(p => { runningScores[p.id] = 0; });
+
+    // Derive points series across timeline
+    chronological.forEach((h, idx) => {
+      const pId = h.playerId;
+      const prev = Number.isFinite(h.prevScore) ? h.prevScore : (Number.isFinite(h.newScore) ? h.newScore - h.delta : 0);
+      if (idx === 0) {
+        runningScores[pId] = prev;
+        if (playerPoints[pId] && playerPoints[pId][0]) {
+          playerPoints[pId][0].score = prev;
+        }
+      }
+      runningScores[pId] = Number.isFinite(h.newScore) ? h.newScore : (runningScores[pId] + h.delta);
+
+      // Record point at this step for all active players
+      players.forEach(p => {
+        const isThisPlayerAction = (p.id === pId);
+        playerPoints[p.id].push({
+          eventIdx: idx + 1,
+          score: runningScores[p.id],
+          delta: isThisPlayerAction ? h.delta : 0,
+          isAction: isThisPlayerAction,
+          timeStr: h.time || "",
+          timestampMs: h.timestampMs || Date.now(),
+          winnerName: h.winnerName || p.name,
+        });
+      });
+    });
+
+    // Calculate Y range
+    let minScore = 0;
+    let maxScore = 0;
+    players.forEach(p => {
+      playerPoints[p.id].forEach(pt => {
+        if (pt.score < minScore) minScore = pt.score;
+        if (pt.score > maxScore) maxScore = pt.score;
+      });
+    });
+
+    // Add padding to Y range
+    const ySpan = maxScore - minScore;
+    const yPadding = ySpan < 4 ? 2 : Math.ceil(ySpan * 0.15);
+    const domainMinY = minScore - yPadding;
+    const domainMaxY = maxScore + yPadding;
+    const totalDomainY = domainMaxY - domainMinY || 1;
+
+    // SVG Layout Dimensions
+    const svgWidth = 800;
+    const svgHeight = 260;
+    const padLeft = 45;
+    const padRight = 30;
+    const padTop = 25;
+    const padBottom = 35;
+    const chartW = svgWidth - padLeft - padRight;
+    const chartH = svgHeight - padTop - padBottom;
+
+    const totalEvents = chronological.length;
+    const getX = (eventIdx) => padLeft + (eventIdx / totalEvents) * chartW;
+    const getY = (score) => padTop + ((domainMaxY - score) / totalDomainY) * chartH;
+
+    // 1. Draw Grid Lines & Labels
+    const numYSteps = Math.min(6, domainMaxY - domainMinY);
+    const yStepSize = Math.max(1, Math.round((domainMaxY - domainMinY) / numYSteps));
+    
+    // Y Gridlines
+    for (let s = Math.ceil(domainMinY / yStepSize) * yStepSize; s <= domainMaxY; s += yStepSize) {
+      const yPos = getY(s);
+      const isZero = (s === 0);
+      const lineClass = isZero ? "graph-zero-line" : "graph-grid-line";
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", padLeft);
+      line.setAttribute("y1", yPos);
+      line.setAttribute("x2", svgWidth - padRight);
+      line.setAttribute("y2", yPos);
+      line.setAttribute("class", lineClass);
+      matchHistorySvg.appendChild(line);
+
+      const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      label.setAttribute("x", padLeft - 8);
+      label.setAttribute("y", yPos + 3.5);
+      label.setAttribute("text-anchor", "end");
+      label.setAttribute("class", "graph-axis-label");
+      label.textContent = s > 0 ? `+${s}` : `${s}`;
+      matchHistorySvg.appendChild(label);
+    }
+
+    // X Gridlines & Time Labels
+    const stepCount = Math.min(totalEvents, 6);
+    const stepIdxInterval = Math.max(1, Math.floor(totalEvents / stepCount));
+    for (let e = 0; e <= totalEvents; e += stepIdxInterval) {
+      const xPos = getX(e);
+      const gridX = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      gridX.setAttribute("x1", xPos);
+      gridX.setAttribute("y1", padTop);
+      gridX.setAttribute("x2", xPos);
+      gridX.setAttribute("y2", svgHeight - padBottom);
+      gridX.setAttribute("class", "graph-grid-line");
+      matchHistorySvg.appendChild(gridX);
+
+      const timeLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      timeLabel.setAttribute("x", xPos);
+      timeLabel.setAttribute("y", svgHeight - padBottom + 16);
+      timeLabel.setAttribute("text-anchor", "middle");
+      timeLabel.setAttribute("class", "graph-axis-label");
+
+      const timeItem = e === 0 ? playerPoints[players[0].id][0] : playerPoints[players[0].id][e];
+      timeLabel.textContent = timeItem ? timeItem.timeStr : "";
+      matchHistorySvg.appendChild(timeLabel);
+    }
+
+    // 2. Render Legend Bar Chips
+    const allChip = document.createElement("button");
+    allChip.type = "button";
+    allChip.className = `legend-chip ${state.selectedGraphPlayerId === null ? "active" : ""}`;
+    allChip.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px;">density_small</span> ${t("all_players")}`;
+    allChip.addEventListener("click", () => {
+      tactileFeedback();
+      state.selectedGraphPlayerId = null;
+      renderRackHistoryGraph();
+    });
+    graphLegendBar.appendChild(allChip);
+
+    // Individual Player Chips
+    players.forEach((p, idx) => {
+      const style = getPlayerStyle(idx);
+      const color = isDark ? style.strokeDark : style.strokeLight;
+      const isSelected = state.selectedGraphPlayerId === p.id;
+      const isDimmed = state.selectedGraphPlayerId !== null && !isSelected;
+
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = `legend-chip ${isSelected ? "active" : ""} ${isDimmed ? "dimmed" : ""}`;
+      chip.innerHTML = `
+        <span class="legend-line-sample" style="background:${color};"></span>
+        <span>${escapeHtml(p.name)}</span>
+        <strong>(${p.score > 0 ? "+" : ""}${p.score})</strong>
+      `;
+      chip.addEventListener("click", () => {
+        tactileFeedback();
+        state.selectedGraphPlayerId = (state.selectedGraphPlayerId === p.id ? null : p.id);
+        renderRackHistoryGraph();
+      });
+      graphLegendBar.appendChild(chip);
+    });
+
+    // 3. Render Player Lines and Marker Dots
+    players.forEach((p, idx) => {
+      const style = getPlayerStyle(idx);
+      const color = isDark ? style.strokeDark : style.strokeLight;
+      const isSelected = state.selectedGraphPlayerId === p.id;
+      const isDimmed = state.selectedGraphPlayerId !== null && !isSelected;
+      const pts = playerPoints[p.id];
+
+      // Build SVG path
+      let d = "";
+      pts.forEach((pt, i) => {
+        const x = getX(pt.eventIdx);
+        const y = getY(pt.score);
+        d += (i === 0 ? `M ${x} ${y} ` : `L ${x} ${y} `);
+      });
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", d);
+      path.setAttribute("stroke", color);
+      path.setAttribute("stroke-width", isSelected ? "3.4" : "2.2");
+      if (style.dash !== "none") {
+        path.setAttribute("stroke-dasharray", style.dash);
+      }
+      path.setAttribute("class", `player-line ${isDimmed ? "is-dimmed" : ""} ${isSelected ? "is-focused" : ""}`);
+      path.addEventListener("click", () => {
+        tactileFeedback();
+        state.selectedGraphPlayerId = (state.selectedGraphPlayerId === p.id ? null : p.id);
+        renderRackHistoryGraph();
+      });
+      matchHistorySvg.appendChild(path);
+
+      // Marker Dots: hollow dot for plus, solid smaller dot for minus
+      pts.forEach((pt) => {
+        if (!pt.isAction) return;
+        const x = getX(pt.eventIdx);
+        const y = getY(pt.score);
+        const isPlus = pt.delta > 0;
+
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", x);
+        circle.setAttribute("cy", y);
+
+        if (isPlus) {
+          // Hollow dot
+          circle.setAttribute("r", isSelected ? "5.5" : "4.2");
+          circle.setAttribute("fill", isDark ? "#111214" : "#ffffff");
+          circle.setAttribute("stroke", color);
+          circle.setAttribute("stroke-width", "2");
+          circle.setAttribute("class", `graph-dot dot-plus ${isDimmed ? "is-dimmed" : ""} ${isSelected ? "is-focused" : ""}`);
+        } else {
+          // Solid smaller dot (almost same width as line)
+          circle.setAttribute("r", isSelected ? "3.0" : "2.2");
+          circle.setAttribute("fill", color);
+          circle.setAttribute("class", `graph-dot dot-minus ${isDimmed ? "is-dimmed" : ""} ${isSelected ? "is-focused" : ""}`);
+        }
+
+        circle.addEventListener("mouseenter", (e) => showGraphTooltip(e, p.name, pt.delta, pt.score, pt.timeStr));
+        circle.addEventListener("touchstart", (e) => showGraphTooltip(e, p.name, pt.delta, pt.score, pt.timeStr), { passive: true });
+        circle.addEventListener("mouseleave", hideGraphTooltip);
+
+        circle.addEventListener("click", (e) => {
+          e.stopPropagation();
+          tactileFeedback();
+          state.selectedGraphPlayerId = (state.selectedGraphPlayerId === p.id ? null : p.id);
+          renderRackHistoryGraph();
+        });
+
+        matchHistorySvg.appendChild(circle);
+      });
+    });
+
+    // Clicking empty background resets line isolation
+    matchHistorySvg.addEventListener("click", (e) => {
+      if (e.target === matchHistorySvg || e.target.tagName === "line") {
+        if (state.selectedGraphPlayerId !== null) {
+          tactileFeedback();
+          state.selectedGraphPlayerId = null;
+          renderRackHistoryGraph();
+        }
+      }
+    });
+  }
+
+  function showGraphTooltip(e, name, delta, score, time) {
+    if (!graphTooltip || !matchHistorySvg) return;
+    const rect = matchHistorySvg.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    const deltaSign = delta > 0 ? `+${delta}` : `${delta}`;
+    graphTooltip.innerHTML = `
+      <div class="graph-tooltip-title">${escapeHtml(name)} (${deltaSign})</div>
+      <div class="graph-tooltip-row">
+        <span>Score: ${score}</span>
+        <span>${time}</span>
+      </div>
+    `;
+    graphTooltip.style.left = `${Math.max(40, Math.min(rect.width - 40, x))}px`;
+    graphTooltip.style.top = `${Math.max(30, y)}px`;
+    graphTooltip.style.display = "block";
+  }
+
+  function hideGraphTooltip() {
+    if (graphTooltip) graphTooltip.style.display = "none";
+  }
+
+  function toggleGraphView() {
+    tactileFeedback();
+    state.viewGraphHistory = !state.viewGraphHistory;
+    syncGraphViewState();
+    saveState();
+    showToast(state.viewGraphHistory ? t("graph_view_on") : t("graph_view_off"));
+  }
+
+  function syncGraphViewState() {
+    if (!rackLogScrollList || !rackLogGraphContainer) return;
+    if (state.viewGraphHistory) {
+      rackLogScrollList.style.display = "none";
+      rackLogGraphContainer.style.display = "flex";
+      if (btnToggleGraphView) btnToggleGraphView.classList.add("active");
+      if (graphToggleIcon) graphToggleIcon.textContent = "format_list_bulleted";
+      if (graphToggleBtnText) graphToggleBtnText.textContent = t("list_view");
+      renderRackHistoryGraph();
+    } else {
+      rackLogScrollList.style.display = "block";
+      rackLogGraphContainer.style.display = "none";
+      if (btnToggleGraphView) btnToggleGraphView.classList.remove("active");
+      if (graphToggleIcon) graphToggleIcon.textContent = "show_chart";
+      if (graphToggleBtnText) graphToggleBtnText.textContent = t("graph_view");
+      renderRackLog();
+    }
+  }
+
+  if (btnToggleGraphView) {
+    btnToggleGraphView.addEventListener("click", toggleGraphView);
+  }
+
+  // ═══════════════ UI ZOOM SCALE ENGINE ═══════════════
+  const ZOOM_PRESETS = [0.75, 0.85, 0.90, 1.00, 1.10, 1.25, 1.40, 1.50];
+
+  function setAppZoom(scale) {
+    const clamped = Math.max(0.75, Math.min(1.50, Math.round(scale * 100) / 100));
+    state.zoomScale = clamped;
+    document.documentElement.style.setProperty("--app-zoom", clamped);
+    document.documentElement.style.zoom = clamped;
+
+    const pct = `${Math.round(clamped * 100)}%`;
+    if (zoomLevelDisplay) zoomLevelDisplay.textContent = pct;
+    const burgerZoomDisplay = $("burgerZoomDisplay");
+    if (burgerZoomDisplay) burgerZoomDisplay.textContent = pct;
+
+    document.documentElement.classList.toggle("is-zoomed-in", clamped > 1.05);
+    document.documentElement.classList.toggle("is-zoomed-out", clamped < 0.95);
+
+    try {
+      localStorage.setItem("score_app_zoom_v1", clamped.toString());
+    } catch {}
+  }
+
+  function stepZoom(direction) {
+    tactileFeedback();
+    const curr = state.zoomScale || 1.0;
+    let target = curr;
+    if (direction > 0) {
+      target = ZOOM_PRESETS.find(p => p > curr + 0.02) || ZOOM_PRESETS[ZOOM_PRESETS.length - 1];
+    } else {
+      const reversed = [...ZOOM_PRESETS].reverse();
+      target = reversed.find(p => p < curr - 0.02) || ZOOM_PRESETS[0];
+    }
+    setAppZoom(target);
+    showToast(`${t("burger_zoom")}: ${Math.round(target * 100)}%`);
+  }
+
+  if (btnZoomOut) btnZoomOut.addEventListener("click", () => stepZoom(-1));
+  if (btnZoomIn) btnZoomIn.addEventListener("click", () => stepZoom(1));
+  if (zoomLevelDisplay) zoomLevelDisplay.addEventListener("click", () => {
+    tactileFeedback();
+    setAppZoom(1.0);
+    showToast(`${t("burger_zoom")}: 100%`);
+  });
+  if (btnBurgerZoomOut) btnBurgerZoomOut.addEventListener("click", () => stepZoom(-1));
+  if (btnBurgerZoomIn) btnBurgerZoomIn.addEventListener("click", () => stepZoom(1));
+
+  // ═══════════════ BURGER CONTROLS MENU ENGINE ═══════════════
+  function openBurgerMenu() {
+    tactileFeedback();
+    syncBurgerMenuState();
+    const burgerMenuBackdrop = $("burgerMenuBackdrop");
+    if (!burgerMenuBackdrop) return;
+    burgerMenuBackdrop.style.display = "flex";
+    void burgerMenuBackdrop.offsetWidth;
+    burgerMenuBackdrop.classList.add("open");
+  }
+
+  function closeBurgerMenu() {
+    const burgerMenuBackdrop = $("burgerMenuBackdrop");
+    if (!burgerMenuBackdrop) return;
+    burgerMenuBackdrop.classList.remove("open");
+    setTimeout(() => {
+      burgerMenuBackdrop.style.display = "none";
+    }, 200);
+  }
+
+  function syncBurgerMenuState() {
+    const mState = getModeState();
+    const btnBurgerUndo = $("btnBurgerUndo");
+    const btnBurgerRedo = $("btnBurgerRedo");
+    if (btnBurgerUndo) btnBurgerUndo.disabled = mState.undoStack.length === 0;
+    if (btnBurgerRedo) btnBurgerRedo.disabled = mState.redoStack.length === 0;
+
+    const burgerFullscreenIcon = $("burgerFullscreenIcon");
+    if (burgerFullscreenIcon) {
+      burgerFullscreenIcon.textContent = document.fullscreenElement ? "fullscreen_exit" : "fullscreen";
+    }
+
+    const burgerRowPoolFormat = $("burgerRowPoolFormat");
+    if (burgerRowPoolFormat) {
+      burgerRowPoolFormat.style.display = state.activeMode === "tournament" ? "flex" : "none";
+    }
+    const burgerPoolFormatText = $("burgerPoolFormatText");
+    if (burgerPoolFormatText) {
+      burgerPoolFormatText.textContent = state.tournament.format === "chinese" ? "Chinese (+4/+7/+10)" : "American (±1)";
+    }
+
+    const burgerRowStakes = $("burgerRowStakes");
+    if (burgerRowStakes) {
+      burgerRowStakes.style.display = state.activeMode === "cash" ? "flex" : "none";
+    }
+    const burgerStakesText = $("burgerStakesText");
+    if (burgerStakesText) {
+      burgerStakesText.textContent = `$${state.cash.stakeRate.toFixed(2)} / pt`;
+    }
+
+    const burgerLangText = $("burgerLangText");
+    if (burgerLangText) {
+      burgerLangText.textContent = state.lang === "vi" ? "Tiếng Việt (VI)" : "English (EN)";
+    }
+
+    const btnBurgerSound = $("btnBurgerSound");
+    const burgerSoundIcon = $("burgerSoundIcon");
+    if (btnBurgerSound) {
+      btnBurgerSound.classList.toggle("active", state.soundEnabled);
+      btnBurgerSound.setAttribute("aria-pressed", state.soundEnabled ? "true" : "false");
+    }
+    if (burgerSoundIcon) {
+      burgerSoundIcon.textContent = state.soundEnabled ? "volume_up" : "volume_off";
+    }
+
+    const burgerThemeText = $("burgerThemeText");
+    const burgerThemeIcon = $("burgerThemeIcon");
+    const isDark = document.documentElement.classList.contains("dark");
+    if (burgerThemeText) {
+      burgerThemeText.textContent = isDark ? "Dark Theme" : "Light Theme";
+    }
+    if (burgerThemeIcon) {
+      burgerThemeIcon.textContent = isDark ? "dark_mode" : "light_mode";
+    }
+
+    const burgerZoomDisplay = $("burgerZoomDisplay");
+    if (burgerZoomDisplay) {
+      burgerZoomDisplay.textContent = `${Math.round((state.zoomScale || 1.0) * 100)}%`;
+    }
+  }
+
+  if (btnBurgerMenu) btnBurgerMenu.addEventListener("click", openBurgerMenu);
+  if (btnCloseBurgerMenu) btnCloseBurgerMenu.addEventListener("click", closeBurgerMenu);
+  if (burgerMenuBackdrop) {
+    burgerMenuBackdrop.addEventListener("click", (e) => {
+      if (e.target === burgerMenuBackdrop) closeBurgerMenu();
+    });
+  }
+
+  if (btnBurgerUndo) {
+    btnBurgerUndo.addEventListener("click", () => {
+      handleUndoAction();
+      syncBurgerMenuState();
+    });
+  }
+  if (btnBurgerRedo) {
+    btnBurgerRedo.addEventListener("click", () => {
+      handleRedoAction();
+      syncBurgerMenuState();
+    });
+  }
+  if (btnBurgerFullscreen) {
+    btnBurgerFullscreen.addEventListener("click", () => {
+      toggleFullscreen();
+      syncBurgerMenuState();
+    });
+  }
+  if (btnBurgerReset) {
+    btnBurgerReset.addEventListener("click", () => {
+      closeBurgerMenu();
+      resetAllScoresQuick();
+    });
+  }
+  if (btnBurgerPoolFormat) {
+    btnBurgerPoolFormat.addEventListener("click", () => {
+      togglePoolFormat();
+      syncBurgerMenuState();
+    });
+  }
+  if (btnBurgerStakes) {
+    btnBurgerStakes.addEventListener("click", () => {
+      closeBurgerMenu();
+      openStakesModal();
+    });
+  }
+  if (btnBurgerLang) {
+    btnBurgerLang.addEventListener("click", () => {
+      toggleLang();
+      syncBurgerMenuState();
+    });
+  }
+  if (btnBurgerSound) {
+    btnBurgerSound.addEventListener("click", () => {
+      toggleSound();
+      syncBurgerMenuState();
+    });
+  }
+  if (btnBurgerTheme) {
+    btnBurgerTheme.addEventListener("click", () => {
+      toggleTheme();
+      syncBurgerMenuState();
+    });
+  }
+  if (btnBurgerGuide) {
+    btnBurgerGuide.addEventListener("click", () => {
+      closeBurgerMenu();
+      openTutorial();
+    });
+  }
+  if (btnBurgerInfo) {
+    btnBurgerInfo.addEventListener("click", () => {
+      closeBurgerMenu();
+      openInfoModal();
     });
   }
 
@@ -2241,11 +2907,15 @@
 
   // ═══════════════ KEYBOARD SHORTCUTS ═══════════════
   function anyModalOpen() {
-    return [stakesModal, infoModal, tutorialModal].some((m) => m && m.classList.contains("open"));
+    return [burgerMenuBackdrop, stakesModal, infoModal, tutorialModal].some((m) => m && (m.classList.contains("open") || m.style.display === "flex"));
   }
 
   /** Closes the topmost overlay. @returns {boolean} true when something closed */
   function closeTopModal() {
+    if (burgerMenuBackdrop && burgerMenuBackdrop.classList.contains("open")) {
+      closeBurgerMenu();
+      return true;
+    }
     if (tutorialModal && tutorialModal.classList.contains("open")) {
       closeTutorial();
       return true;
@@ -2424,13 +3094,25 @@
 
     soundIcon.textContent = state.soundEnabled ? "volume_up" : "volume_off";
 
-    // Restore extended history preference
+    // Restore UI Zoom preference
+    const savedZoom = localStorage.getItem("score_app_zoom_v1");
+    if (savedZoom) {
+      const parsedZoom = parseFloat(savedZoom);
+      if (Number.isFinite(parsedZoom) && parsedZoom >= 0.75 && parsedZoom <= 1.5) {
+        state.zoomScale = parsedZoom;
+      }
+    }
+    setAppZoom(state.zoomScale || 1.0);
+
+    // Restore extended history & graph view preferences
     if (rackLogDrawer) {
       rackLogDrawer.classList.toggle("show-extended", !!state.showExtendedHistory);
     }
     if (btnToggleExtendedHistory) {
       btnToggleExtendedHistory.classList.toggle("active", !!state.showExtendedHistory);
     }
+    syncGraphViewState();
+    syncBurgerMenuState();
 
     resetBlurCountdown();
 
