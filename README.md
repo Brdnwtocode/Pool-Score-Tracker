@@ -56,11 +56,26 @@ relative, so it works from a subpath such as
 Service workers require **http(s)** — they are skipped on `file://`, where the
 app still runs fine but cannot be installed or used offline.
 
-### Local check
+### Local Server & Development
 
-```powershell
-c:/python314/python.exe -m http.server 8177 --bind 127.0.0.1
-# then open http://127.0.0.1:8177/
+Double-click `run-server.cmd` (or run in CMD / PowerShell):
+
+```cmd
+run-server.cmd
+```
+
+- **Dynamic Port Selection**: Never gets blocked if port 8000 is occupied; automatically binds to the next free port (`8001`, `8002`...).
+- **Port Inspection & Scanner**: Scans system ports, identifies process PIDs & names, and detects if an instance of 21N2 Scoreboard is already running.
+- **Mobile Wi-Fi Access**: Displays your local network IP (e.g. `http://192.168.1.99:8000/`) so you can load and install the PWA directly on your phone.
+- **PWA Dev Friendly**: Supplies proper MIME types (`.webmanifest`, `.woff2`, `.js`) with no-cache headers for instant updates.
+
+**Useful Commands:**
+```cmd
+run-server.cmd            # Auto-detects free port starting from 8000 & opens browser
+run-server.cmd 8080       # Starts on specific port (e.g. 8080)
+run-server.cmd --scan     # Scans and displays all active listening servers
+run-server.cmd --kill     # Stops any running 21N2 Scoreboard server instances
+run-server.cmd --no-browser # Starts server without auto-opening the default browser
 ```
 
 ## Install on a device
